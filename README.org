@@ -1,0 +1,32 @@
+* Cl-ownpress 
+
+#+begin_quote
+Convert inputs to outputs.
+#+end_quote
+
+To elaborate a bit further:
+
+1. Collect inputs from anywhere. e.g tweets, local org files, Reddit/HN comments
+2. Process the inputs to produce outputs e.g convert them to HTML files
+
+That's it folks. clownpress is a general framework that shall allow you to do
+just that, and only that.
+
+It is not an "I don't know what I am doing" end-user software, it is meant to
+maximize hackability. Code is the UI.
+
+** Usage
+
+** Installation
+
+** Author
+
++ Charanjit Singh
+
+** Copyright
+
+Copyright (c) 2022 Charanjit Singh
+
+** License
+
+Licensed under the AGPL License.
