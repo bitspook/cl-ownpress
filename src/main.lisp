@@ -2,19 +2,6 @@
   (:use :cl :cl-ownpress.db))
 (in-package :cl-ownpress)
 
-(ql:quickload '(:cl-migratum
-                :cl-migratum.provider.local-path
-                :cl-migratum.driver.dbi
-                :cl-dbi
-                :log4cl
-                :lass
-                :cffi))
-
-(log:config :debug)
-
-(setf cffi::*foreign-library-directories*
-      (cffi::explode-path-environment-variable "CLOWN_LIBRARY_PATH"))
-
 (defclass provider ()
   ((name
     :type string
@@ -31,6 +18,8 @@
      :name "org-roam-provider"))
 
 (defmethod invoke-provider ((provider (eql *org-roam-provider*)) &key)
-  (let ((script-path "./providers/org-roam/org-roam.el")
+  (let ((script-path (asdf:system-relative-pathname "cl-ownpress" "./src/providers/org-roam/org-roam.el"))
         (db-name (dbi:connection-database-name *conn*)))
-    (uiop:run-program (format nil "emacs --script ~s ~s" script-path db-name))))
+    (uiop:run-program (format nil "emacs --script ~a ~a" script-path db-name)
+                      :output *standard-output*
+                      :error-output *standard-output*)))

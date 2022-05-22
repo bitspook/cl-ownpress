@@ -4,13 +4,17 @@
   :license "AGPL"
   :depends-on ("cl-dbi"
                "cl-migratum"
+               "cl-migratum.provider.local-path"
+               "cl-migratum.driver.dbi"
                "lass"
                "log4cl"
                "cffi")
   :components ((:module "src"
+                :serial t
                 :components
-                ((:file "db")
-                 (:file "main" :depends-on ("db")))))
+                ((:file "setup")
+                 (:file "db")
+                 (:file "main"))))
   :description ""
   :in-order-to ((test-op (test-op "cl-ownpress/tests"))))
 
