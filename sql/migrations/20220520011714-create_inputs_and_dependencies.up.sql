@@ -8,6 +8,7 @@ CREATE TABLE IF NOT EXISTS inputs (
   provider TEXT NOT NULL,
   title TEXT,
   tags JSON,                     -- An array
+  metadata JSON,
   content TEXT,                  -- Content of *some* inputs
   published_at TEXT
 );

@@ -24,7 +24,7 @@
 (require 'org-roam)
 (require 'org)
 
-(defvar clown--control-tags '("blog-post" "draft" "published")
+(defvar *clown-control-tags* '("blog-post" "draft" "published")
   "Tags meant for controlling publishing.
 Which themselves should be not be published.")
 
@@ -42,16 +42,45 @@ Which themselves should be not be published.")
   "Get slug for org-roam NODE."
   (string-replace "_" "-" (org-roam-node-slug node)))
 
+(defun clown--get-org-file-props (filename)
+  "Get file-level org props for FILENAME."
+  (with-temp-buffer
+    (insert-file filename)
+    (org-element-map (org-element-parse-buffer 'greater-element)
+        '(keyword)
+      (lambda (kwd)
+        (let ((data (cadr kwd)))
+          (list (plist-get data :key)
+                (plist-get data :value)))))))
+
+(defun clown--get-post-meta (org-file)
+  "Get post metadata for org file with ORG-FILE published to PUBLISHED-FILE."
+  (let* ((props (clown--get-org-file-props org-file))
+         (props (seq-map
+                 (lambda (pcell)
+                   (let ((key (downcase (car pcell)))
+                         (val (cadr pcell)))
+                     (pcase key
+                       ("date" (cons 'date (format-time-string "%Y-%m-%d %H:%M:%S" (org-time-string-to-time val))))
+                       ("filetags" (cons 'tags (split-string val " " t "[ \t]")))
+                       (_ (cons (intern key) val)))))
+                 props)))
+
+    (when (not (assq 'date props))
+      (push (cons 'date (format-time-string "%Y-%m-%d %H:%M:%S" (current-time))) props))
+
+    props))
+
 (defun clown--collect-node (node)
   "Collect a single org-roam NODE."
-  `((id . ,(org-roam-node-id node))
-    (slug . ,(clown--node-slug node))
-    (title . ,(org-roam-node-title node))
-    (tags . ,(org-roam-node-tags node))
-    (content . ,(org-file-contents (org-roam-node-file node)))))
-
-(clown--collect-node
- (car (seq-take (clown--roam-nodes-with-tags '("blog-post")) 1)))
+  (let ((meta (clown--get-post-meta (org-roam-node-file node))))
+    `((id . ,(org-roam-node-id node))
+      (slug . ,(or (alist-get 'slug meta) (clown--node-slug node)))
+      (title . ,(alist-get 'title meta))
+      (tags . ,(json-encode-list (alist-get 'tags meta)))
+      (metadata . ,(json-encode-alist meta))
+      (published-at . ,(alist-get 'date meta))
+      (content . ,(org-file-contents (org-roam-node-file node))))))
 
 (defun clown--collect ()
   "Collect all the org-roam notes which should be published.
@@ -67,11 +96,16 @@ Along with their dependencies."
                         (alist-get 'slug row)
                         (alist-get 'title row)
                         (alist-get 'content row)
-                        (concat "[" (string-join (mapcar (lambda (tag) (format "\"%s\"" tag)) (alist-get 'tags row)) ",") "]")
+                        (alist-get 'metadata row)
+                        (alist-get 'tags row)
+                        (alist-get 'published-at row)
                         *provider-name*))
                 (clown--collect))))
   (cl-dolist (row values)
     (sqlite-execute db
-                    "INSERT OR REPLACE INTO inputs (id, slug, title, content, tags, provider) VALUES (?, ?, ?, ?, ?, ?)"
+                    "INSERT OR REPLACE INTO inputs
+                      (id, slug, title, content, metadata, tags, published_at, provider) VALUES
+                      (?, ?, ?, ?, ?, ?, ?, ?)
+                    "
                     row))
   (message "Done! org-roam blog posts are now in %s" db-name))
