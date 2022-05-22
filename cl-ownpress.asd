@@ -4,10 +4,13 @@
   :license "AGPL"
   :depends-on ("cl-dbi"
                "cl-migratum"
-               "lass")
+               "lass"
+               "log4cl"
+               "cffi")
   :components ((:module "src"
                 :components
-                ((:file "main"))))
+                ((:file "db")
+                 (:file "main" :depends-on ("db")))))
   :description ""
   :in-order-to ((test-op (test-op "cl-ownpress/tests"))))
 

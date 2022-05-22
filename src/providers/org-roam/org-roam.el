@@ -44,15 +44,16 @@ Which themselves should be not be published.")
   "Get slug for org-roam NODE."
   (string-replace "_" "-" (org-roam-node-slug node)))
 
-(org-roam-node-properties
- (car (seq-take (clown--roam-nodes-with-tags '("blog-post")) 1)))
-
 (defun clown--collect-node (node)
   "Collect a single org-roam NODE."
-  (let ((title (org-roam-node-title node))
-        (slug (clown--node-slug node))
-        (content (org-file-contents (org-roam-node-file node))))
-    (list slug title content)))
+  `((id . ,(org-roam-node-id node))
+    (slug . ,(clown--node-slug node))
+    (title . ,(org-roam-node-title node))
+    (tags . ,(org-roam-node-tags node))
+    (content . ,(org-file-contents (org-roam-node-file node)))))
+
+(clown--collect-node
+ (car (seq-take (clown--roam-nodes-with-tags '("blog-post")) 1)))
 
 (defun clown--collect ()
   "Collect all the org-roam notes which should be published.
@@ -63,11 +64,17 @@ Along with their dependencies."
 (let* ((db-name (car argv))
        (db (emacsql-sqlite db-name))
        (values (mapcar
-                (lambda (row) (vector (car row) (cadr row) (caddr row) *provider-name*))
+                (lambda (row)
+                  (vector (alist-get 'id row)
+                          (alist-get 'slug row)
+                          (alist-get 'title row)
+                          (alist-get 'content row)
+                          (alist-get 'tags row)
+                          *provider-name*))
                 (clown--collect))))
   (emacsql db [:insert
                :or :replace
-               :into inputs [slug title content provider]
+               :into inputs [id slug title content tags provider]
                :values $v1]
            values)
   (message "Done! org-roam blog posts are now in %s" db-name))

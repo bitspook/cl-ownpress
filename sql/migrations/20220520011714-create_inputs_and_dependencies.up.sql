@@ -3,13 +3,13 @@
 -- description: create_inputs_and_dependencies
 
 CREATE TABLE IF NOT EXISTS inputs (
-  slug TEXT PRIMARY KEY NOT NULL,
-  title TEXT,
-  published_at TEXT,
+  id TEXT PRIMARY KEY NOT NULL, -- Uniquely identify an input, in case we want to allow changing slugs in future
+  slug TEXT UNIQUE NOT NULL,
   provider TEXT NOT NULL,
-  is_deleted BOOLEAN,
-  metadata JSON,
-  content NULL                  -- Content of *some* inputs
+  title TEXT,
+  tags JSON,                     -- An array
+  content TEXT,                  -- Content of *some* inputs
+  published_at TEXT
 );
 --;;
 CREATE TABLE IF NOT EXISTS dependencies (
