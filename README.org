@@ -15,18 +15,33 @@ just that, and only that.
 It is not an "I don't know what I am doing" end-user software, it is meant to
 maximize hackability. Code is the UI.
 
-** Usage
+* Architecture
 
-** Installation
+1. <<Provider>>
 
-** Author
+   Providers are instances of =provider= class. Job of a provider is to:
 
-+ Charanjit Singh
+   #+begin_quote
+   collect [[input][inputs]] and their [[dependency][dependencies]] directly into the database
+   #+end_quote
 
-** Copyright
+   A provider when invoked can do whatever is necessary to build a dependency
+   graph for everything that should be published.
 
-Copyright (c) 2022 Charanjit Singh
+2. <<Builder>>
 
-** License
+   A Builder is an instance of =builder= class. Job of a builder is to:
 
-Licensed under the AGPL License.
+   #+begin_quote
+   convert an input to a publishable asset
+   #+end_quote
+
+Clownpress itself is an orchestrator, which provides a framework for building a
+dependency tree of inputs provided by providers, and then resolves the
+dependency tree into publishable assets built by builders. 
+
+** Glossary
+- <<input>> : A file which should be built to produce a publishable asset
+- <<dependency>> : A file which must be built before an [[input]]
+- [[Provider]]
+- [[Builder]]

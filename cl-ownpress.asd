@@ -18,6 +18,7 @@
                "rove")
   :components ((:module "tests"
                 :components
-                ((:file "main"))))
+                ((:file "db")
+                 (:file "main" :depends-on ("db")))))
   :description "Test system for cl-ownpress"
   :perform (test-op (op c) (symbol-call :rove :run c)))
