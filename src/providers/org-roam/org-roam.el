@@ -22,8 +22,6 @@
 (require 'seq)
 (require 'cl-lib)
 (require 'org-roam)
-(require 'emacsql)
-(require 'emacsql-sqlite)
 (require 'org)
 
 (defvar clown--control-tags '("blog-post" "draft" "published")
@@ -62,19 +60,18 @@ Along with their dependencies."
     (mapcar #'clown--collect-node blog-posts-to-publish)))
 
 (let* ((db-name (car argv))
-       (db (emacsql-sqlite db-name))
+       (db (sqlite-open db-name))
        (values (mapcar
                 (lambda (row)
-                  (vector (alist-get 'id row)
-                          (alist-get 'slug row)
-                          (alist-get 'title row)
-                          (alist-get 'content row)
-                          (alist-get 'tags row)
-                          *provider-name*))
+                  (list (alist-get 'id row)
+                        (alist-get 'slug row)
+                        (alist-get 'title row)
+                        (alist-get 'content row)
+                        (concat "[" (string-join (mapcar (lambda (tag) (format "\"%s\"" tag)) (alist-get 'tags row)) ",") "]")
+                        *provider-name*))
                 (clown--collect))))
-  (emacsql db [:insert
-               :or :replace
-               :into inputs [id slug title content tags provider]
-               :values $v1]
-           values)
+  (cl-dolist (row values)
+    (sqlite-execute db
+                    "INSERT OR REPLACE INTO inputs (id, slug, title, content, tags, provider) VALUES (?, ?, ?, ?, ?, ?)"
+                    row))
   (message "Done! org-roam blog posts are now in %s" db-name))
