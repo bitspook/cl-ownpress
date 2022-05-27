@@ -8,7 +8,8 @@
                 :cl-dbi
                 :log4cl
                 :lass
-                :cffi))
+                :cffi
+                :spinneret))
 
 (log:config :debug)
 

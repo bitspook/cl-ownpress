@@ -8,7 +8,8 @@
                "cl-migratum.driver.dbi"
                "lass"
                "log4cl"
-               "cffi")
+               "cffi"
+               "spinneret")
   :components ((:module "src"
                 :serial t
                 :components

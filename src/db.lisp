@@ -1,4 +1,5 @@
 (defpackage cl-ownpress.db
+  (:nicknames :clown.db)
   (:use :cl)
   (:export *conn*
            create-new-migration))
