@@ -9,7 +9,9 @@
                 :log4cl
                 :lass
                 :cffi
-                :spinneret))
+                :spinneret
+                :str
+                :ppath))
 
 (log:config :debug)
 

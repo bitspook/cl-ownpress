@@ -15,7 +15,12 @@
                 :components
                 ((:file "setup")
                  (:file "db")
-                 (:file "main"))))
+                 (:file "main")))
+               (:module "clown-slick"
+                :pathname "src/publishers/slick"
+                :serial t
+                :components
+                ((:file "slick"))))
   :description ""
   :in-order-to ((test-op (test-op "cl-ownpress/tests"))))
 
