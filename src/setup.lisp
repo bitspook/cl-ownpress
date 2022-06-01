@@ -11,7 +11,8 @@
                 :cffi
                 :spinneret
                 :str
-                :ppath))
+                :ppath
+                :osicat))
 
 (log:config :debug)
 
