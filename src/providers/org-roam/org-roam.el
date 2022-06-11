@@ -23,6 +23,7 @@
 (require 'cl-lib)
 (require 'org-roam)
 (require 'org)
+(require 'jsonrpc)
 
 (defvar *clown-control-tags* '("blog-post" "draft" "published")
   "Tags meant for controlling publishing.
@@ -74,13 +75,13 @@ Which themselves should be not be published.")
 (defun clown--collect-node (node)
   "Collect a single org-roam NODE."
   (let ((meta (clown--get-post-meta (org-roam-node-file node))))
-    `((id . ,(org-roam-node-id node))
-      (slug . ,(or (alist-get 'slug meta) (clown--node-slug node)))
-      (title . ,(alist-get 'title meta))
-      (tags . ,(json-encode-list (alist-get 'tags meta)))
-      (metadata . ,(json-encode-alist meta))
-      (published-at . ,(alist-get 'date meta))
-      (content . ,(org-file-contents (org-roam-node-file node))))))
+    `(:id ,(org-roam-node-id node)
+      :slug ,(or (alist-get 'slug meta) (clown--node-slug node))
+      :title ,(alist-get 'title meta)
+      :tags ,(json-encode-list (alist-get 'tags meta))
+      :metadata ,(json-encode-alist meta)
+      :published-at ,(alist-get 'date meta)
+      :content ,(org-file-contents (org-roam-node-file node)))))
 
 (defun clown--collect ()
   "Collect all the org-roam notes which should be published.
@@ -88,24 +89,21 @@ Along with their dependencies."
   (let* ((blog-posts-to-publish (clown--roam-nodes-with-tags '("blog-post" "published"))))
     (mapcar #'clown--collect-node blog-posts-to-publish)))
 
-(let* ((db-name (car argv))
-       (db (sqlite-open db-name))
-       (values (mapcar
-                (lambda (row)
-                  (list (alist-get 'id row)
-                        (alist-get 'slug row)
-                        (alist-get 'title row)
-                        (alist-get 'content row)
-                        (alist-get 'metadata row)
-                        (alist-get 'tags row)
-                        (alist-get 'published-at row)
-                        *provider-name*))
-                (clown--collect))))
-  (cl-dolist (row values)
-    (sqlite-execute db
-                    "INSERT OR REPLACE INTO inputs
-                      (id, slug, title, content, metadata, tags, published_at, provider) VALUES
-                      (?, ?, ?, ?, ?, ?, ?, ?)
-                    "
-                    row))
-  (message "Done! org-roam blog posts are now in %s" db-name))
+(defun main ()
+  (defvar conn (make-network-process :name "clown-rpc"
+                                     :buffer nil
+                                     :host "localhost"
+                                     :service 8192))
+
+
+  (let ((inputs (clown--collect)))
+    (cl-dolist (input inputs)
+      (process-send-string conn (json-encode input))
+      (process-send-string conn "<<<<RPC-EOM>>>>")))
+
+  (process-send-string conn "DONE")
+  (process-send-string conn "<<<<RPC-EOM>>>>")
+
+  (delete-process conn))
+
+(main)

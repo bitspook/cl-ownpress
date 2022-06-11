@@ -1,6 +1,6 @@
 (defpackage "cl-ownpress.publishers.slick"
   (:nicknames :clown-slick)
-  (:use :cl)
+  (:use :cl :cl-ownpress.db)
   (:shadowing-import-from :spinneret :with-html-string))
 (in-package :clown-slick)
 
@@ -29,6 +29,14 @@
           (:ul (:li (:a :href "/blog" "Blog"))
                (:li (:a :href "/poems" "Poems"))
                (:li (:a :href (conf 'github) "Projects"))))))
+
+(loop :for row := (dbi:fetch
+                   (dbi:prepare *conn*
+                                (sxql:yield
+                                 (sxql:select (:id :slug :title)
+                                   (sxql:from :inputs)))))
+      :while row
+      :do (format t "~a" row))
 
 (defun home-tree ()
   `(:div :class "home"

@@ -12,9 +12,15 @@
                 :spinneret
                 :str
                 :ppath
-                :osicat))
+                :osicat
+                :sxql
+                :lparallel
+                :usocket
+                :yason))
 
 (log:config :debug)
 
 (setf cffi::*foreign-library-directories*
       (cffi::explode-path-environment-variable "CLOWN_LIBRARY_PATH"))
+
+(setf lparallel:*kernel* (lparallel:make-kernel 4))
