@@ -9,18 +9,20 @@
                "lass"
                "log4cl"
                "cffi"
-               "spinneret")
+               "spinneret"
+               "str"
+               "ppath"
+               "osicat"
+               "sxql"
+               "lparallel"
+               "usocket"
+               "yason")
   :components ((:module "src"
                 :serial t
                 :components
                 ((:file "setup")
                  (:file "db")
-                 (:file "main")))
-               (:module "clown-slick"
-                :pathname "src/publishers/slick"
-                :serial t
-                :components
-                ((:file "slick"))))
+                 (:file "main"))))
   :description ""
   :in-order-to ((test-op (test-op "cl-ownpress/tests"))))
 
