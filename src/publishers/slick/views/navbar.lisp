@@ -1,0 +1,59 @@
+(defpackage :clown-slick.views.navbar
+  (:use :cl :clown-slick.config)
+  (:import-from :clown-slick.config conf *debug-transpiles*)
+  (:import-from :clown-slick.css
+                font-defs
+                css-var
+                css-color
+                top-level-defs
+                button-defs
+                to-css-str)
+  (:export navbar-))
+(in-package :clown-slick.views.navbar)
+
+(defun navbar-tree ()
+  `(:nav :class "top-nav"
+         (:div :class "brand"
+               (:a :href "/"
+                   (:img :class "brand-avatar"
+                         :src (conf 'avatar)
+                         :alt (conf 'author))))
+         (:div
+          (:ul (:li (:a :href "/blog" "Blog"))
+               (:li (:a :href "/poems" "Poems"))
+               (:li (:a :href (conf 'github) "Projects"))))))
+
+(defun navbar-defs ()
+  `((.top-nav
+     :height 90px
+     :display flex
+     :position relative
+     :justify-content space-between
+
+     (ul :list-style-type none
+         :display flex
+         :align-items center
+         :padding 2em 0)
+
+     (li :flex-grow 1
+         :padding-right 2em
+
+         (a :text-decoration underline
+            :font-size 1.4em
+            :font-family Roboto sans-serif
+            :color ,(css-color :primary))
+
+         ("a:hover" :color ,(css-color :secondary)))
+
+     ("li:last-child" :padding 0)
+
+     (.brand :width 60px
+             :height 60px
+             :align-self center
+             :flex-grow 1)
+
+     (.brand-avatar :height 100%))
+    (:media ,(format nil "(max-width: ~a)" (css-var 'width-sm))
+            (.top-nav :padding-right 1em
+                      (a :font-size 1.2em)))
+    ,@(adjustable-width ".top-nav")))

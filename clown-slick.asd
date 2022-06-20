@@ -11,5 +11,6 @@
   :components ((:file "config")
                (:file "css")
                (:file "views/home")
+               (:file "views/navbar")
                (:file "slick"))
   :description "")
