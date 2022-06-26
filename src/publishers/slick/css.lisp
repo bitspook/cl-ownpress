@@ -1,7 +1,7 @@
 (defpackage :clown-slick.css
   (:nicknames :slick.css)
   (:use :cl)
-  (:import-from :clown-slick.config *debug-transpiles*)
+  (:import-from :clown-slick.conf *debug-transpiles*)
   (:export *css-vars*
            css-var
            css-color

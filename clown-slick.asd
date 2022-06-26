@@ -8,8 +8,9 @@
                "spinneret")
   :pathname "src/publishers/slick"
   :serial t
-  :components ((:file "config")
+  :components ((:file "conf")
                (:file "css")
+               (:file "views/package")
                (:file "views/home")
                (:file "views/navbar")
                (:file "slick"))

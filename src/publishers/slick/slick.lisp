@@ -1,7 +1,5 @@
 (defpackage :clown-slick
-  (:use :cl :cl-ownpress.db
-        :clown-slick.config
-   :clown-slick.views.home)
+  (:use :cl :cl-ownpress.db :clown-slick.conf)
   (:import-from :spinneret :with-html-string)
   (:export build))
 (in-package :clown-slick)
@@ -35,4 +33,4 @@
     (copy-dirs assets-dir dest-assets-dir)
 
     (write-html-to-file
-     (ppath:join dest "index.html") (home-html) :clean-urls? clean-urls?)))
+     (ppath:join dest "index.html") (slick-views:home) :clean-urls? clean-urls?)))

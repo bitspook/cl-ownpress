@@ -1,16 +1,4 @@
-(defpackage :clown-slick.views.home
-  (:use :cl)
-  (:import-from :spinneret :with-html-string)
-  (:import-from :clown-slick.config conf *debug-transpiles*)
-  (:import-from :clown-slick.css
-                font-defs
-                css-var
-                css-color
-                top-level-defs
-                button-defs
-                to-css-str)
-  (:export home-html))
-(in-package :clown-slick.views.home)
+(in-package :clown-slick.views)
 
 (defun home-defs ()
   `((:media ,(format nil "(max-width: ~a)" (css-var 'width-md))
@@ -194,7 +182,7 @@
                                    :href "/archive"
                                    "See all"))))))
 
-(defmacro home-html ()
+(defmacro home ()
   (let ((body (home-tree)))
     `(let ((spinneret:*suppress-inserted-spaces* t)
            (spinneret:*html-style* (if *debug-transpiles* :human :tree))

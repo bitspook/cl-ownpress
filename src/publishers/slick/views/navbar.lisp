@@ -1,15 +1,4 @@
-(defpackage :clown-slick.views.navbar
-  (:use :cl :clown-slick.config)
-  (:import-from :clown-slick.config conf *debug-transpiles*)
-  (:import-from :clown-slick.css
-                font-defs
-                css-var
-                css-color
-                top-level-defs
-                button-defs
-                to-css-str)
-  (:export navbar-))
-(in-package :clown-slick.views.navbar)
+(in-package :clown-slick.views)
 
 (defun navbar-tree ()
   `(:nav :class "top-nav"

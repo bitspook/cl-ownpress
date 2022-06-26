@@ -1,8 +1,7 @@
-(defpackage :clown-slick.config
+(defpackage :clown-slick.conf
   (:use :cl)
-  (:export config
-           *debug-transpiles*))
-(in-package :clown-slick.config)
+  (:export conf *debug-transpiles*))
+(in-package :clown-slick.conf)
 
 (defparameter *conf*
   '((author . "Charanjit Singh")
