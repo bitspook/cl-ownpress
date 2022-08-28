@@ -46,3 +46,5 @@
             (.top-nav :padding-right 1em
                       (a :font-size 1.2em)))
     ,@(adjustable-width ".top-nav")))
+
+(defun navbar () nil)

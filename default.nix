@@ -3,7 +3,7 @@
 }:
 pkgs.mkShell {
   buildInputs = with pkgs; [
-    sbcl
+    # sbcl
     sqlite
     sqlitebrowser
     emacs

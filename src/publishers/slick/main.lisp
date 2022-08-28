@@ -1,7 +1,3 @@
-(defpackage :clown-slick
-  (:use :cl :cl-ownpress.db :clown-slick.conf)
-  (:import-from :spinneret :with-html-string)
-  (:export build))
 (in-package :clown-slick)
 
 (defun write-html-to-file (dest html &key clean-urls?)
@@ -19,7 +15,7 @@
                     :output *standard-output*
                     :error-output *standard-output*))
 
-(defun build (dest &key clean-dest? clean-urls?)
+(defun main (dest &key clean-dest? clean-urls?)
   "Use slick publisher to build a publishable bundle to DEST"
   (let ((dest (if (str:ends-with? "/" dest) dest (str:concat dest "/")))
         (assets-dir "./assets/")
@@ -34,3 +30,13 @@
 
     (write-html-to-file
      (ppath:join dest "index.html") (slick-views:home) :clean-urls? clean-urls?)))
+
+(defun publish-all-posts ()
+  (let* ((query (sxql:yield
+                 (sxql:select (:*)
+                   (sxql:from :inputs))))
+         (conn (clown:make-connection))
+         (query (dbi:execute (dbi:prepare conn query))))
+    (loop :for row := (dbi:fetch query)
+          :while row
+          :collect (slick-views:post row))))

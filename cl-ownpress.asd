@@ -20,8 +20,20 @@
   :components ((:module "src"
                 :serial t
                 :components
-                ((:file "setup")
-                 (:file "db")
+                ((:file "package")
+                 (:file "main")))
+               (:module "src/publishers/slick"
+                :serial t
+                :components
+                ((:file "package")
+                 (:file "css")
+                 (:module "views"
+                  :serial t
+                  :components
+                  ((:file "package")
+                   (:file "navbar")
+                   (:file "home")
+                   (:file "post")))
                  (:file "main"))))
   :description ""
   :in-order-to ((test-op (test-op "cl-ownpress/tests"))))

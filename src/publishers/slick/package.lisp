@@ -1,7 +1,17 @@
-(defpackage :clown-slick.conf
+(defpackage :clown-slick
   (:use :cl)
-  (:export conf *debug-transpiles*))
-(in-package :clown-slick.conf)
+  (:import-from :spinneret :with-html-string)
+  (:export
+   conf
+   *debug-transpiles*
+   *css-vars*
+   css-var
+   css-color
+   font-defs
+   top-level-defs
+   adjustable-width
+   main))
+(in-package :clown-slick)
 
 (defparameter *conf*
   '((author . "Charanjit Singh")

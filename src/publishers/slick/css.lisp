@@ -1,14 +1,4 @@
-(defpackage :clown-slick.css
-  (:nicknames :slick.css)
-  (:use :cl)
-  (:import-from :clown-slick.conf *debug-transpiles*)
-  (:export *css-vars*
-           css-var
-           css-color
-           font-defs
-           top-level-defs
-           adjustable-width))
-(in-package :clown-slick.css)
+(in-package :clown-slick)
 
 (defparameter *css-vars*
   '((width-l . "990px")
