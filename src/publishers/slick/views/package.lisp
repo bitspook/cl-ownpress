@@ -14,3 +14,17 @@
   (:export home
            navbar
            post))
+(in-package :slick-views)
+
+(defmacro html-str (&key title cssom dom)
+  `(let ((spinneret:*suppress-inserted-spaces* t)
+         (spinneret:*html-style* (if *debug-transpiles* :human :tree))
+         (*print-pretty* *debug-transpiles*)
+         (styles (apply #'to-css-str ,cssom)))
+     (with-html-string
+       (:doctype)
+       (:html
+        (:head
+         (:title ,title)
+         (:style (:raw styles)))
+        (:body (spinneret:interpret-html-tree ,dom))))))

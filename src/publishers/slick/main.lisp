@@ -1,6 +1,6 @@
 (in-package :clown-slick)
 
-(defun write-html-to-file (dest html &key clean-urls?)
+(defun write-html-to-file (dest html &key (clean-urls? t))
   "Write HTML to DEST. If CLEAN-URL?, write as dest/index.html"
   (let ((dest (if (and clean-urls? (not (string= (ppath:basename dest) "index.html")))
                   (str:concat dest "/index.html")
@@ -30,13 +30,3 @@
 
     (write-html-to-file
      (ppath:join dest "index.html") (slick-views:home) :clean-urls? clean-urls?)))
-
-(defun publish-all-posts ()
-  (let* ((query (sxql:yield
-                 (sxql:select (:*)
-                   (sxql:from :inputs))))
-         (conn (clown:make-connection))
-         (query (dbi:execute (dbi:prepare conn query))))
-    (loop :for row := (dbi:fetch query)
-          :while row
-          :collect (slick-views:post row))))

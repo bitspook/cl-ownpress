@@ -135,33 +135,45 @@
             (.read-more-btn :font-size 1.3em
                             :margin 0.7em 0)))))
 
-(defun home-tree ()
+(defun publish-recent-posts (&optional (limit 5))
+  (let* ((query (sxql:yield
+                 (sxql:select (:*)
+                   (sxql:from :inputs)
+                   (sxql:order-by :published_at)
+                   (sxql:limit limit))))
+         (conn (clown:make-connection))
+         (query (dbi:execute (dbi:prepare conn query))))
+    (loop :for row := (dbi:fetch query)
+          :while row
+          :collect (slick-views:post row))))
+
+(defun home-dom ()
   `(:div :class "home"
          (:div :class "sidebar"
                (:div :class "author"
-                     (:img :class "avatar" :src (conf 'avatar) :alt (conf 'author))
-                     (:h2 :class "name" (conf 'author))
+                     (:img :class "avatar" :src ,(conf :avatar) :alt ,(conf :author))
+                     (:h2 :class "name" ,(conf :author))
                      (:p :class "handle"
-                         (:a :href (conf 'twitter) "@" (conf 'handle))))
+                         (:a :href ,(conf :twitter) "@" ,(conf :handle))))
                (:div :class "quote" "Math is the new sexy")
                (:div :class "social"
-                     (:a :href (conf 'github)
-                         :title (str:concat (conf 'author) " on Github")
+                     (:a :href ,(conf :github)
+                         :title ,(str:concat (conf :author) " on Github")
                          :target "_blank"
                          (:span :class "github"))
-                     (:a :href (conf 'twitter)
-                         :title (str:concat (conf 'author) " on Twitter")
+                     (:a :href ,(conf :twitter)
+                         :title ,(str:concat (conf :author) " on Twitter")
                          :target "_blank"
                          (:span :class "twitter"))
-                     (:a :href (conf 'linkedin)
-                         :title (str:concat (conf 'author) " on LinkedIn")
+                     (:a :href ,(conf :linkedin)
+                         :title ,(str:concat (conf :author) " on LinkedIn")
                          :target "_blank" (:span :class "linkedin"))
                      (:a :href "/feed.xml"
                          :title "Follow via RSS"
                          :target "_blank"
                          (:span :class "rss")))
                (:img :class "pub-key-qr"
-                     :alt ,(str:concat (conf 'author) "'s Public GPG Key")
+                     :alt ,(str:concat (conf :author) "'s Public GPG Key")
                      :src "/images/public-key-qr.svg"))
          (:div :class "main"
                (:section :class "about-me-snippet"
@@ -170,7 +182,7 @@
                          (:p "I write software to make a living. I have been on voluntary unemployment since March 26, 2022.")
                          (:p "I also enjoy writing, giving talks and discussing computers, security and politics.")
                          (:p "This website has things I am willing to share publicly. You can go through my "
-                             (:a :href "/blog/" "blog") ", " (:a :href "/poems" "poems") ", " (:a :href (conf 'github) :target "_blank" "projects") ", " (:a :href "/talks" "talks") ", and my " (:a :href (conf 'resume) :target "_blank" "resume") " as well.")
+                             (:a :href "/blog/" "blog") ", " (:a :href "/poems" "poems") ", " (:a :href ,(conf :github) :target "_blank" "projects") ", " (:a :href "/talks" "talks") ", and my " (:a :href ,(conf :resume) :target "_blank" "resume") " as well.")
                          (:footer "More " (:a :href "/about" "about me.")))
                (:section :class "recent-content"
                          (:header (:h2 "Recent Content"))
@@ -178,25 +190,14 @@
                               (:li (:a :href "/blog/post"
                                        :class "recent-content-item content-type--blog"
                                        "Blog post")))
-                         (:footer (:a.btn.btn-primary.read-more-btn
+                         (:footer (:a :class "btn btn-primary read-more-btn"
                                    :href "/archive"
                                    "See all"))))))
 
-(defmacro home ()
-  (let ((body (home-tree)))
-    `(let ((spinneret:*suppress-inserted-spaces* t)
-           (spinneret:*html-style* (if *debug-transpiles* :human :tree))
-           (*print-pretty* *debug-transpiles*)
-           (title (str:concat (conf 'author) "'s online home"))
-           (styles (to-css-str
-                    (font-defs)
-                    (top-level-defs)
-                    (button-defs)
-                    (home-defs))))
-       (with-html-string
-         (:doctype)
-         (:html
-          (:head
-           (:title title)
-           (:style (:raw styles)))
-          (:body ,body))))))
+(defun home ()
+  (let ((title (str:concat (conf :author) "'s online home"))
+        (styles (list (font-defs)
+                      (top-level-defs)
+                      (button-defs)
+                      (home-defs))))
+    (html-str :title title :cssom styles :dom (home-dom))))
