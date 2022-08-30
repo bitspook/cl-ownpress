@@ -47,4 +47,4 @@
                       (a :font-size 1.2em)))
     ,@(adjustable-width ".top-nav")))
 
-(defun navbar () nil)
+(defun navbar-html () nil)

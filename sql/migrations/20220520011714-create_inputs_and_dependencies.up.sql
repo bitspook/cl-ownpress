@@ -10,12 +10,22 @@ CREATE TABLE IF NOT EXISTS inputs (
   tags JSON,                     -- An array
   metadata JSON,
   content TEXT,                  -- Content of *some* inputs
-  published_at TEXT
-);
+  published_at DATETIME
+) WITHOUT ROWID;
 --;;
 CREATE TABLE IF NOT EXISTS dependencies (
-  depended_by TEXT NOT NULL,
-  dependent_on TEXT NOT NULL,
-  PRIMARY KEY (depended_by, dependent_on)
+  input_id TEXT NOT NULL,
+  depends_on TEXT NOT NULL,
+  PRIMARY KEY (input_id, depends_on),
+  FOREIGN KEY(input_id) REFERENCES inputs(id),
+  FOREIGN KEY(depends_on) REFERENCES inputs(id)
 ) WITHOUT ROWID;
-
+--;;
+CREATE TABLE IF NOT EXISTS outputs (
+  id INTEGER PRIMARY KEY NOT NULL,
+  input_id TEXT NOT NULL,
+  path TEXT NOT NULL UNIQUE,
+  created_at TEXT NOT NULL DEFAULT datetime,
+  updated_at TEXT NOT NULL DEFAULT datetime,
+  FOREIGN KEY(input_id) REFERENCES inputs(id)
+);

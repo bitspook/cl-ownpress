@@ -2,12 +2,13 @@
 
 (defun post-css () `())
 
-(defun post-dom (input)
-  `(:h1 ,(format nil "~s" (getf input :|title|))))
+(defun post-dom (post)
+  (with-slots ((title clown:title)) post
+    `(:h1 ,title)))
 
-(defun post (input)
+(defun post-html (post)
   (let ((title (str:concat (conf 'author) "'s online home"))
         (styles (list (font-defs)
                       (top-level-defs)
                       (post-css))))
-    (html-str :title title :cssom nil :dom (post-dom input))))
+    (html-str :title title :cssom styles :dom (post-dom post))))

@@ -21,6 +21,7 @@
                 :serial t
                 :components
                 ((:file "package")
+                 (:file "models")
                  (:file "main")))
                (:module "src/publishers/slick"
                 :serial t

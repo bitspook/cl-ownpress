@@ -35,7 +35,6 @@
 
 (defmethod invoke-provider ((provider (eql *org-roam-provider*)) &key)
            (let ((script-path (asdf:system-relative-pathname "cl-ownpress" "./src/providers/org-roam/org-roam.el")))
-
              (uiop:run-program (format nil "emacs --script ~a" script-path)
                                :output *standard-output*
                                :error-output *standard-output*)))

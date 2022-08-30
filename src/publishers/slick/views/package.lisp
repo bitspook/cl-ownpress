@@ -11,9 +11,9 @@
                 top-level-defs
                 button-defs
                 to-css-str)
-  (:export home
-           navbar
-           post))
+  (:export home-html
+           navbar-html
+           post-html))
 (in-package :slick-views)
 
 (defmacro html-str (&key title cssom dom)

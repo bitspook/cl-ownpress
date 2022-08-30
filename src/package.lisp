@@ -1,7 +1,12 @@
 (defpackage cl-ownpress
   (:nicknames :clown)
   (:use :cl)
-  (:export make-connection run-pending-migrations))
+  (:export
+   make-connection
+   run-pending-migrations
+   post id title slug
+   published-post
+   db-to-post))
 (in-package :cl-ownpress)
 
 (require :cl-migratum)

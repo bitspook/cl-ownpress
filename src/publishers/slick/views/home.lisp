@@ -135,6 +135,28 @@
             (.read-more-btn :font-size 1.3em
                             :margin 0.7em 0)))))
 
+(defun publish-post (post)
+  "Publish a POST. It writes the HTML to a file, update database. Returns
+`published-post'."
+  (with-slots ((slug clown:slug) (id clown:id) (title clown:title)) post
+    (let* ((output-path (concatenate 'string "/blog/" slug))
+           (dest (str:concat (format nil "~a" (conf :dest)) output-path))
+           (body (post-html post)))
+      (clown-slick:write-html-to-file dest body)
+
+      (let ((conn (clown:make-connection)))
+        (multiple-value-bind (stmt values) (sxql:yield
+                                           (sxql:insert-into :outputs
+                                             (sxql:set= :input_id id
+                                                        :path output-path)))
+          (dbi:fetch-all (dbi:execute (dbi:prepare conn stmt) values))))
+
+      (make-instance 'clown:published-post
+                     :title title
+                     :id id
+                     :slug slug
+                     :output-path output-path))))
+
 (defun publish-recent-posts (&optional (limit 5))
   (let* ((query (sxql:yield
                  (sxql:select (:*)
@@ -144,8 +166,9 @@
          (conn (clown:make-connection))
          (query (dbi:execute (dbi:prepare conn query))))
     (loop :for row := (dbi:fetch query)
+          :for post := (clown:db-to-post row)
           :while row
-          :collect (slick-views:post row))))
+          :collect (publish-post post))))
 
 (defun home-dom ()
   `(:div :class "home"
@@ -194,7 +217,7 @@
                                    :href "/archive"
                                    "See all"))))))
 
-(defun home ()
+(defun home-html ()
   (let ((title (str:concat (conf :author) "'s online home"))
         (styles (list (font-defs)
                       (top-level-defs)

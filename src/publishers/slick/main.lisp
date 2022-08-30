@@ -1,21 +1,11 @@
 (in-package :clown-slick)
 
-(defun write-html-to-file (dest html &key (clean-urls? t))
-  "Write HTML to DEST. If CLEAN-URL?, write as dest/index.html"
-  (let ((dest (if (and clean-urls? (not (string= (ppath:basename dest) "index.html")))
-                  (str:concat dest "/index.html")
-                  dest))
-        (dest-dirs (ppath:dirname dest)))
-    (unless (or (string= dest-dirs ".") (str:emptyp dest-dirs))
-      (ensure-directories-exist dest-dirs))
-    (str:to-file dest html)))
-
 (defun copy-dirs (src dest)
   (uiop:run-program (format nil "cp -r ~a ~a" (ppath:join src "*") dest)
                     :output *standard-output*
                     :error-output *standard-output*))
 
-(defun main (dest &key clean-dest? clean-urls?)
+(defun main (&optional (dest (conf :dest)) &key (clean-dest? t) (clean-urls? t))
   "Use slick publisher to build a publishable bundle to DEST"
   (let ((dest (if (str:ends-with? "/" dest) dest (str:concat dest "/")))
         (assets-dir "./assets/")
@@ -29,4 +19,4 @@
     (copy-dirs assets-dir dest-assets-dir)
 
     (write-html-to-file
-     (ppath:join dest "index.html") (slick-views:home) :clean-urls? clean-urls?)))
+     (ppath:join dest "index.html") (slick-views:home-html) :clean-urls? clean-urls?)))
