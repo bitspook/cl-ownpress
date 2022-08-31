@@ -12,7 +12,6 @@
                 button-defs
                 to-css-str)
   (:export home-html
-           navbar-html
            post-html))
 (in-package :slick-views)
 

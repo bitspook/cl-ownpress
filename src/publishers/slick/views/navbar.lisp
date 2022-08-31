@@ -1,18 +1,18 @@
 (in-package :clown-slick.views)
 
-(defun navbar-tree ()
+(defun navbar-dom ()
   `(:nav :class "top-nav"
          (:div :class "brand"
                (:a :href "/"
                    (:img :class "brand-avatar"
-                         :src (conf 'avatar)
-                         :alt (conf 'author))))
+                         :src ,(conf :avatar)
+                         :alt ,(conf :author))))
          (:div
           (:ul (:li (:a :href "/blog" "Blog"))
                (:li (:a :href "/poems" "Poems"))
-               (:li (:a :href (conf 'github) "Projects"))))))
+               (:li (:a :href ,(conf :github) "Projects"))))))
 
-(defun navbar-defs ()
+(defun navbar-css ()
   `((.top-nav
      :height 90px
      :display flex
@@ -45,6 +45,4 @@
     (:media ,(format nil "(max-width: ~a)" (css-var 'width-sm))
             (.top-nav :padding-right 1em
                       (a :font-size 1.2em)))
-    ,@(adjustable-width ".top-nav")))
-
-(defun navbar-html () nil)
+    ,@(clown-slick:adjustable-width ".top-nav")))
