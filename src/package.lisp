@@ -5,7 +5,7 @@
    make-connection
    run-pending-migrations
    post id title slug
-   published-post
+   published-post output-path
    db-to-post))
 (in-package :cl-ownpress)
 

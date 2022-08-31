@@ -10,7 +10,7 @@
    font-defs
    top-level-defs
    adjustable-width
-   main
+   build
    write-html-to-file))
 (in-package :clown-slick)
 
@@ -22,7 +22,7 @@
     (:github . "https://github.com/bitspook")
     (:handle . "bitspook")
     (:resume . "https://docs.google.com/document/d/1HFOxl97RGtuhAX95AhGWwa808SO9qSCYLjP1Pm39la0/")
-    (:dest . ,(asdf:system-relative-pathname "cl-ownpress" "./_site"))))
+    (:dest . ,(format nil "~a" (asdf:system-relative-pathname "cl-ownpress" "./_site")))))
 
 (defparameter *debug-transpiles* t)
 

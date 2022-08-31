@@ -5,7 +5,7 @@
                     :output *standard-output*
                     :error-output *standard-output*))
 
-(defun main (&optional (dest (conf :dest)) &key (clean-dest? t) (clean-urls? t))
+(defun build (&optional (dest (conf :dest)) &key (clean-dest? t) (clean-urls? t))
   "Use slick publisher to build a publishable bundle to DEST"
   (let ((dest (if (str:ends-with? "/" dest) dest (str:concat dest "/")))
         (assets-dir "./assets/")

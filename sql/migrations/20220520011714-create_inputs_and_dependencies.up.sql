@@ -24,7 +24,7 @@ CREATE TABLE IF NOT EXISTS dependencies (
 CREATE TABLE IF NOT EXISTS outputs (
   id INTEGER PRIMARY KEY NOT NULL,
   input_id TEXT NOT NULL,
-  path TEXT NOT NULL UNIQUE,
+  path TEXT NOT NULL,
   created_at TEXT NOT NULL DEFAULT datetime,
   updated_at TEXT NOT NULL DEFAULT datetime,
   FOREIGN KEY(input_id) REFERENCES inputs(id)

@@ -145,10 +145,11 @@
       (clown-slick:write-html-to-file dest body)
 
       (let ((conn (clown:make-connection)))
-        (multiple-value-bind (stmt values) (sxql:yield
-                                           (sxql:insert-into :outputs
-                                             (sxql:set= :input_id id
-                                                        :path output-path)))
+        (multiple-value-bind (stmt values)
+            (sxql:yield
+             (sxql:insert-into :outputs
+               (sxql:set= :input_id id
+                          :path output-path)))
           (dbi:fetch-all (dbi:execute (dbi:prepare conn stmt) values))))
 
       (make-instance 'clown:published-post
@@ -210,9 +211,13 @@
                (:section :class "recent-content"
                          (:header (:h2 "Recent Content"))
                          (:ul :class "recent-content-list"
-                              (:li (:a :href "/blog/post"
-                                       :class "recent-content-item content-type--blog"
-                                       "Blog post")))
+                              ,@(loop :with posts := (publish-recent-posts 5)
+                                      :for rp :in posts
+                                      :collect
+                                      (with-slots ((href clown:output-path) (title clown:title)) rp
+                                        `(:li (:a :href ,href
+                                                  :class "recent-content-item content-type--blog"
+                                                  ,title)))))
                          (:footer (:a :class "btn btn-primary read-more-btn"
                                    :href "/archive"
                                    "See all"))))))
