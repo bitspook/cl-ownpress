@@ -33,8 +33,8 @@
                   :components
                   ((:file "package")
                    (:file "navbar")
-                   (:file "home")
-                   (:file "post")))
+                   (:file "post")
+                   (:file "home")))
                  (:file "main"))))
   :description ""
   :in-order-to ((test-op (test-op "cl-ownpress/tests"))))

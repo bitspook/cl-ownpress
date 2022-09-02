@@ -72,16 +72,25 @@ Which themselves should be not be published.")
 
     props))
 
+(defun clown--org-to-html (filename)
+  "Return content of FILENAME named org file as HTML."
+  (let ((org-content (org-file-contents filename))
+        (org-export-show-temporary-export-buffer nil))
+    (with-temp-buffer
+      (insert org-content)
+      (org-export-as 'html nil nil t))))
+
 (defun clown--collect-node (node)
   "Collect a single org-roam NODE."
   (let ((meta (clown--get-post-meta (org-roam-node-file node))))
     `(:id ,(org-roam-node-id node)
-      :slug ,(or (alist-get 'slug meta) (clown--node-slug node))
-      :title ,(alist-get 'title meta)
-      :tags ,(json-encode-list (alist-get 'tags meta))
-      :metadata ,(json-encode-alist meta)
-      :published-at ,(alist-get 'date meta)
-      :content ,(org-file-contents (org-roam-node-file node)))))
+          :slug ,(or (alist-get 'slug meta) (clown--node-slug node))
+          :title ,(alist-get 'title meta)
+          :tags ,(json-encode-list (alist-get 'tags meta))
+          :metadata ,(json-encode-alist meta)
+          :published-at ,(alist-get 'date meta)
+          :content_raw ,(org-file-contents (org-roam-node-file node))
+          :content_html ,(clown--org-to-html (org-roam-node-file node)))))
 
 (defun clown--collect ()
   "Collect all the org-roam notes which should be published.

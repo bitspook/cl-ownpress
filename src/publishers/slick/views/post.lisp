@@ -27,10 +27,10 @@
                    (.date :padding 0
                           :padding-right 1rem)
 
-                   (.tags (ul :list-style-type none
-                              :display flex
-                              :flex-wrap wrap)
-                          (li :padding-right 1rem)))
+                   (.tags  :list-style-type none
+                           :display flex
+                           :flex-wrap wrap
+                           (li :padding-right 1rem)))
     (.main-article :font-family "Cantarell, sans-serif"
                    :min-height 500px
 
@@ -44,24 +44,53 @@
                    (li :margin 0.7rem
                        :margin-right 0))))
 
-(defun post-dom (post)
-  (with-slots ((title clown:title)) post
-    `(:div ,(navbar-dom)
-           (:section :class "content"
-                     (:header :class "content-header"
-                              (:h1 ,title)
-                              (:span :class "content-meta"
-                                     (:span :class "meta-item date"
-                                            "Jan 01, 1992")
-                                     (:span :class "meta-item tags"
-                                            (:ul (:li :class "tag" "Emacs")))))
-                     (:article :class "main-article"
-                               "Lol bro what's up?")))))
+(defun post-dom ()
+  `(:div ,(navbar-dom)
+         (:section :class "content"
+                   (:header :class "content-header"
+                            (:h1 (slot-value post 'clown:title))
+                            (:span :class "content-meta"
+                                   (:span :class "meta-item date" "Jan 01, 1992")
+                                   (:ul :class "meta-item tags"
+                                        (dolist (tag tags) (:li :class "tag" tag)))))
+                   (:article :class "main-article" (:raw (slot-value post 'clown:html-content))))))
 
-(defun post-html (post)
-  (let ((title (slot-value post 'clown:title))
-        (styles (list (font-defs)
-                      (top-level-defs)
-                      (post-css)))
-        (dom (post-dom post)))
-    (html-str :title title :cssom styles :dom dom)))
+(defmacro post-html ()
+  "Produce HTML required for publishing a `post'. A variable named 'post' must be
+present at execution"
+  (let ((styles '((font-defs)
+                  (top-level-defs)
+                  (post-css))))
+    `(html-str (:title (slot-value post 'clown:title) :css ,styles)
+       ,(post-dom))))
+
+(defun publish-post (post)
+  "Publish a POST. It writes the HTML to a file, update database. Returns
+`published-post'."
+  (with-slots ((slug clown:slug) (id clown:id) (title clown:title) (tags clown:tags)) post
+    (let* ((output-path (concatenate 'string "/blog/" slug))
+           (dest (str:concat (format nil "~a" (conf :dest)) output-path))
+           (body (post-html)))
+      (clown-slick:write-html-to-file dest body)
+
+      (let ((conn (clown:make-connection)))
+        (multiple-value-bind (stmt values)
+            (sxql:yield
+             (sxql:insert-into :outputs
+               (sxql:set= :input_id id
+                          :path output-path)))
+          (dbi:fetch-all (dbi:execute (dbi:prepare conn stmt) values))))
+
+      (make-instance 'clown:published-post
+                     :title title
+                     :id id
+                     :slug slug
+                     :tags tags
+                     :output-path output-path))))
+
+(defun publish-recent-posts (&optional (limit 5))
+  (loop
+    :with fetcher := (clown:fetch-recent-posts limit)
+    :for post := (funcall fetcher)
+    :while post
+    :collect (publish-post post)))

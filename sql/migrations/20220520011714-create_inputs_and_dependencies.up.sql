@@ -9,7 +9,8 @@ CREATE TABLE IF NOT EXISTS inputs (
   title TEXT,
   tags JSON,                     -- An array
   metadata JSON,
-  content TEXT,                  -- Content of *some* inputs
+  content_raw TEXT,                  -- Content of *some* inputs
+  content_html TEXT,                 -- Content in HTML formfor *some* inputs
   published_at DATETIME
 ) WITHOUT ROWID;
 --;;

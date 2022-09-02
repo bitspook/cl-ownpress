@@ -135,69 +135,33 @@
             (.read-more-btn :font-size 1.3em
                             :margin 0.7em 0)))))
 
-(defun publish-post (post)
-  "Publish a POST. It writes the HTML to a file, update database. Returns
-`published-post'."
-  (with-slots ((slug clown:slug) (id clown:id) (title clown:title)) post
-    (let* ((output-path (concatenate 'string "/blog/" slug))
-           (dest (str:concat (format nil "~a" (conf :dest)) output-path))
-           (body (post-html post)))
-      (clown-slick:write-html-to-file dest body)
-
-      (let ((conn (clown:make-connection)))
-        (multiple-value-bind (stmt values)
-            (sxql:yield
-             (sxql:insert-into :outputs
-               (sxql:set= :input_id id
-                          :path output-path)))
-          (dbi:fetch-all (dbi:execute (dbi:prepare conn stmt) values))))
-
-      (make-instance 'clown:published-post
-                     :title title
-                     :id id
-                     :slug slug
-                     :output-path output-path))))
-
-(defun publish-recent-posts (&optional (limit 5))
-  (let* ((query (sxql:yield
-                 (sxql:select (:*)
-                   (sxql:from :inputs)
-                   (sxql:order-by :published_at)
-                   (sxql:limit limit))))
-         (conn (clown:make-connection))
-         (query (dbi:execute (dbi:prepare conn query))))
-    (loop :for row := (dbi:fetch query)
-          :for post := (clown:db-to-post row)
-          :while row
-          :collect (publish-post post))))
-
 (defun home-dom ()
   `(:div :class "home"
          (:div :class "sidebar"
                (:div :class "author"
-                     (:img :class "avatar" :src ,(conf :avatar) :alt ,(conf :author))
-                     (:h2 :class "name" ,(conf :author))
+                     (:img :class "avatar" :src (conf :avatar) :alt (conf :author))
+                     (:h2 :class "name" (conf :author))
                      (:p :class "handle"
-                         (:a :href ,(conf :twitter) "@" ,(conf :handle))))
+                         (:a :href (conf :twitter) "@" (conf :handle))))
                (:div :class "quote" "Math is the new sexy")
                (:div :class "social"
-                     (:a :href ,(conf :github)
-                         :title ,(str:concat (conf :author) " on Github")
+                     (:a :href (conf :github)
+                         :title (str:concat (conf :author) " on Github")
                          :target "_blank"
                          (:span :class "github"))
-                     (:a :href ,(conf :twitter)
-                         :title ,(str:concat (conf :author) " on Twitter")
+                     (:a :href (conf :twitter)
+                         :title ("~a on Twitter" (conf :author))
                          :target "_blank"
                          (:span :class "twitter"))
-                     (:a :href ,(conf :linkedin)
-                         :title ,(str:concat (conf :author) " on LinkedIn")
+                     (:a :href (conf :linkedin)
+                         :title ("~a on LinkedIn" (conf :author))
                          :target "_blank" (:span :class "linkedin"))
                      (:a :href "/feed.xml"
                          :title "Follow via RSS"
                          :target "_blank"
                          (:span :class "rss")))
                (:img :class "pub-key-qr"
-                     :alt ,(str:concat (conf :author) "'s Public GPG Key")
+                     :alt ("~a's Public GPG Key" (conf :author))
                      :src "/images/public-key-qr.svg"))
          (:div :class "main"
                (:section :class "about-me-snippet"
@@ -206,26 +170,25 @@
                          (:p "I write software to make a living. I have been on voluntary unemployment since March 26, 2022.")
                          (:p "I also enjoy writing, giving talks and discussing computers, security and politics.")
                          (:p "This website has things I am willing to share publicly. You can go through my "
-                             (:a :href "/blog/" "blog") ", " (:a :href "/poems" "poems") ", " (:a :href ,(conf :github) :target "_blank" "projects") ", " (:a :href "/talks" "talks") ", and my " (:a :href ,(conf :resume) :target "_blank" "resume") " as well.")
+                             (:a :href "/blog/" "blog") ", " (:a :href "/poems" "poems") ", " (:a :href (conf :github) :target "_blank" "projects") ", " (:a :href "/talks" "talks") ", and my " (:a :href (conf :resume) :target "_blank" "resume") " as well.")
                          (:footer "More " (:a :href "/about" "about me.")))
                (:section :class "recent-content"
                          (:header (:h2 "Recent Content"))
                          (:ul :class "recent-content-list"
-                              ,@(loop :with posts := (publish-recent-posts 5)
-                                      :for rp :in posts
-                                      :collect
-                                      (with-slots ((href clown:output-path) (title clown:title)) rp
-                                        `(:li (:a :href ,href
-                                                  :class "recent-content-item content-type--blog"
-                                                  ,title)))))
+                              (dolist (rp (publish-recent-posts 5))
+                                (with-slots ((href clown:output-path) (title clown:title)) rp
+                                  (:li (:a :href href
+                                           :class "recent-content-item content-type--blog"
+                                           title)))))
                          (:footer (:a :class "btn btn-primary read-more-btn"
                                    :href "/archive"
                                    "See all"))))))
 
-(defun home-html ()
+(defmacro home-html ()
   (let ((title (str:concat (conf :author) "'s online home"))
-        (styles (list (font-defs)
-                      (top-level-defs)
-                      (button-defs)
-                      (home-defs))))
-    (html-str :title title :cssom styles :dom (home-dom))))
+        (styles '((font-defs)
+                  (top-level-defs)
+                  (button-defs)
+                  (home-defs))))
+    `(html-str (:title ,title :css ,styles)
+       ,(home-dom))))

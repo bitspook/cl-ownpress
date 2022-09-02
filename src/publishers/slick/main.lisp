@@ -8,7 +8,7 @@
 (defun build (&optional (dest (conf :dest)) &key (clean-dest? t) (clean-urls? t))
   "Use slick publisher to build a publishable bundle to DEST"
   (let ((dest (if (str:ends-with? "/" dest) dest (str:concat dest "/")))
-        (assets-dir "./assets/")
+        (assets-dir (format nil "~a" (asdf:system-relative-pathname "cl-ownpress" "src/publishers/slick/assets/")))
         (dest-assets-dir dest))
     (when (uiop:directory-exists-p dest)
       (if (not clean-dest?)

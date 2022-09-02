@@ -29,7 +29,8 @@
                       :metadata (gethash "metadata" post)
                       :provider (provider-name *org-roam-provider*)
                       :published_at (gethash "published-at" post)
-                      :content (gethash "content" post))))
+                      :content_raw (gethash "content_raw" post)
+                      :content_html (gethash "content_html" post))))
       (log:d "EXECUTING ~a~%" stmt)
       (dbi:fetch-all (dbi:execute (dbi:prepare conn stmt) values)))))
 
