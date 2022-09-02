@@ -22,7 +22,7 @@
   (let ((colors (css-var 'colors)))
     (getf colors name)))
 
-(defun font-defs ()
+(defparameter font-css
   (mapcar
    (lambda (args)
      (destructuring-bind (family style weight asset) args
@@ -37,8 +37,9 @@
      ("Cantarell" "normal" "bold" "Cantarell-Bold.ttf")
      ("Cantarell" "normal" "regular" "Cantarell-Regular.ttf"))))
 
-(defun top-level-defs ()
-  `(("*" :margin 0
+(defparameter top-level-css
+  `(,@font-css
+    ("*" :margin 0
          :padding 0
          :box-sizing "border-box")
     (body :font-family "Roboto"
@@ -67,31 +68,9 @@
                 :font-weight bold
                 :font-size 1.7em
                 :line-height 1.2
-                :text-transform capitalize))
-    (.postamble
-     :font-family monospace
-     :color "#666"
-     :margin 4rem auto
+                :text-transform capitalize))))
 
-     (.validation :display none))
-    (:media ,(format nil "(max-width: ~a)" (css-var 'width-md))
-     (.postamble
-      :max-width 100%
-      :padding 0 8%))
-    (:media ,(format nil "(max-width: ~a)" (css-var 'width-sm))
-     (.postamble
-      :max-width 100%
-      :padding 0 4%))
-    ("#mc_embed_signup" :max-width 600px
-                        :background transparent
-                        :margin-bottom 4rem)
-    (.newsletter-email :border 1px solid ,(css-color :secondary)
-                       :border-radius 25px
-                       :width 100%
-                       :margin-bottom 1rem
-                       :padding 0.4rem 0.8rem)))
-
-(defun adjustable-width (&rest selectors)
+(defun adjustable-width-css (&rest selectors)
   `((,@selectors :max-width 70%
                 :padding 0 124px
                 :margin 0 auto)
@@ -102,7 +81,7 @@
             (,@selectors :max-width 100%
                         :padding 0 4%))))
 
-(defun button-defs ()
+(defparameter button-css
   `((.btn :display inline-flex
           :border 2px solid
           :border-radius 25px

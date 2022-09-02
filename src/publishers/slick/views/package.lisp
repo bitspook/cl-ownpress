@@ -5,11 +5,11 @@
   (:import-from :clown-slick
                 conf
                 *debug-transpiles*
-                font-defs
+                font-css
                 css-var
                 css-color
-                top-level-defs
-                button-defs
+                top-level-css
+                button-css
                 to-css-str)
   (:export home-html
            post-html))

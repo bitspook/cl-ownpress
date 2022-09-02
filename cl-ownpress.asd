@@ -33,6 +33,7 @@
                   :components
                   ((:file "package")
                    (:file "navbar")
+                   (:file "footer")
                    (:file "post")
                    (:file "home")))
                  (:file "main"))))

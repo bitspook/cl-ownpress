@@ -7,9 +7,9 @@
    *css-vars*
    css-var
    css-color
-   font-defs
-   top-level-defs
-   adjustable-width
+   font-css
+   top-level-css
+   adjustable-width-css
    build
    write-html-to-file))
 (in-package :clown-slick)
