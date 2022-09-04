@@ -1,5 +1,6 @@
 (in-package :clown-slick.views)
 
+;; Need these available at compile time for the home-html macro
 (eval-when (:compile-toplevel :load-toplevel :execute)
   (defparameter home-css
     `((:media ,(format nil "(max-width: ~a)" (css-var 'width-md))

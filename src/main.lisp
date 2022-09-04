@@ -54,16 +54,18 @@
          :with stream := (usocket:socket-stream conn)
          :for
          msg := (str:trim
-                 (str:replace-first msg-sep ""
-                                    (with-output-to-string (msg-str)
-                                                           (loop :named inner
-                                                                 :with trail := '()
-                                                                 :for char := (read-char stream nil 'eof)
-                                                                 :do (princ char msg-str)
-                                                                 (when (>= (length trail) (length msg-sep))
-                                                                   (setq trail (subseq trail 1)))
-                                                                 (setq trail (nconc trail (list char)))
-                                                                 (when (equal trail msg-sep) (return-from inner))))))
+                 (str:replace-first
+                  msg-sep ""
+                  (with-output-to-string
+                    (msg-str)
+                    (loop :named inner
+                          :with trail := '()
+                          :for char := (read-char stream nil 'eof)
+                          :do (princ char msg-str)
+                          (when (>= (length trail) (length msg-sep))
+                            (setq trail (subseq trail 1)))
+                          (setq trail (nconc trail (list char)))
+                          (when (equal trail msg-sep) (return-from inner))))))
          :until (string= msg "DONE")
          :do (funcall msg-processor (yason:parse msg)))
       (progn

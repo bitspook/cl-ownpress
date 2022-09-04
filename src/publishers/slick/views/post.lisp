@@ -6,7 +6,7 @@
       (.content :font-family "Cantarell, sans-serif"
                 :font-style normal
                 :font-weight 500
-                :font-size 1.5rem
+                :font-size 1.5em
                 :line-height 1.4
                 :max-width 70%
                 :margin 0 auto

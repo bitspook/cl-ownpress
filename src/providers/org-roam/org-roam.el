@@ -24,6 +24,7 @@
 (require 'org-roam)
 (require 'org)
 (require 'jsonrpc)
+(require 'htmlize)
 
 (defvar *clown-control-tags* '("blog-post" "draft" "published")
   "Tags meant for controlling publishing.
@@ -74,7 +75,12 @@ Which themselves should be not be published.")
 
 (defun clown--org-to-html (filename)
   "Return content of FILENAME named org file as HTML."
-  (let ((org-content (org-file-contents filename))
+  (let ((org-export-with-section-numbers nil)
+        (org-export-with-toc nil)
+        (org-src-fontify-natively t)
+        (org-html-htmlize-output-type 'inline-css)
+        (org-content (org-file-contents filename))
+        (org-html-head-include-default-style nil)
         (org-export-show-temporary-export-buffer nil))
     (with-temp-buffer
       (insert org-content)
@@ -104,6 +110,7 @@ Along with their dependencies."
                                      :host "localhost"
                                      :service 8192))
 
+  (load-theme 'leuven)
 
   (let ((inputs (clown--collect)))
     (cl-dolist (input inputs)
