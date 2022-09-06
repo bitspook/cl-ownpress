@@ -18,5 +18,7 @@
     (ensure-directories-exist dest-assets-dir)
     (copy-dirs assets-dir dest-assets-dir)
 
+    (slick-views:publish-post-listings)
+
     (write-html-to-file
      (ppath:join dest "index.html") (slick-views:home-html) :clean-urls? clean-urls?)))

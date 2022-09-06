@@ -97,25 +97,6 @@
       :while post
       :collect (publish-post post))))
 
-(defun publish-all-posts ()
-  "Publish all the posts along with tag pages."
-  (let ((tagged-posts (make-hash-table :test 'equal)))
-    (loop :with fetcher := (clown:fetch-recent-posts)
-          :for post := (funcall fetcher)
-          :while post
-          :do (let ((p-post (publish-post post)))
-                (loop :for tag :in (clown:post-tags p-post)
-                      :do (uiop:if-let ((%posts (gethash tag tagged-posts)))
-                            (push p-post (gethash tag tagged-posts))
-                            (setf (gethash tag tagged-posts) (list p-post))))))
-    (loop :for tag :being :each :hash-key :of tagged-posts
-          :do (publish-listing
-               :posts (gethash tag tagged-posts)
-               :title (format nil "Posts tagged `~a'" tag)
-               :dest (str:concat (format nil "~a" (conf :dest)) "/tags/" tag "/index.html")))
-
-    t))
-
 (defmacro post-html ()
   "Produce HTML required for publishing a `post'. A variable named 'post' must be
 present at execution"

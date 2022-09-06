@@ -12,7 +12,8 @@
                 button-css
                 to-css-str)
   (:export home-html
-           post-html))
+           post-html
+           publish-post-listings))
 (in-package :slick-views)
 
 (defmacro html-str ((&key title css) &body dom)

@@ -85,5 +85,5 @@
          :title "Follow via RSS"
          :target "blank"
          (:span.rss) "Or Follow via RSS"))
-    (:p ("Author: ~a" (conf :author))
+    (:p ("Author: ~a " (conf :author))
         (:a :href (conf :twitter) ("@~a" (conf :handle))))))

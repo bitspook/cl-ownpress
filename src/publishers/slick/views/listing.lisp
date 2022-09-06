@@ -81,3 +81,41 @@ Required context:
 (defun publish-listing (&key posts title dest)
   (let ((html (listing-html :title title :posts posts)))
     (clown-slick:write-html-to-file dest html)))
+
+(defun publish-post-listings ()
+  "Publish all the listing pages. It includes:
+   1. Listing page for each tag
+   2. Listing page for each category
+   3. Listing page with all the posts"
+  (let ((tagged-posts (make-hash-table :test 'equal))
+        (categorized-posts (make-hash-table :test 'equal))
+        (all-posts (publish-recent-posts -1)))
+    (loop :for post :in all-posts
+          :for cat := (clown:post-category post)
+          :do (loop
+                :for tag :in (clown:post-tags post)
+                :do (if (gethash tag tagged-posts)
+                        (push post (gethash tag tagged-posts))
+                        (setf (gethash tag tagged-posts) (list post))))
+              (if (gethash cat categorized-posts)
+                  (push post (gethash cat categorized-posts))
+                  (setf (gethash cat categorized-posts) (list post))))
+
+    (loop :for tag :being :each :hash-key :of tagged-posts
+          :do (publish-listing
+               :posts (gethash tag tagged-posts)
+               :title (format nil "Posts tagged `~a'" tag)
+               :dest (ppath:join (conf :dest) "tags" tag "index.html")))
+
+    (maphash (lambda (cat posts)
+               (publish-listing :posts posts
+                                :title (format nil "Posts categorized as `~a'" cat)
+                                :dest (ppath:join (conf :dest) cat "index.html")))
+             categorized-posts)
+
+    (publish-listing
+     :posts all-posts
+     :title "All Posts"
+     :dest (ppath:join (conf :dest) "archive/index.html"))
+
+    t))

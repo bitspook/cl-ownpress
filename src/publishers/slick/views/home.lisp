@@ -181,7 +181,7 @@
            (with-slots ((href clown:output-path)) rp
              (:li (:a :href href
                       :class "recent-content-item content-type--blog"
-                      (post-title title))))))
+                      (clown:post-title rp))))))
         (:footer (:a :class "btn btn-primary read-more-btn"
                      :href "/archive"
                   "See all")))))))
