@@ -1,10 +1,10 @@
 (in-package :clown-slick)
 
 (defparameter *css-vars*
-  '((width-l . "990px")
-    (width-md . "840px")
-    (width-sm . "480px")
-    (colors . (:background "#fcfcfc"
+  '((:width-l . "990px")
+    (:width-md . "840px")
+    (:width-sm . "480px")
+    (:colors . (:background "#fcfcfc"
                :background-dark1 "#f9f9f9"
                :background-dark2 "#efefef"
                :primary "#006992"
@@ -19,7 +19,7 @@
   (cdr (assoc name *css-vars*)))
 
 (defun css-color (name)
-  (let ((colors (css-var 'colors)))
+  (let ((colors (css-var :colors)))
     (getf colors name)))
 
 (defparameter font-css
@@ -74,10 +74,10 @@
   `((,@selectors :max-width 70%
                 :padding 0 124px
                 :margin 0 auto)
-    (:media ,(format nil "(max-width: ~a)" (css-var 'width-md))
+    (:media ,(format nil "(max-width: ~a)" (css-var :width-md))
             (,@selectors :max-width 100%
                         :padding 0 8%))
-    (:media ,(format nil "(max-width: ~a)" (css-var 'width-sm))
+    (:media ,(format nil "(max-width: ~a)" (css-var :width-sm))
             (,@selectors :max-width 100%
                         :padding 0 4%))))
 
