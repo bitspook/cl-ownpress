@@ -4,9 +4,9 @@
   (:export
    make-connection
    run-pending-migrations
-   post id title slug tags html-content
+   post id slug tags html-content post-tags post-category post-published-at post-title
    fetch-recent-posts
-   published-post output-path
+   published-post output-path post-output-path
    db-to-post))
 (in-package :cl-ownpress)
 

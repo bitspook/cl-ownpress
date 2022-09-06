@@ -1,6 +1,6 @@
 (defpackage :clown-slick.views
   (:nicknames :slick-views)
-  (:use :cl)
+  (:use :cl :alexandria)
   (:import-from :spinneret :with-html-string)
   (:import-from :clown-slick
                 conf

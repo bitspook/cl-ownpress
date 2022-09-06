@@ -11,22 +11,7 @@ CREATE TABLE IF NOT EXISTS inputs (
   metadata JSON,
   content_raw TEXT,                  -- Content of *some* inputs
   content_html TEXT,                 -- Content in HTML formfor *some* inputs
-  published_at DATETIME
+  published_at DATETIME,
+  out_path TEXT         -- Path where the input is published
 ) WITHOUT ROWID;
 --;;
-CREATE TABLE IF NOT EXISTS dependencies (
-  input_id TEXT NOT NULL,
-  depends_on TEXT NOT NULL,
-  PRIMARY KEY (input_id, depends_on),
-  FOREIGN KEY(input_id) REFERENCES inputs(id),
-  FOREIGN KEY(depends_on) REFERENCES inputs(id)
-) WITHOUT ROWID;
---;;
-CREATE TABLE IF NOT EXISTS outputs (
-  id INTEGER PRIMARY KEY NOT NULL,
-  input_id TEXT NOT NULL,
-  path TEXT NOT NULL,
-  created_at TEXT NOT NULL DEFAULT datetime,
-  updated_at TEXT NOT NULL DEFAULT datetime,
-  FOREIGN KEY(input_id) REFERENCES inputs(id)
-);

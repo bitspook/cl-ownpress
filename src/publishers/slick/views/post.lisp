@@ -31,7 +31,10 @@
                      (.tags  :list-style-type none
                              :display flex
                              :flex-wrap wrap
-                             (li :padding-right 1rem)))
+
+                             (li :padding-right 1rem
+
+                                 (a :color ,(css-color :secondary)))))
       (.main-article :font-family "Cantarell, sans-serif"
                      :min-height 500px
 
@@ -50,18 +53,22 @@
     `(:div ,(navbar-dom)
            (:section :class "content"
                      (:header :class "content-header"
-                              (:h1 (slot-value post 'clown:title))
+                              (:h1 (clown:post-title post))
                               (:span :class "content-meta"
-                                     (:span :class "meta-item date" "Jan 01, 1992")
+                                     (:span :class "meta-item date"
+                                            (local-time:format-timestring
+                                             nil (clown:post-published-at post)
+                                             :format '(:long-month " " :day ", " :year)))
                                      (:ul :class "meta-item tags"
-                                          (dolist (tag tags) (:li :class "tag" tag)))))
+                                          (dolist (tag (clown:post-tags post))
+                                            (:li.tag (:a :href (str:concat "/tags/" tag) (str:capitalize tag)))))))
                      (:article :class "main-article" (:raw (slot-value post 'clown:html-content))))
            ,(footer-dom)))
 
   (defun publish-post (post)
     "Publish a POST. It writes the HTML to a file, update database. Returns
    `published-post'."
-    (with-slots ((slug clown:slug) (id clown:id) (title clown:title) (tags clown:tags)) post
+    (with-slots ((slug clown:slug) (id clown:id) (tags clown:tags)) post
       (let* ((output-path (concatenate 'string "/blog/" slug))
              (dest (str:concat (format nil "~a" (conf :dest)) output-path)))
         (clown-slick:write-html-to-file dest (post-html))
@@ -69,29 +76,50 @@
         (let ((conn (clown:make-connection)))
           (multiple-value-bind (stmt values)
               (sxql:yield
-               (sxql:insert-into :outputs
-                 (sxql:set= :input_id id
-                            :path output-path)))
+               (sxql:update :inputs
+                 (sxql:set= :out_path output-path)
+                 (sxql:where (:= :id id))))
             (dbi:fetch-all (dbi:execute (dbi:prepare conn stmt) values))))
 
         (make-instance 'clown:published-post
-                       :title title
+                       :title (clown:post-title post)
                        :id id
                        :slug slug
                        :tags tags
-                       :output-path output-path))))
+                       :output-path output-path
+                       :category (clown:post-category post)
+                       :published-at (clown:post-published-at post)))))
 
   (defun publish-recent-posts (&optional (limit 5))
     (loop
-  :with fetcher := (clown:fetch-recent-posts limit)
-    :for post := (funcall fetcher)
-    :while post
-    :collect (publish-post post))))
+      :with fetcher := (clown:fetch-recent-posts limit)
+      :for post := (funcall fetcher)
+      :while post
+      :collect (publish-post post))))
+
+(defun publish-all-posts ()
+  "Publish all the posts along with tag pages."
+  (let ((tagged-posts (make-hash-table :test 'equal)))
+    (loop :with fetcher := (clown:fetch-recent-posts)
+          :for post := (funcall fetcher)
+          :while post
+          :do (let ((p-post (publish-post post)))
+                (loop :for tag :in (clown:post-tags p-post)
+                      :do (uiop:if-let ((%posts (gethash tag tagged-posts)))
+                            (push p-post (gethash tag tagged-posts))
+                            (setf (gethash tag tagged-posts) (list p-post))))))
+    (loop :for tag :being :each :hash-key :of tagged-posts
+          :do (publish-listing
+               :posts (gethash tag tagged-posts)
+               :title (format nil "Posts tagged `~a'" tag)
+               :dest (str:concat (format nil "~a" (conf :dest)) "/tags/" tag "/index.html")))
+
+    t))
 
 (defmacro post-html ()
   "Produce HTML required for publishing a `post'. A variable named 'post' must be
 present at execution"
   (let ((styles '(top-level-css
                   (post-css))))
-    `(html-str (:title (slot-value post 'clown:title) :css ,styles)
+    `(html-str (:title (clown:post-title post) :css ,styles)
        ,(post-dom))))
