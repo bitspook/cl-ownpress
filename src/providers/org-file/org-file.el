@@ -74,6 +74,7 @@
     `(:id ,(or (alist-get 'slug meta) (clown--file-slug file))
       :slug ,(or (alist-get 'slug meta) (clown--file-slug file))
       :title ,(alist-get 'title meta)
+      :filepath ,file
       :tags ,(json-encode-list (alist-get 'tags meta))
       :metadata ,(json-encode-alist meta)
       :provider ,*provider-name*

@@ -1,5 +1,13 @@
 (in-package :clown-slick.views)
 
+(defmacro post-html ()
+  "Produce HTML required for publishing a `post'. A variable named 'post' must be
+present at execution"
+  (let ((styles '(top-level-css
+                  (post-css))))
+    `(html-str (:title (clown:post-title post) :css ,styles)
+       ,(post-dom))))
+
 (eval-when (:compile-toplevel :load-toplevel :execute)
   (defun post-css ()
     `(,@(navbar-css)
@@ -69,8 +77,8 @@
     "Publish a POST. It writes the HTML to a file, update database. Returns
    `published-post'."
     (with-slots ((slug clown:slug) (id clown:id) (tags clown:tags)) post
-      (let* ((output-path (concatenate 'string "/blog/" slug))
-             (dest (str:concat (format nil "~a" (conf :dest)) output-path)))
+      (let* ((output-path (ppath:normpath (str:concat "/" (clown:post-category post) "/" slug "/")))
+             (dest (str:concat (conf :dest) output-path)))
         (clown-slick:write-html-to-file dest (post-html))
 
         (let ((conn (clown:make-connection)))
@@ -96,11 +104,3 @@
       :for post := (funcall fetcher)
       :while post
       :collect (publish-post post))))
-
-(defmacro post-html ()
-  "Produce HTML required for publishing a `post'. A variable named 'post' must be
-present at execution"
-  (let ((styles '(top-level-css
-                  (post-css))))
-    `(html-str (:title (clown:post-title post) :css ,styles)
-       ,(post-dom))))

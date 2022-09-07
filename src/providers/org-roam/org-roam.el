@@ -91,14 +91,15 @@ Which themselves should be not be published.")
   "Collect a single org-roam NODE."
   (let ((meta (clown--get-post-meta (org-roam-node-file node))))
     `(:id ,(org-roam-node-id node)
-          :slug ,(or (alist-get 'slug meta) (clown--node-slug node))
-          :title ,(alist-get 'title meta)
-          :tags ,(json-encode-list (alist-get 'tags meta))
-          :metadata ,(json-encode-alist (push '("category" . "blog") meta))
-          :provider ,*provider-name*
-          :published-at ,(alist-get 'date meta)
-          :content_raw ,(org-file-contents (org-roam-node-file node))
-          :content_html ,(clown--org-to-html (org-roam-node-file node)))))
+      :slug ,(or (alist-get 'slug meta) (clown--node-slug node))
+      :title ,(alist-get 'title meta)
+      :tags ,(json-encode-list (alist-get 'tags meta))
+      :category ,(or (alist-get "category" meta) "blog")
+      :metadata ,(json-encode-alist meta)
+      :provider ,*provider-name*
+      :published-at ,(alist-get 'date meta)
+      :content_raw ,(org-file-contents (org-roam-node-file node))
+      :content_html ,(clown--org-to-html (org-roam-node-file node)))))
 
 (defun clown--collect ()
   "Collect all the org-roam notes which should be published.

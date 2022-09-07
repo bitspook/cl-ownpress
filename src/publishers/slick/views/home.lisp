@@ -180,7 +180,7 @@
          (dolist (rp (publish-recent-posts 5))
            (with-slots ((href clown:output-path)) rp
              (:li (:a :href href
-                      :class "recent-content-item content-type--blog"
+                      :class (format nil "recent-content-item content-type--~a" (clown:post-category rp))
                       (clown:post-title rp))))))
         (:footer (:a :class "btn btn-primary read-more-btn"
                      :href "/archive"

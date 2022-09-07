@@ -8,6 +8,7 @@ CREATE TABLE IF NOT EXISTS inputs (
   provider TEXT NOT NULL,
   title TEXT,
   tags JSON,                     -- An array
+  category TEXT,
   metadata JSON,
   content_raw TEXT,                  -- Content of *some* inputs
   content_html TEXT,                 -- Content in HTML formfor *some* inputs

@@ -51,7 +51,9 @@ query itself as second value.
   (labels ((parse-tags (tag-str)
              (let ((tags (yason:parse tag-str)))
                (if (hash-table-p tags) nil
-                   tags))))
+                   tags)))
+           (parse-category (cat-str)
+             (when (not (str:emptyp cat-str)) cat-str)))
 
     (let ((pub-date (uiop:if-let ((date (getf row :|published_at|)))
                       (local-time:parse-timestring date :date-time-separator #\Space)
@@ -62,6 +64,6 @@ query itself as second value.
        :id (getf row :|id|)
        :slug (getf row :|slug|)
        :tags (parse-tags (getf row :|tags|))
-       :category (gethash "category" (yason:parse (getf row :|metadata|)))
+       :category (parse-category (getf row :|category|))
        :published-at pub-date
        :html-content (getf row :|content_html|)))))

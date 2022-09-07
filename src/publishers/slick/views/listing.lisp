@@ -1,5 +1,13 @@
 (in-package :clown-slick.views)
 
+(defmacro listing-html (&key title posts)
+  (let ((css '(top-level-css
+               (navbar-css)
+               (listing-css)
+               (footer-css))))
+    `(html-str (:title ,title :css ,css)
+       ,(listing-dom))))
+
 (eval-when (:compile-toplevel :load-toplevel :execute)
   (defun listing-css ()
     `(,@(clown-slick:adjustable-width-css ".content")
@@ -72,7 +80,8 @@
              (:span :class "meta-item tags"
                     (dolist (tag (clown:post-tags post))
                       (:a :href (str:concat "/tags/" tag) (str:capitalize tag)))))))
-          posts))))))
+          posts)))
+      ,(footer-dom))))
 
 (defun publish-listing (&key posts title dest)
   (let ((html (listing-html :title title :posts posts)))
@@ -85,7 +94,7 @@
    3. Listing page with all the posts"
   (let ((tagged-posts (make-hash-table :test 'equal))
         (categorized-posts (make-hash-table :test 'equal))
-        (all-posts (publish-recent-posts -1)))
+        (all-posts (remove-if-not #'clown:post-category (publish-recent-posts -1))))
     (loop :for post :in all-posts
           :for cat := (clown:post-category post)
           :do (loop
@@ -115,8 +124,3 @@
      :dest (ppath:join (conf :dest) "archive/index.html"))
 
     t))
-
-(defmacro listing-html (&key title posts)
-  (let ((css '(top-level-css (navbar-css) (listing-css))))
-    `(html-str (:title ,title :css ,css)
-       ,(listing-dom))))

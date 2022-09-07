@@ -23,6 +23,7 @@
                 :components
                 ((:file "package")
                  (:file "models")
+                 (:file "rpc-server")
                  (:file "main")))
                (:module "src/publishers/slick"
                 :serial t
