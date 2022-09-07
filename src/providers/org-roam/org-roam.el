@@ -14,7 +14,8 @@
 
 (setq user-emacs-directory (expand-file-name "./" *provider-dir*)
       *cask-bundle* (cask-initialize)
-      load-path (cask-load-path *cask-bundle*))
+      load-path (cask-load-path *cask-bundle*)
+      inhibit-message t)
 
 (when *setup-cask*
   (cask-install *cask-bundle*))
@@ -94,6 +95,7 @@ Which themselves should be not be published.")
           :title ,(alist-get 'title meta)
           :tags ,(json-encode-list (alist-get 'tags meta))
           :metadata ,(json-encode-alist (push '("category" . "blog") meta))
+          :provider ,*provider-name*
           :published-at ,(alist-get 'date meta)
           :content_raw ,(org-file-contents (org-roam-node-file node))
           :content_html ,(clown--org-to-html (org-roam-node-file node)))))

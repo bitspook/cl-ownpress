@@ -17,9 +17,10 @@
 
 (defmethod invoke-provider ((provider (eql *org-roam-provider*)) &key)
   (let ((script-path (asdf:system-relative-pathname "cl-ownpress" "./src/providers/org-roam/org-roam.el")))
-    (uiop:run-program (format nil "emacs --script ~a" script-path)
-                      :output *standard-output*
-                      :error-output *standard-output*)))
+    (with-rpc-server
+      (uiop:run-program (format nil "emacs --script ~a" script-path)
+                        :output *standard-output*
+                        :error-output *standard-output*))))
 
 (defparameter *fs-provider* (make-instance 'provider :name "fs-provider"))
 
@@ -32,14 +33,15 @@
   (let* ((start-dir (asdf:system-relative-pathname "cl-ownpress" content-dir))
          (content-files (recursive-directory-files start-dir))
          (script-path (asdf:system-relative-pathname "cl-ownpress" "./src/providers/org-file/org-file.el")))
-    (uiop:run-program (format nil "emacs --script ~a ~{~a ~}" script-path content-files)
-                      :output *standard-output*
-                      :error-output *standard-output*)))
+    (with-rpc-server
+      (uiop:run-program (format nil "emacs --script ~a ~{~a ~}" script-path content-files)
+                        :output *standard-output*
+                        :error-output *standard-output*))))
 
-(defun save-post (post)
+(defun process-rpc-msg (post)
   "Save a blog POST into the database. POST is a hash-table, to be obtained as a
    message to rpc-server"
-  (log:d "Got Post: ~a~%" (gethash "title" post))
+  (log:d "Processing post: ~a~%" (gethash "title" post))
   (let ((conn (make-connection)))
     (multiple-value-bind (stmt values)
         (sxql:yield
@@ -49,13 +51,11 @@
                       :title (gethash "title" post)
                       :tags (gethash "tags" post)
                       :metadata (gethash "metadata" post)
-                      :provider (provider-name *org-roam-provider*)
+                      :provider (gethash "provider" post)
                       :published_at (gethash "published-at" post)
                       :content_raw (gethash "content_raw" post)
                       :content_html (gethash "content_html" post))))
-      (log:d "EXECUTING ~a~%" stmt)
       (dbi:fetch-all (dbi:execute (dbi:prepare conn stmt) values)))))
-
 
 (defun start-rpc-server (msg-processor)
   "RPC server should be used for communicating with external processes a
@@ -73,8 +73,7 @@
            msg := (str:trim
                    (str:replace-first
                     msg-sep ""
-                    (with-output-to-string
-                        (msg-str)
+                    (with-output-to-string (msg-str)
                       (loop :named inner
                             :with trail := '()
                             :for char := (read-char stream nil 'eof)
@@ -87,14 +86,22 @@
            :do (funcall msg-processor (yason:parse msg)))
       (progn
         (usocket:socket-close conn)
-        (usocket:socket-close socket)))))
+        (usocket:socket-close socket)))
+    socket))
+
+(defmacro with-rpc-server (&body body)
+  "Run BODY with a running rpc-server, and wait until the server stops. Stopping
+the server is responsibility of BODY. If BODY don't stop the server, a call to
+this macro will hang indefinitely until heap exhaustion."
+  ;; FIXME It shouldn't be BODY's responsibility to close the server
+  (let ((channel (gensym)))
+    `(let ((,channel (lparallel:make-channel)))
+       (lparallel:submit-task ,channel #'start-rpc-server #'process-rpc-msg)
+       ,@body
+       (lparallel:receive-result ,channel))))
 
 (defun main ()
-  (let ((rpc-channel (lparallel:make-channel)))
-    (run-pending-migrations)
-    (lparallel:submit-task rpc-channel #'start-rpc-server #'save-post)
+  (run-pending-migrations)
 
-    (invoke-provider *org-roam-provider*)
-    (invoke-provider *fs-provider* :content-dir "./content/")
-
-    (lparallel:receive-result rpc-channel)))
+  (invoke-provider *org-roam-provider*)
+  (invoke-provider *fs-provider* :content-dir "./content/"))
