@@ -35,7 +35,7 @@ query itself as second value.
   (let* ((query (sxql:yield
                  (sxql:select (:*)
                    (sxql:from :inputs)
-                   (sxql:order-by :published_at)
+                   (sxql:order-by (:desc :published_at))
                    (sxql:limit limit))))
          (conn (clown:make-connection))
          (query (dbi:execute (dbi:prepare conn query))))
@@ -48,15 +48,20 @@ query itself as second value.
 
 (defun db-to-post (row)
   "Try to make a `post' from a database row."
-  (let ((pub-date (uiop:if-let ((date (getf row :|published_at|)))
-                    (local-time:parse-timestring date :date-time-separator #\Space)
-                    nil)))
-    (make-instance
-     'post
-     :title (getf row :|title|)
-     :id (getf row :|id|)
-     :slug (getf row :|slug|)
-     :tags (yason:parse (getf row :|tags|))
-     :category (gethash "category" (yason:parse (getf row :|metadata|)))
-     :published-at pub-date
-     :html-content (getf row :|content_html|))))
+  (labels ((parse-tags (tag-str)
+             (let ((tags (yason:parse tag-str)))
+               (if (hash-table-p tags) nil
+                   tags))))
+
+    (let ((pub-date (uiop:if-let ((date (getf row :|published_at|)))
+                      (local-time:parse-timestring date :date-time-separator #\Space)
+                      nil)))
+      (make-instance
+       'post
+       :title (getf row :|title|)
+       :id (getf row :|id|)
+       :slug (getf row :|slug|)
+       :tags (parse-tags (getf row :|tags|))
+       :category (gethash "category" (yason:parse (getf row :|metadata|)))
+       :published-at pub-date
+       :html-content (getf row :|content_html|)))))

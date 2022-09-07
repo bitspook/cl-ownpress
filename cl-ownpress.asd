@@ -36,6 +36,7 @@
                    (:file "navbar")
                    (:file "footer")
                    (:file "post")
+                   (:file "listing")
                    (:file "home")))
                  (:file "main"))))
   :description ""

@@ -190,5 +190,5 @@
   (let ((styles '(top-level-css
                   button-css
                   home-css)))
-    `(html-str (:title '("~a's online home" (conf :author)) :css ,styles)
+    `(html-str (:title ("~a's online home" (conf :author)) :css ,styles)
        ,home-dom)))
