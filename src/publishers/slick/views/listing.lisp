@@ -1,7 +1,7 @@
 (in-package :clown-slick.views)
 
 (defmacro listing-html (&key title posts)
-  (let ((css '(top-level-css
+  (let ((css '((top-level-css)
                (navbar-css)
                (listing-css)
                (footer-css))))
@@ -46,11 +46,13 @@
 
       (.meta-item :line-height 1
                   :padding 0
-                  :padding-right 1em)
+                  :padding-right 1em
+                  :border-right ,(format nil "1px solid ~a" (css-color :separator)))
+      ((:and .meta-item :last-child) :padding-right 0
+                                     :border none)
 
       (.tags :display flex
              :flex-wrap wrap
-             :text-transform capitalize
 
              (a :margin-left 1em))))
 
@@ -77,9 +79,10 @@
                     (local-time:format-timestring
                      nil (clown:post-published-at post)
                      :format '(:long-month " " :day ", " :year)))
-             (:span :class "meta-item tags"
-                    (dolist (tag (clown:post-tags post))
-                      (:a :href (str:concat "/tags/" tag) (str:capitalize tag)))))))
+             (when-let ((tags (clown:post-tags post)))
+               (:span :class "meta-item tags"
+                      (dolist (tag tags)
+                        (:a :href (str:concat "/tags/" tag) (str:concat "#" (str:downcase tag)))))))))
           posts)))
       ,(footer-dom))))
 
@@ -108,12 +111,12 @@
 
     (loop :for tag :being :each :hash-key :of tagged-posts
           :do (publish-listing
-               :posts (gethash tag tagged-posts)
+               :posts (reverse (gethash tag tagged-posts))
                :title (format nil "Posts tagged `~a'" tag)
                :dest (ppath:join (conf :dest) "tags" tag "index.html")))
 
     (maphash (lambda (cat posts)
-               (publish-listing :posts posts
+               (publish-listing :posts (reverse posts)
                                 :title (format nil "Posts categorized as `~a'" cat)
                                 :dest (ppath:join (conf :dest) cat "index.html")))
              categorized-posts)

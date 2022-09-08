@@ -187,7 +187,7 @@
                   "See all")))))))
 
 (defmacro home-html ()
-  (let ((styles '(top-level-css
+  (let ((styles '((top-level-css)
                   button-css
                   home-css)))
     `(html-str (:title ("~a's online home" (conf :author)) :css ,styles)

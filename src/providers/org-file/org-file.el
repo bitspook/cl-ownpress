@@ -60,6 +60,8 @@
         (org-html-htmlize-output-type 'inline-css)
         (org-content (org-file-contents filename))
         (org-html-head-include-default-style nil)
+        (org-export-with-properties nil)
+        (org-export-with-drawers nil)
         (org-export-show-temporary-export-buffer nil))
     (with-temp-buffer
       (insert org-content)

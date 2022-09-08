@@ -3,7 +3,7 @@
 (defmacro post-html ()
   "Produce HTML required for publishing a `post'. A variable named 'post' must be
 present at execution"
-  (let ((styles '(top-level-css
+  (let ((styles '((top-level-css)
                   (post-css))))
     `(html-str (:title (clown:post-title post) :css ,styles)
        ,(post-dom))))
@@ -41,8 +41,8 @@ present at execution"
                              :flex-wrap wrap
 
                              (li :padding-right 1rem
-
                                  (a :color ,(css-color :secondary)))))
+
       (.main-article :font-family "Cantarell, sans-serif"
                      :min-height 500px
 
@@ -67,9 +67,10 @@ present at execution"
                                             (local-time:format-timestring
                                              nil (clown:post-published-at post)
                                              :format '(:long-month " " :day ", " :year)))
-                                     (:ul :class "meta-item tags"
-                                          (dolist (tag (clown:post-tags post))
-                                            (:li.tag (:a :href (str:concat "/tags/" tag) (str:capitalize tag)))))))
+                                     (when-let ((tags (clown:post-tags post)))
+                                       (:ul :class "meta-item tags"
+                                            (dolist (tag tags)
+                                              (:li.tag (:a :href (str:concat "/tags/" tag) (str:concat "#" (str:downcase tag)))))))))
                      (:article :class "main-article" (:raw (slot-value post 'clown:html-content))))
            ,(footer-dom)))
 

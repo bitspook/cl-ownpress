@@ -37,7 +37,7 @@
      ("Cantarell" "normal" "bold" "Cantarell-Bold.ttf")
      ("Cantarell" "normal" "regular" "Cantarell-Regular.ttf"))))
 
-(defparameter top-level-css
+(defun top-level-css ()
   `(,@font-css
     ("*" :margin 0
          :padding 0
@@ -57,10 +57,10 @@
       :padding-top 0
       :border-bottom "2px solid" ,(css-color :secondary)
       :font-size "0.7em"))
-    (blockquote :background-color ,(css-color :secondary)
-                :padding 0.01em 1em
+    (blockquote :padding 0.01em 1em
                 :margin 1em 0
-                :border-left 4px solid ,(css-color :secondary))
+                :border-left 4px solid ,(css-color :secondary)
+                :font-size 1.2em)
     (pre :overflow auto
          :padding 1em)
     (.title :margin 2rem 0
