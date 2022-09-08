@@ -50,7 +50,7 @@ present at execution"
                      (p :font-family inherit
                         :font-size inherit
                         :margin 1rem 0)
-                     (h3 :margin 0.4rem 0)
+                     (h3 :margin 1.2rem 0 0.4rem 0)
                      (a :text-decoration underline)
                      (ul :margin-left 1.4rem)
                      (li :margin 0.7rem

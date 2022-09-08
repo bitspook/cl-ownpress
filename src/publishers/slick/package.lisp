@@ -1,8 +1,9 @@
 (defpackage :clown-slick
-  (:use :cl)
+  (:use :cl :alexandria)
   (:import-from :spinneret :with-html-string)
   (:export
    conf
+   *conf*
    *debug-transpiles*
    *css-vars*
    css-var
