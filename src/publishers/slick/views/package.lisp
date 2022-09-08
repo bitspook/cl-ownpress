@@ -27,4 +27,5 @@
         (:head
          (:title ,title)
          (:style (:raw styles)))
-        (:body ,@dom)))))
+        (:body ,@dom)
+        ,(mixpanel-dom)))))

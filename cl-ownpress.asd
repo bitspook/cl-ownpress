@@ -35,6 +35,7 @@
                   :components
                   ((:file "package")
                    (:file "navbar")
+                   (:file "mixpanel")
                    (:file "footer")
                    (:file "post")
                    (:file "listing")

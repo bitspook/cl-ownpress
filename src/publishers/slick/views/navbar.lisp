@@ -5,12 +5,12 @@
          (:div :class "brand"
                (:a :href "/"
                    (:img :class "brand-avatar"
-                         :src ,(conf :avatar)
-                         :alt ,(conf :author))))
+                         :src (conf :avatar)
+                         :alt (conf :author))))
          (:div
           (:ul (:li (:a :href "/blog" "Blog"))
                (:li (:a :href "/poems" "Poems"))
-               (:li (:a :href ,(conf :github) "Projects"))))))
+               (:li (:a :href (conf :github) "Projects"))))))
 
 (defun navbar-css ()
   `((.top-nav
