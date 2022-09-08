@@ -1,7 +1,8 @@
 (in-package :clown-slick)
 
 (defparameter *css-vars*
-  '((:width-l . "990px")
+  '((:width-xl . "1080px")
+    (:width-l . "990px")
     (:width-md . "840px")
     (:width-sm . "480px")
     (:colors . (:background "#fcfcfc"
@@ -71,7 +72,7 @@
                 :text-transform capitalize))))
 
 (defun adjustable-width-css (&rest selectors)
-  `((,@selectors :max-width 70%
+  `((,@selectors :max-width ,(css-var :width-xl)
                 :padding 0 124px
                 :margin 0 auto)
     (:media ,(format nil "(max-width: ~a)" (css-var :width-md))

@@ -16,9 +16,9 @@ present at execution"
                 :font-weight 500
                 :font-size 1.5em
                 :line-height 1.4
-                :max-width 70%
                 :margin 0 auto
                 :padding 0 124px)
+      ,@(clown-slick:adjustable-width-css ".content")
       (.content-header (h1 :margin-bottom 1rem))
       (.content-meta :margin-top 0
                      :margin-bottom 2rem

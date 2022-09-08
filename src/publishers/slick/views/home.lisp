@@ -3,16 +3,7 @@
 ;; Need these available at compile time for the home-html macro
 (eval-when (:compile-toplevel :load-toplevel :execute)
   (defparameter home-css
-    `((:media ,(format nil "(max-width: ~a)" (css-var 'width-md))
-              (.home :flex-direction column)
-              (.sidebar :width 100%)
-              (.main :width 100%))
-
-      (:media ,(format nil "(max-width: ~a)" (css-var 'width-l))
-              (.sidebar :width 40%)
-              (.main :width 60%))
-
-      (.home :display flex
+    `((.home :display flex
              (.sidebar :width 450px
                        :left 0
                        :top 0%
@@ -135,7 +126,16 @@
                :background-size contain)
 
               (.read-more-btn :font-size 1.3em
-                              :margin 0.7em 0)))))
+                              :margin 0.7em 0)))
+
+      (:media ,(format nil "(max-width: ~a)" (css-var :width-l))
+              (.home (.sidebar :width 40%)
+                     (.main :width 60%)))
+
+      (:media ,(format nil "(max-width: ~a)" (css-var :width-md))
+              (.home :flex-direction column
+                     (.sidebar :width 100%)
+                     (.main :width 100%)))))
 
   (defparameter home-dom
     '(:div :class "home"
