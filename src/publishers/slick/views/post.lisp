@@ -71,13 +71,13 @@ present at execution"
                                        (:ul :class "meta-item tags"
                                             (dolist (tag tags)
                                               (:li.tag (:a :href (str:concat "/tags/" tag) (str:concat "#" (str:downcase tag)))))))))
-                     (:article :class "main-article" (:raw (slot-value post 'clown:html-content))))
+                     (:article :class "main-article" (:raw (clown:post-html-content post))))
            ,(footer-dom)))
 
   (defun publish-post (post)
     "Publish a POST. It writes the HTML to a file, update database. Returns
    `published-post'."
-    (with-slots ((slug clown:slug) (id clown:id) (tags clown:tags)) post
+    (with-slots ((slug clown:slug) (tags clown:tags)) post
       (let* ((output-path (ppath:normpath (str:concat "/" (clown:post-category post) "/" slug "/")))
              (dest (str:concat (conf :dest) output-path)))
         (clown-slick:write-html-to-file dest (post-html))
@@ -87,17 +87,18 @@ present at execution"
               (sxql:yield
                (sxql:update :inputs
                  (sxql:set= :out_path output-path)
-                 (sxql:where (:= :id id))))
+                 (sxql:where (:= :id (clown:post-id post)))))
             (dbi:fetch-all (dbi:execute (dbi:prepare conn stmt) values))))
 
         (make-instance 'clown:published-post
                        :title (clown:post-title post)
-                       :id id
+                       :id (clown:post-id post)
                        :slug slug
                        :tags tags
                        :output-path output-path
                        :category (clown:post-category post)
-                       :published-at (clown:post-published-at post)))))
+                       :published-at (clown:post-published-at post)
+                       :html-content (clown:post-html-content post)))))
 
   (defun publish-recent-posts (&optional (limit 5))
     (loop

@@ -1,13 +1,13 @@
 (in-package :clown)
 
 (defclass post ()
-  ((id :initarg :id)
+  ((id :initarg :id :reader post-id)
    (slug :initarg :slug)
    (title :initarg :title :accessor post-title)
    (tags :initarg :tags :accessor post-tags)
    (category :initarg :category :accessor post-category)
    (published-at :initarg :published-at :accessor post-published-at)
-   (html-content :initarg :html-content)))
+   (html-content :initarg :html-content :accessor post-html-content)))
 
 (defmethod print-object ((obj post) out)
   (print-unreadable-object (obj out)

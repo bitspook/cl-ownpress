@@ -16,7 +16,7 @@
            publish-post-listings))
 (in-package :slick-views)
 
-(defmacro html-str ((&key title css) &body dom)
+(defmacro html-str ((&key title css (rss-url nil)) &body dom)
   `(let ((spinneret:*suppress-inserted-spaces* t)
          (spinneret:*html-style* (if *debug-transpiles* :human :tree))
          (*print-pretty* *debug-transpiles*)
@@ -26,6 +26,8 @@
        (:html
         (:head
          (:title ,title)
+         (when ,rss-url
+           (:link :rel "alternate" :type "application/atom+xml" :title "RSS Feed" :href ,rss-url))
          (:style (:raw styles)))
         (:body ,@dom)
         ,(mixpanel-dom)))))

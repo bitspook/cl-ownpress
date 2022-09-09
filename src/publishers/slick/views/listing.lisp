@@ -1,11 +1,11 @@
 (in-package :clown-slick.views)
 
-(defmacro listing-html (&key title posts)
+(defmacro listing-html (&key title posts rss-url)
   (let ((css '((top-level-css)
                (navbar-css)
                (listing-css)
                (footer-css))))
-    `(html-str (:title ,title :css ,css)
+    `(html-str (:title ,title :css ,css :rss-url rss-url)
        ,(listing-dom))))
 
 (eval-when (:compile-toplevel :load-toplevel :execute)
@@ -87,8 +87,15 @@
       ,(footer-dom))))
 
 (defun publish-listing (&key posts title dest)
-  (let ((html (listing-html :title title :posts posts)))
-    (clown-slick:write-html-to-file dest html)))
+  (let* ((feed-dest (clown:join-paths (ppath:dirname dest) "feed.xml"))
+         (rss-url (clown:join-paths (conf :site-url) (str:replace-first (conf :dest) "" feed-dest)))
+         (html (listing-html :title title :posts posts :rss-url rss-url))
+         (rss (rss-str (subseq posts 0 (min (length posts) (conf :rss-max-posts)))
+                       :title title
+                       :feed-url rss-url
+                       :feed-updated-at (clown:post-published-at (first posts)))))
+    (clown-slick:write-html-to-file dest html)
+    (clown-slick:write-to-file feed-dest rss)))
 
 (defun publish-post-listings ()
   "Publish all the listing pages. It includes:
@@ -113,17 +120,17 @@
           :do (publish-listing
                :posts (reverse (gethash tag tagged-posts))
                :title (format nil "Posts tagged `~a'" tag)
-               :dest (ppath:join (conf :dest) "tags" tag "index.html")))
+               :dest (ppath:join (conf :dest) (format nil "tags/~a/" tag))))
 
     (maphash (lambda (cat posts)
                (publish-listing :posts (reverse posts)
                                 :title (format nil "Posts categorized as `~a'" cat)
-                                :dest (ppath:join (conf :dest) cat "index.html")))
+                                :dest (ppath:join (conf :dest) (format nil "~a/" cat))))
              categorized-posts)
 
     (publish-listing
      :posts all-posts
      :title "All Posts"
-     :dest (ppath:join (conf :dest) "archive/index.html"))
+     :dest (ppath:join (conf :dest) "archive/"))
 
     t))

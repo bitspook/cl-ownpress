@@ -158,7 +158,7 @@
         (:a :href (conf :linkedin)
             :title (format nil "~a on LinkedIn" (conf :author))
             :target "_blank" (:span :class "linkedin"))
-        (:a :href "/feed.xml"
+        (:a :href "/archive/feed.xml"
             :title "Follow via RSS"
             :target "_blank"
          (:span :class "rss")))
@@ -190,5 +190,5 @@
   (let ((styles '((top-level-css)
                   button-css
                   home-css)))
-    `(html-str (:title ("~a's online home" (conf :author)) :css ,styles)
+    `(html-str (:title ("~a's online home" (conf :author)) :css ,styles :rss-url (clown:join-paths (conf :site-url) "archive/feed.xml"))
        ,home-dom)))

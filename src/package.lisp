@@ -4,10 +4,11 @@
   (:export
    make-connection
    run-pending-migrations
-   post id slug tags html-content post-tags post-category post-published-at post-title
+   post post-id slug tags post-html-content post-tags post-category post-published-at post-title
    fetch-recent-posts
    published-post output-path post-output-path
-   db-to-post))
+   db-to-post
+   join-paths))
 (in-package :cl-ownpress)
 
 (require :cl-migratum)

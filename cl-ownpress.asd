@@ -22,6 +22,7 @@
                 :serial t
                 :components
                 ((:file "package")
+                 (:file "utils")
                  (:file "models")
                  (:file "rpc-server")
                  (:file "main")))

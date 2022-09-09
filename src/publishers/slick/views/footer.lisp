@@ -81,7 +81,7 @@
   `(:footer.site-footer.postamble
     ,(newsletter-dom)
     (:p.rss-sub
-     (:a :href "/feed.xml"
+     (:a :href "/archive/feed.xml"
          :title "Follow via RSS"
          :target "blank"
          (:span.rss) "Or Follow via RSS"))
