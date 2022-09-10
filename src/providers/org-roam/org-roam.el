@@ -1,7 +1,5 @@
-;-*- lexical-binding: t; -*-
-
 (defconst *provider-name* "org-roam")
-(defvar *provider-dir* (file-name-directory load-file-name))
+(defvar *provider-dir* (expand-file-name "./" (file-name-directory load-file-name)))
 (defvar *cask-bundle* nil)
 (defvar *setup-cask* nil)
 (setq org-directory "~/Documents/org")
@@ -10,15 +8,15 @@
 (defvar org-roam-tag-sources '(prop))
 (defvar org-roam-v2-ack t)
 
-(require 'cask (format "%scask.el" (getenv "CASK_DIR")))
+(when-let ((cask-dir (getenv "CASK_DIR") ))
+  (require 'cask (format "%scask.el" cask-dir))
+  (setq *cask-bundle* (cask-initialize *provider-dir*)
+        load-path (cask-load-path *cask-bundle*))
+  (when *setup-cask*
+    (cask-install *cask-bundle*)))
 
-(setq user-emacs-directory (expand-file-name "./" *provider-dir*)
-      *cask-bundle* (cask-initialize)
-      load-path (cask-load-path *cask-bundle*)
+(setq user-emacs-directory *provider-dir*
       inhibit-message t)
-
-(when *setup-cask*
-  (cask-install *cask-bundle*))
 
 (require 'seq)
 (require 'cl-lib)
@@ -100,7 +98,7 @@
 (defun clown--collect ()
   "Collect all the org-roam notes which should be published.
 Along with their dependencies."
-  (let* ((blog-posts-to-publish (clown--roam-nodes-with-tags '("blog-post" "published"))))
+  (let* ((blog-posts-to-publish (clown--roam-nodes-with-tags '("blog-post"))))
     (mapcar #'clown--collect-node blog-posts-to-publish)))
 
 (defun main ()

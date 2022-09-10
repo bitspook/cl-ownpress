@@ -10,10 +10,13 @@
 (defgeneric invoke-provider (provider &key)
   (:documentation "Execute a provider."))
 
+(defmethod invoke-provider :before (provider &key)
+  (run-pending-migrations))
+
 (defparameter *org-roam-provider*
-    (make-instance
-     'provider
-     :name "org-roam-provider"))
+  (make-instance
+   'provider
+   :name "org-roam-provider"))
 
 (defmethod invoke-provider ((provider (eql *org-roam-provider*)) &key)
   (let ((script-path (asdf:system-relative-pathname "cl-ownpress" "./src/providers/org-roam/org-roam.el")))
@@ -30,9 +33,9 @@
     (concatenate 'list files (mapcan #'recursive-directory-files subdirs))))
 
 (defmethod invoke-provider ((provider (eql *fs-provider*)) &key content-dir)
-  (let* ((start-dir (uiop:unix-namestring (asdf:system-relative-pathname "cl-ownpress" content-dir)))
-         (content-files (recursive-directory-files start-dir))
-         (script-path (asdf:system-relative-pathname "cl-ownpress" "./src/providers/org-file/org-file.el")))
+  (let ((content-dir (namestring (uiop:truename* content-dir)))
+        (content-files (recursive-directory-files content-dir))
+        (script-path (asdf:system-relative-pathname "cl-ownpress" "./src/providers/org-file/org-file.el")))
     (with-rpc-server
         (:processor (lambda (post)
                       (setf (gethash "category" post)
@@ -41,13 +44,13 @@
                              (first
                               (ppath:split
                                (str:replace-first
-                                start-dir ""
+                                content-dir ""
                                 (gethash "filepath" post))))))
                       (setf (gethash "provider" post) (provider-name *fs-provider*))
                       (save-post post)))
-        (uiop:run-program (format nil "emacs --script ~a ~{~a ~}" script-path content-files)
-         :output *standard-output*
-         :error-output *standard-output*))))
+      (uiop:run-program (format nil "emacs --script ~a ~{~a ~}" script-path content-files)
+                        :output *standard-output*
+                        :error-output *standard-output*))))
 
 (defun save-post (post)
   "Save a blog POST into the database. POST is a hash-table, to be obtained as a
@@ -66,11 +69,6 @@
                       :provider (gethash "provider" post)
                       :published_at (gethash "published-at" post)
                       :content_raw (gethash "content_raw" post)
-                      :content_html (gethash "content_html" post))))
+                      :content_html (gethash "content_html" post))
+           (sxql:on-conflict-do-nothing)))
       (dbi:fetch-all (dbi:execute (dbi:prepare conn stmt) values)))))
-
-(defun main ()
-  (run-pending-migrations)
-
-  (invoke-provider *org-roam-provider*)
-  (invoke-provider *fs-provider* :content-dir "./content/"))

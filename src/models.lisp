@@ -13,7 +13,7 @@
   (print-unreadable-object (obj out)
     (format out "Post: title={~a}" (post-title obj))))
 
-(defun fetch-recent-posts (&optional (limit -1))
+(defun fetch-recent-posts (&optional (limit -1) (where 1))
   "Create a fetcher to fetch recent posts, one post at a time. Return the
 query itself as second value.
 
@@ -32,16 +32,17 @@ query itself as second value.
 (multiple-value-bind (fetcher query) (fetch-recent-posts 5)
  (mapcar #'db-to-post (dbi:fetch-all query)))
 ```"
-  (let* ((query (sxql:yield
-                 (sxql:select (:*)
-                   (sxql:from :inputs)
-                   (sxql:order-by (:desc :published_at))
-                   (sxql:limit limit))))
-         (conn (clown:make-connection))
-         (query (dbi:execute (dbi:prepare conn query))))
-    (values (lambda () (let ((row (dbi:fetch query)))
-                         (when row (db-to-post row))))
-            query)))
+  (multiple-value-bind (stmt values) (sxql:yield
+                                      (sxql:select (:*)
+                                        (sxql:from :inputs)
+                                        (sxql:order-by (:desc :published_at))
+                                        (sxql:limit limit)
+                                        (sxql:where where)))
+    (let* ((conn (clown:make-connection))
+           (query (dbi:execute (dbi:prepare conn stmt) values)))
+      (values (lambda () (let ((row (dbi:fetch query)))
+                           (when row (db-to-post row))))
+              query))))
 
 (defclass published-post (post)
   ((output-path :initarg :output-path :accessor post-output-path)))

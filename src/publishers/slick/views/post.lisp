@@ -102,7 +102,13 @@ present at execution"
 
   (defun publish-recent-posts (&optional (limit 5))
     (loop
-      :with fetcher := (clown:fetch-recent-posts limit)
+      :with fetcher := (clown:fetch-recent-posts
+                        limit
+                        (if (conf :exclude-tags)
+                            `(:and ,@(loop :for tag :in (conf :exclude-tags)
+                                           :collect
+                                           `(:not (:like :tags ,(format nil "%\"~a\"%" tag)))))
+                            1))
       :for post := (funcall fetcher)
       :while post
       :collect (publish-post post))))

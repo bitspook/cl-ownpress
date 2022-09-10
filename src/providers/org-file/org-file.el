@@ -1,19 +1,17 @@
-;-*- lexical-binding: t; -*-
-
 (defconst *provider-name* "org-file")
 (defvar *provider-dir* (file-name-directory load-file-name))
 (defvar *cask-bundle* nil)
 (defvar *setup-cask* nil)
 
-(require 'cask (format "%scask.el" (getenv "CASK_DIR")))
+(when-let ((cask-dir (getenv "CASK_DIR") ))
+  (require 'cask (format "%scask.el" cask-dir))
+  (setq *cask-bundle* (cask-initialize *provider-dir*)
+        load-path (cask-load-path *cask-bundle*))
+  (when *setup-cask*
+    (cask-install *cask-bundle*)))
 
 (setq user-emacs-directory (expand-file-name "./" *provider-dir*)
-      *cask-bundle* (cask-initialize)
-      load-path (cask-load-path *cask-bundle*)
       inhibit-message t)
-
-(when *setup-cask*
-  (cask-install *cask-bundle*))
 
 (require 'seq)
 (require 'cl-lib)

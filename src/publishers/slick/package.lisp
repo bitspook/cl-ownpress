@@ -28,7 +28,8 @@
     (:site-url . nil)
     (:mixpanel-token . nil)
     (:rss-max-posts . 10)
-    (:control-tags . ("blog-post" "published" "draft"))))
+    (:control-tags . ("blog-post" "published"))
+    (:exclude-tags . ("draft"))))
 
 (defparameter *debug-transpiles* t)
 

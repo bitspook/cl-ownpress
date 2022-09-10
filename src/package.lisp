@@ -8,7 +8,8 @@
    fetch-recent-posts
    published-post output-path post-output-path
    db-to-post
-   join-paths))
+   join-paths
+   invoke-provider *org-roam-provider* *fs-provider*))
 (in-package :cl-ownpress)
 
 (require :cl-migratum)
