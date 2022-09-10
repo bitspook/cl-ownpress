@@ -67,7 +67,7 @@ present at execution"
                                             (local-time:format-timestring
                                              nil (clown:post-published-at post)
                                              :format '(:long-month " " :day ", " :year)))
-                                     (when-let ((tags (clown:post-tags post)))
+                                     (when-let ((tags (post-tags post)))
                                        (:ul :class "meta-item tags"
                                             (dolist (tag tags)
                                               (:li.tag (:a :href (str:concat "/tags/" tag) (str:concat "#" (str:downcase tag)))))))))

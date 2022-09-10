@@ -27,10 +27,6 @@
 (require 'jsonrpc)
 (require 'htmlize)
 
-(defvar *clown-control-tags* '("blog-post" "draft" "published")
-  "Tags meant for controlling publishing.
-Which themselves should be not be published.")
-
 (defun clown--roam-nodes-with-tags (tags)
   "Find all org-roam nodes which have all TAGS."
   (let ((nodes (seq-filter

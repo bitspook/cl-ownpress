@@ -94,7 +94,7 @@
                     (local-time:format-timestring
                      nil (clown:post-published-at post)
                      :format '(:long-month " " :day ", " :year)))
-             (when-let ((tags (clown:post-tags post)))
+             (when-let ((tags (post-tags post)))
                (:span :class "meta-item tags"
                       (dolist (tag tags)
                         (:a :href (str:concat "/tags/" tag) (str:concat "#" (str:downcase tag)))))))))
@@ -123,7 +123,7 @@
     (loop :for post :in all-posts
           :for cat := (clown:post-category post)
           :do (loop
-                :for tag :in (clown:post-tags post)
+                :for tag :in (post-tags post)
                 :do (if (gethash tag tagged-posts)
                         (push post (gethash tag tagged-posts))
                         (setf (gethash tag tagged-posts) (list post))))

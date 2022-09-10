@@ -2,8 +2,7 @@
   (:use :cl :alexandria)
   (:import-from :spinneret :with-html-string)
   (:export
-   conf
-   *conf*
+   *conf* conf conf-merge
    *debug-transpiles*
    *css-vars*
    css-var
@@ -28,12 +27,25 @@
     (:static-dir . nil)
     (:site-url . nil)
     (:mixpanel-token . nil)
-    (:rss-max-posts . 10)))
+    (:rss-max-posts . 10)
+    (:control-tags . ("blog-post" "published" "draft"))))
 
 (defparameter *debug-transpiles* t)
 
 (defun conf (key)
   (cdr (assoc key *conf*)))
+
+(defun conf-merge (new-conf)
+  "Merge NEW-CONF into default `clown-slick:*conf*' and return the result.
+
+## Example
+
+```lisp
+(in-package :clown-slick)
+(let ((*conf* (conf-merge `((:site-url \"https://mysite.com/\")))))
+  (build))
+```"
+  (concatenate 'list new-conf *conf*))
 
 (defun write-to-file (fname str)
   "Write STR to FNAME ensuring all the required directories exist."
@@ -48,3 +60,9 @@
                    (str:concat dest "/index.html")
                    dest)))
     (write-to-file dest html)))
+
+(defun post-tags (post)
+  "Return list of valid `post' tags.
+`clown-slick' reserves some tags to be \"control\" tags (configured as
+`:control-tags' in `*conf'), which aren't published."
+  (remove-if (lambda (tag) (find tag (conf :control-tags) :test #'equal)) (clown:post-tags post)))

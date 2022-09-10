@@ -10,7 +10,8 @@
                 css-color
                 top-level-css
                 button-css
-                to-css-str)
+                to-css-str
+                post-tags)
   (:export home-html
            post-html
            publish-post-listings))
