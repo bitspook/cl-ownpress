@@ -11,6 +11,10 @@
 (eval-when (:compile-toplevel :load-toplevel :execute)
   (defun listing-css ()
     `(,@(clown-slick:adjustable-width-css ".content")
+      (.content (h1 :display flex
+                    :align-items center
+                    (.rss-sub :margin 0
+                              :margin-left 2rem)))
 
       (.listing :list-style-type none
                 :font-family "Cantarell, sans-serif"
@@ -54,7 +58,14 @@
       (.tags :display flex
              :flex-wrap wrap
 
-             (a :margin-left 1em))))
+             (a :margin-left 1em))
+
+      (.rss :width 24px
+            :height 24px
+            :margin-right 1rem
+            :background "url(\"/images/icons/rss.svg\")"
+            :background-repeat no-repeat
+            :background-size contain)))
 
   (defun listing-dom ()
     "DOM for rendering a listing of posts.
@@ -65,7 +76,11 @@
     `(:div.container
       ,(navbar-dom)
       (:div.content
-       (:h1 title)
+       (:h1 title (:span.rss-sub
+                   (:a :href rss-url
+                       :title (format nil "Follow ~a via RSS" title)
+                       :target "blank"
+                       (:span.rss))))
        (:ul.listing
         (dolist (post posts)
           (:li

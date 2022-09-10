@@ -35,6 +35,7 @@
                   :serial t
                   :components
                   ((:file "package")
+                   (:file "rss")
                    (:file "navbar")
                    (:file "mixpanel")
                    (:file "footer")
