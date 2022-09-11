@@ -2,12 +2,12 @@
   (:nicknames :clown)
   (:use :cl)
   (:export
+   *conf* conf
    make-connection
    run-pending-migrations
    post post-id slug tags post-html-content post-tags post-category post-published-at post-title
-   fetch-recent-posts
    published-post output-path post-output-path
-   db-to-post
+   fetch-recent-posts db-to-post
    join-paths
    invoke-provider *org-roam-provider* *fs-provider*))
 (in-package :cl-ownpress)
@@ -23,6 +23,28 @@
       (cffi::explode-path-environment-variable "CLOWN_LIBRARY_PATH"))
 
 (setf lparallel:*kernel* (lparallel:make-kernel 4))
+
+(defparameter *conf*
+  `((:db-name . "clownpress.db"))
+  "Configuration for managing cl-ownpress.")
+
+(defun conf (key)
+  "Get configuration value for KEY."
+  (cdr (assoc key *conf*)))
+
+(defun (setf conf) (new-val key)
+  (setf (cdr (assoc key *conf*)) new-val))
+
+(defun conf-merge (new-conf)
+  "Merge NEW-CONF into default `clown-slick:*conf*' and return the result.
+
+## Example
+
+```lisp
+(let ((*conf* (conf-merge `((:db-name \"my.db\")))))
+  (operation))
+```"
+  (concatenate 'list new-conf *conf*))
 
 (defparameter *conn* nil
   "The database connection. Should not be used directly, use `make-connection'
@@ -45,10 +67,10 @@ instead.")
     (migratum:driver-init *migration-driver*)
     *migration-driver*))
 
-(defun make-connection (&optional (name "clownpress.db"))
+(defun make-connection ()
   (when *conn* (return-from make-connection *conn*))
 
-  (setq *conn* (dbi:connect :sqlite3 :database-name (asdf:system-relative-pathname :cl-ownpress name)))
+  (setq *conn* (dbi:connect :sqlite3 :database-name (conf :db-name)))
   *conn*)
 
 (defun run-pending-migrations ()
