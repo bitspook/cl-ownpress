@@ -15,38 +15,23 @@
    write-html-to-file))
 (in-package :clown-slick)
 
-(defparameter *conf*
-  `((:author . nil)
-    (:avatar . nil)
-    (:twitter . nil)
-    (:linkedin . nil)
-    (:github . nil)
-    (:handle . nil)
-    (:resume . nil)
-    (:dest . "./_site/")
-    (:static-dir . nil)
-    (:site-url . nil)
-    (:mixpanel-token . nil)
-    (:rss-max-posts . 10)
-    (:control-tags . ("blog-post" "published"))
-    (:exclude-tags . ("draft"))))
+(clown:make-conf
+ `(:author nil
+   :avatar nil
+   :twitter nil
+   :linkedin nil
+   :github nil
+   :handle nil
+   :resume nil
+   :dest "./_site/"
+   :static-dir nil
+   :site-url nil
+   :mixpanel-token nil
+   :rss-max-posts 10
+   :control-tags '("blog-post" "published")
+   :exclude-tags "draft"))
 
 (defparameter *debug-transpiles* t)
-
-(defun conf (key)
-  (cdr (assoc key *conf*)))
-
-(defun conf-merge (new-conf)
-  "Merge NEW-CONF into default `clown-slick:*conf*' and return the result.
-
-## Example
-
-```lisp
-(in-package :clown-slick)
-(let ((*conf* (conf-merge `((:site-url \"https://mysite.com/\")))))
-  (build))
-```"
-  (concatenate 'list new-conf *conf*))
 
 (defun write-to-file (fname str)
   "Write STR to FNAME ensuring all the required directories exist."

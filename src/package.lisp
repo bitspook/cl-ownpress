@@ -2,13 +2,13 @@
   (:nicknames :clown)
   (:use :cl)
   (:export
-   *conf* conf
+   *conf* conf conf-merge
    make-connection
    run-pending-migrations
    post post-id slug tags post-html-content post-tags post-category post-published-at post-title
    published-post output-path post-output-path
    fetch-recent-posts db-to-post
-   join-paths
+   join-paths make-conf
    invoke-provider *org-roam-provider* *fs-provider*))
 (in-package :cl-ownpress)
 
@@ -24,27 +24,7 @@
 
 (setf lparallel:*kernel* (lparallel:make-kernel 4))
 
-(defparameter *conf*
-  `((:db-name . "clownpress.db"))
-  "Configuration for managing cl-ownpress.")
-
-(defun conf (key)
-  "Get configuration value for KEY."
-  (cdr (assoc key *conf*)))
-
-(defun (setf conf) (new-val key)
-  (setf (cdr (assoc key *conf*)) new-val))
-
-(defun conf-merge (new-conf)
-  "Merge NEW-CONF into default `clown-slick:*conf*' and return the result.
-
-## Example
-
-```lisp
-(let ((*conf* (conf-merge `((:db-name \"my.db\")))))
-  (operation))
-```"
-  (concatenate 'list new-conf *conf*))
+(make-conf '(:db-name "clownpress.db"))
 
 (defparameter *conn* nil
   "The database connection. Should not be used directly, use `make-connection'
