@@ -17,7 +17,8 @@
                "sxql"
                "lparallel"
                "usocket"
-               "yason")
+               "yason"
+               "xml-emitter")
   :components ((:module "src"
                 :serial t
                 :components
