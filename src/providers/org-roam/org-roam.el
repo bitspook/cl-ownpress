@@ -1,22 +1,6 @@
 (defconst *provider-name* "org-roam")
-(defvar *provider-dir* (expand-file-name "./" (file-name-directory load-file-name)))
-(defvar *cask-bundle* nil)
-(defvar *setup-cask* nil)
-(setq org-directory "~/Documents/org")
-(defvar org-roam-directory (concat org-directory "/notes/"))
-(defvar org-roam-db-location "~/.emacs.d/org-roam.db")
-(defvar org-roam-tag-sources '(prop))
-(defvar org-roam-v2-ack t)
 
-(when-let ((cask-dir (getenv "CASK_DIR") ))
-  (require 'cask (format "%scask.el" cask-dir))
-  (setq *cask-bundle* (cask-initialize *provider-dir*)
-        load-path (cask-load-path *cask-bundle*))
-  (when *setup-cask*
-    (cask-install *cask-bundle*)))
-
-(setq user-emacs-directory *provider-dir*
-      inhibit-message t)
+(setq inhibit-message t)
 
 (require 'seq)
 (require 'cl-lib)
@@ -76,7 +60,10 @@
         (org-html-htmlize-output-type 'inline-css)
         (org-content (org-file-contents filename))
         (org-html-head-include-default-style nil)
-        (org-export-show-temporary-export-buffer nil))
+        (org-export-with-properties nil)
+        (org-export-with-drawers nil)
+        (org-export-show-temporary-export-buffer nil)
+        (org-export-use-babel nil))
     (with-temp-buffer
       (insert org-content)
       (org-export-as 'html nil nil t))))
@@ -96,27 +83,23 @@
       :content_html ,(clown--org-to-html (org-roam-node-file node)))))
 
 (defun clown--collect ()
-  "Collect all the org-roam notes which should be published.
-Along with their dependencies."
-  (let* ((blog-posts-to-publish (clown--roam-nodes-with-tags '("blog-post"))))
-    (mapcar #'clown--collect-node blog-posts-to-publish)))
+  "Collect all the org-roam notes which should be provided to cl-ownpress."
+  (mapcar #'clown--collect-node (clown--roam-nodes-with-tags '("blog-post"))))
 
-(defun main ()
-  (defvar conn (make-network-process :name "clown-rpc"
-                                     :buffer nil
-                                     :host "localhost"
-                                     :service 8192))
+(defun clown--main ()
+  "Main function called from cl-ownpress."
+  (let ((conn (make-network-process
+               :name "clown-rpc"
+               :buffer nil
+               :host "localhost"
+               :service 8192))
+        (inputs (clown--collect)))
 
-  (load-theme 'leuven)
-
-  (let ((inputs (clown--collect)))
     (cl-dolist (input inputs)
       (process-send-string conn (json-encode input))
-      (process-send-string conn "<<<<RPC-EOM>>>>")))
+      (process-send-string conn "<<<<RPC-EOM>>>>"))
 
-  (process-send-string conn "DONE")
-  (process-send-string conn "<<<<RPC-EOM>>>>")
+    (process-send-string conn "DONE")
+    (process-send-string conn "<<<<RPC-EOM>>>>")
 
-  (delete-process conn))
-
-(main)
+    (delete-process conn)))

@@ -21,7 +21,7 @@
 (defmethod invoke-provider ((provider (eql *org-roam-provider*)) &key)
   (let ((script-path (asdf:system-relative-pathname "cl-ownpress" "./src/providers/org-roam/org-roam.el")))
     (with-rpc-server (:processor #'save-post)
-      (uiop:run-program (format nil "emacs --script ~a" script-path)
+      (uiop:run-program (format nil "emacsclient -e '(load \"~a\")' '(clown--main)'" script-path)
                         :output *standard-output*
                         :error-output *standard-output*))))
 
@@ -48,7 +48,7 @@
                                 (gethash "filepath" post))))))
                       (setf (gethash "provider" post) (provider-name *fs-provider*))
                       (save-post post)))
-      (uiop:run-program (format nil "emacs --script ~a ~{~a ~}" script-path content-files)
+      (uiop:run-program (format nil "emacsclient -e '(load \"~a\")' '(clown--main ~{\"~a\" ~})'" script-path content-files)
                         :output *standard-output*
                         :error-output *standard-output*))))
 

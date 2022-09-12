@@ -1,17 +1,4 @@
 (defconst *provider-name* "org-file")
-(defvar *provider-dir* (file-name-directory load-file-name))
-(defvar *cask-bundle* nil)
-(defvar *setup-cask* nil)
-
-(when-let ((cask-dir (getenv "CASK_DIR") ))
-  (require 'cask (format "%scask.el" cask-dir))
-  (setq *cask-bundle* (cask-initialize *provider-dir*)
-        load-path (cask-load-path *cask-bundle*))
-  (when *setup-cask*
-    (cask-install *cask-bundle*)))
-
-(setq user-emacs-directory (expand-file-name "./" *provider-dir*)
-      inhibit-message t)
 
 (require 'seq)
 (require 'cl-lib)
@@ -60,7 +47,8 @@
         (org-html-head-include-default-style nil)
         (org-export-with-properties nil)
         (org-export-with-drawers nil)
-        (org-export-show-temporary-export-buffer nil))
+        (org-export-show-temporary-export-buffer nil)
+        (org-export-use-babel nil))
     (with-temp-buffer
       (insert org-content)
       (org-export-as 'html nil nil t))))
@@ -82,22 +70,18 @@
       :content_raw ,(org-file-contents file)
       :content_html ,(clown--org-to-html file))))
 
-(defun main ()
-  (defvar conn (make-network-process :name "clown-rpc"
-                                     :buffer nil
-                                     :host "localhost"
-                                     :service 8192))
+(defun clown--main (&rest files)
+  "Main function called by cl-ownpress with FILES."
+  (let ((conn (make-network-process :name "clown-rpc"
+                                    :buffer nil
+                                    :host "localhost"
+                                    :service 8192)))
 
-  (load-theme 'leuven)
-
-  (let ((files argv))
     (cl-dolist (file files)
       (process-send-string conn (json-encode (clown--org-file-to-post file)))
-      (process-send-string conn "<<<<RPC-EOM>>>>")))
+      (process-send-string conn "<<<<RPC-EOM>>>>"))
 
-  (process-send-string conn "DONE")
-  (process-send-string conn "<<<<RPC-EOM>>>>")
+    (process-send-string conn "DONE")
+    (process-send-string conn "<<<<RPC-EOM>>>>")
 
-  (delete-process conn))
-
-(main)
+    (delete-process conn)))

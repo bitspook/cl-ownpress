@@ -1,6 +1,0 @@
-(source gnu)
-(source melpa)
-
-(package "clownpress-provider-org-file" "0.1.0" "Clownpress org-file provider")
-(depends-on "htmlize")
-(depends-on "s")

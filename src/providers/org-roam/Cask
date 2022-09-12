@@ -1,6 +1,0 @@
-(source gnu)
-(source melpa)
-
-(package "clownpress-provider-org-roam" "0.1.0" "Clownpress org-roam provider")
-(depends-on "org-roam")
-(depends-on "htmlize")
