@@ -1,47 +1,58 @@
 * Cl-ownpress 
 
+Practically, cl-ownpress is a static site generator.
+
+Theoretically, its primary objective is to
 #+begin_quote
-Convert inputs to outputs.
+Give user the ability to publish their content while maintaining its ownership.
 #+end_quote
 
-To elaborate a bit further:
+Examples:
+- Download your tweets and publish them on your own blog as micro-posts
+- Download the comments made on your blog post shared on hacker-news and publish
+  them on your blog
+- Download comments you made on reddit and publish them on your own site,
+  essentially creating a feed of your activity
 
-1. Collect inputs from anywhere. e.g tweets, local org files, Reddit/HN comments
-2. Process the inputs to produce outputs e.g convert them to HTML files
+** Goals
 
-That's it folks. clownpress is a general framework that shall allow you to do
-just that, and only that.
+1. Paramount Hack-ability
 
-It is not an "I don't know what I am doing" end-user software, it is meant to
-maximize hackability. Code is the UI.
+2. Friction-free development experience
+   
+3. Just-works user experience
 
-* Architecture
+   Although cl-ownpress primarily targets software developers as users, but that
+   does not mean it gets to ignore user-experience. Only using the software (i.e
+   without any desire to hack it further) should achieve the "just works"
+   standard.
 
-1. <<Provider>>
+* Software Architecture
 
-   Providers are instances of =provider= class. Job of a provider is to:
+Clownpress itself is not much more than a collection of utilities. It provides
+some convenient constructs to achieve its goals, but bulk of the work is done by
+its various components.
 
-   #+begin_quote
-   collect [[input][inputs]] and their [[dependency][dependencies]] directly into the database
-   #+end_quote
+1. Provider
 
-   A provider when invoked can do whatever is necessary to build a dependency
-   graph for everything that should be published.
+   A provider provides content. It reaches the source, collect, sanitize and
+   stores the content user wants ownership on. For example =*fs-provider*=
+   allows the ability to provide blog posts saved as text files on user's
+   file-system.
 
-2. <<Builder>>
+2. Processor
 
-   A Builder is an instance of =builder= class. Job of a builder is to:
+   A processor converts collected content into formats different than original.
+   e.g a processor might convert org-mode content to HTML.
 
-   #+begin_quote
-   convert an input to a publishable asset
-   #+end_quote
+3. Publisher
 
-Clownpress itself is an orchestrator, which provides a framework for building a
-dependency tree of inputs provided by providers, and then resolves the
-dependency tree into publishable assets built by builders. 
+   A publisher converts saved content into publishable assets. To publish
+   something has a very vague meaning, and that is intentional. e.g a publisher
+   might create a complete blog website ready to be shared online.
 
-** Glossary
-- <<input>> : A file which should be built to produce a publishable asset
-- <<dependency>> : A file which must be built before an [[input]]
-- [[Provider]]
-- [[Builder]]
+4. Distributors
+
+   A distributor takes the published content, and distributes (deploys) it so it
+   can reach an audience. e.g a distributor might take a website produced by a
+   publisher, and uploads it to github pages.
