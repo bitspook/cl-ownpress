@@ -46,9 +46,3 @@
                    (str:concat dest "/index.html")
                    dest)))
     (write-to-file dest html)))
-
-(defun post-tags (post)
-  "Return list of valid `post' tags.
-`clown-slick' reserves some tags to be \"control\" tags (configured as
-`:control-tags' in `*conf'), which aren't published."
-  (remove-if (lambda (tag) (find tag (conf :control-tags) :test #'equal)) (clown:post-tags post)))

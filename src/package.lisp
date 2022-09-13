@@ -3,13 +3,8 @@
   (:use :cl)
   (:export
    *conf* conf conf-merge
-   make-connection
-   run-pending-migrations
-   post post-id slug tags post-html-content post-tags post-category post-published-at post-title
-   published-post output-path post-output-path
-   fetch-recent-posts db-to-post
-   join-paths make-conf
-   invoke-provider *org-roam-provider* *fs-provider*))
+   make-connection run-pending-migrations create-new-migration
+   join-paths make-conf recursive-directory-files))
 (in-package :cl-ownpress)
 
 (require :cl-migratum)
@@ -24,44 +19,39 @@
 
 (setf lparallel:*kernel* (lparallel:make-kernel 4))
 
+(defmacro make-conf (initial-value)
+  "Create a trivial configuration management functionality.
+
+In the context of current package, it creates:
+
+1. A variable named `*conf*' which should be a plist initialized with INITIAL-VALUE
+2. A function `conf' for getting/setting a configuration value saved in a KEY
+3. A non-destructive function `conf-merge' for merging a subset of configuration
+with present configuration"
+  (let ((global-conf (intern "*CONF*" (sb-int:sane-package)))
+        (conf (intern "CONF" (sb-int:sane-package)))
+        (conf-merge (intern "CONF-MERGE" (sb-int:sane-package)))
+        (key (gensym))
+        (val (gensym)))
+    `(progn
+       (defparameter ,global-conf ,initial-value)
+
+       (defun ,conf (,key)
+         "Get configuration value corresponding to KEY."
+         (getf ,global-conf ,key))
+
+       (defun (setf ,conf) (,val ,key)
+         (setf (getf ,global-conf ,key) ,val))
+
+       (defun ,conf-merge (,val)
+         "Merge NEW-CONF into default `*conf*' and return the result.
+
+## Example
+
+```lisp
+(let ((*conf* (conf-merge `((:site-url \"https://mysite.com/\")))))
+  (build))
+```"
+         (concatenate 'list ,val ,global-conf)))))
+
 (make-conf '(:db-name "clownpress.db"))
-
-(defparameter *conn* nil
-  "The database connection. Should not be used directly, use `make-connection'
-instead.")
-
-(defparameter *migration-driver* nil
-  "`migratum.driver' for running migrations")
-
-;; `prep-migrations' should be called to prepare migrations before any code
-;; related to migrations can be executed.
-(defun prep-migrations ()
-  (when *migration-driver*
-    (return-from prep-migrations *migration-driver*))
-
-  (let* ((migrations-dirs (list (asdf:system-relative-pathname :cl-ownpress "sql/migrations/")))
-         (provider (migratum.provider.local-path:make-provider migrations-dirs)))
-    (migratum:provider-init provider)
-
-    (setq *migration-driver* (migratum.driver.dbi:make-driver provider (make-connection)))
-    (migratum:driver-init *migration-driver*)
-    *migration-driver*))
-
-(defun make-connection ()
-  (when *conn* (return-from make-connection *conn*))
-
-  (setq *conn* (dbi:connect :sqlite3 :database-name (conf :db-name)))
-  *conn*)
-
-(defun run-pending-migrations ()
-  (migratum:apply-pending (prep-migrations)))
-
-(defun create-new-migration (desc &optional up-str down-str)
-  "Create new up+down migrations with DESC."
-  (let ((mid (migratum:make-migration-id)))
-    (migratum:provider-create-migration
-     :up :sql *provider* mid desc
-     (or up-str ""))
-    (migratum:provider-create-migration
-     :down :sql *provider* mid desc
-     (or down-str ""))))

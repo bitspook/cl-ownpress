@@ -1,18 +1,8 @@
 (defpackage :clown-slick.views
   (:nicknames :slick-views)
   (:local-nicknames (:xml :xml-emitter))
-  (:use :cl :alexandria)
+  (:use :cl :alexandria :clown-slick)
   (:import-from :spinneret :with-html-string)
-  (:import-from :clown-slick
-                conf
-                *debug-transpiles*
-                font-css
-                css-var
-                css-color
-                top-level-css
-                button-css
-                to-css-str
-                post-tags)
   (:export home-html
            post-html
            publish-post-listings))

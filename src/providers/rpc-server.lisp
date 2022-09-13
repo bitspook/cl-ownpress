@@ -1,4 +1,4 @@
-(in-package :clown)
+(in-package :clown-providers)
 
 (defun start-rpc-server (msg-processor)
   "RPC server should be used for communicating with external processes a
@@ -31,6 +31,38 @@
         (usocket:socket-close conn)
         (usocket:socket-close socket)))
     socket))
+
+(defun save-post (post)
+  "Save a blog POST into the database. POST is a hash-table, to be obtained as a
+   message to rpc-server"
+  (log:d "Processing post: ~a~%" (gethash "title" post))
+  (let ((conn (make-connection)))
+    (multiple-value-bind (stmt values)
+        (sxql:yield
+         (sxql:insert-into :inputs
+           (sxql:set= :id (gethash "id" post)
+                      :slug (gethash "slug" post)
+                      :title (gethash "title" post)
+                      :tags (gethash "tags" post)
+                      :category (gethash "category" post)
+                      :metadata (gethash "metadata" post)
+                      :provider (gethash "provider" post)
+                      :published_at (gethash "published-at" post)
+                      :content_raw (gethash "content_raw" post)
+                      :content_html (gethash "content_html" post))
+           (sxql:on-conflict-do-nothing)))
+      (dbi:fetch-all (dbi:execute (dbi:prepare conn stmt) values)))))
+
+(defmacro insert-into (table values)
+  "Utility to cut some boilerplate to insert a set of values into a table.
+Insert into TABLE VALUES represented as a plist."
+  `(let ((conn (clown:make-connection)))
+     (multiple-value-bind (stmt vals)
+         (sxql:yield
+          (sxql:insert-into ,table
+            (sxql:set= ,@values)
+            (sxql:on-conflict-do-nothing)))
+       (dbi:fetch-all (dbi:execute (dbi:prepare conn stmt) vals)))))
 
 (defmacro with-rpc-server ((&key processor) &body body)
   "Run BODY with a running rpc-server, and wait until the server stops. Stopping

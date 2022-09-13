@@ -1,5 +1,3 @@
-(defconst *provider-name* "org-file")
-
 (require 'seq)
 (require 'cl-lib)
 (require 'org)
@@ -59,18 +57,14 @@
 
 (defun clown--org-file-to-post (file)
   (let ((meta (clown--get-post-meta file)))
-    `(:id ,(or (alist-get 'slug meta) (clown--file-slug file))
-      :slug ,(or (alist-get 'slug meta) (clown--file-slug file))
-      :title ,(alist-get 'title meta)
+    `(
+      :id ,(or (alist-get 'slug meta) (clown--file-slug file))
       :filepath ,file
-      :tags ,(json-encode-list (alist-get 'tags meta))
-      :metadata ,(json-encode-alist meta)
-      :provider ,*provider-name*
-      :published-at ,(alist-get 'date meta)
-      :content_raw ,(org-file-contents file)
-      :content_html ,(clown--org-to-html file))))
+      :metadata ,(json-encode meta)
+      :body_raw ,(org-file-contents file)
+      :body_html ,(clown--org-to-html file))))
 
-(defun clown--main (&rest files)
+(defun clown--main (&key files)
   "Main function called by cl-ownpress with FILES."
   (let ((conn (make-network-process :name "clown-rpc"
                                     :buffer nil

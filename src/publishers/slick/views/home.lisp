@@ -178,10 +178,10 @@
         (:header (:h2 "Recent Content"))
         (:ul :class "recent-content-list"
          (dolist (rp (publish-recent-posts 5))
-           (with-slots ((href clown:output-path)) rp
+           (with-slots ((href output-path)) rp
              (:li (:a :href href
-                      :class (format nil "recent-content-item content-type--~a" (clown:post-category rp))
-                      (clown:post-title rp))))))
+                      :class (format nil "recent-content-item content-type--~a" (post-category rp))
+                      (post-title rp))))))
         (:footer (:a :class "btn btn-primary read-more-btn"
                      :href "/archive"
                   "See all")))))))

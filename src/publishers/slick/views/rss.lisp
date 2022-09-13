@@ -7,12 +7,12 @@
                               :generator "cl-ownpress"
                               :image (conf :avatar))
       (mapcar (lambda (post)
-                (let ((post-url (clown:join-paths (conf :site-url) (clown:post-output-path post))))
+                (let ((post-url (clown:join-paths (conf :site-url) (post-output-path post))))
                   (xml:rss-item
-                   (clown:post-title post)
-                   :guid (clown:post-id post)
-                   :category (clown:post-category post)
+                   (post-title post)
+                   :guid (post-id post)
+                   :category (post-category post)
                    :link post-url
                    :author (conf :author)
-                   :description (clown:post-html-content post)
-                   :pubdate (clown:post-published-at post)))) posts))))
+                   :description (post-html-content post)
+                   :pubdate (post-published-at post)))) posts))))

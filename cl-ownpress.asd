@@ -24,13 +24,19 @@
                 :components
                 ((:file "package")
                  (:file "utils")
-                 (:file "models")
-                 (:file "rpc-server")
-                 (:file "main")))
+                 (:file "db")
+                 (:module "providers"
+                  :serial t
+                  :components
+                  ((:file "package")
+                   (:file "rpc-server")
+                   (:file "org-file-provider")
+                   (:file "org-roam-provider")))))
                (:module "src/publishers/slick"
                 :serial t
                 :components
                 ((:file "package")
+                 (:file "models")
                  (:file "css")
                  (:module "views"
                   :serial t

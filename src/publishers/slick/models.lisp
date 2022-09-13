@@ -1,13 +1,19 @@
-(in-package :clown)
+(in-package :clown-slick)
 
 (defclass post ()
   ((id :initarg :id :reader post-id)
    (slug :initarg :slug)
    (title :initarg :title :accessor post-title)
-   (tags :initarg :tags :accessor post-tags)
+   (tags :initarg :tags)
    (category :initarg :category :accessor post-category)
    (published-at :initarg :published-at :accessor post-published-at)
    (html-content :initarg :html-content :accessor post-html-content)))
+
+(defun post-tags (post)
+  "Return list of valid `post' tags.
+`clown-slick' reserves some tags to be \"control\" tags (configured as
+`:control-tags' in `*conf'), which aren't published."
+  (remove-if (lambda (tag) (find tag (conf :control-tags) :test #'equal)) (slot-value post 'tags)))
 
 (defmethod print-object ((obj post) out)
   (print-unreadable-object (obj out)

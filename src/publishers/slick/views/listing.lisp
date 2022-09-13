@@ -84,15 +84,15 @@
        (:ul.listing
         (dolist (post posts)
           (:li
-           (:span :class (str:concat "li-icon li-icon--" (clown:post-category post)))
+           (:span :class (str:concat "li-icon li-icon--" (post-category post)))
            (:div.li-conent
             (:a.li-title
-             :href (clown:post-output-path post)
-             (clown:post-title post))
+             :href (post-output-path post)
+             (post-title post))
             (:span.li-meta
              (:span :class "meta-item date"
                     (local-time:format-timestring
-                     nil (clown:post-published-at post)
+                     nil (post-published-at post)
                      :format '(:long-month " " :day ", " :year)))
              (when-let ((tags (post-tags post)))
                (:span :class "meta-item tags"
@@ -108,7 +108,7 @@
          (rss (rss-str (subseq posts 0 (min (length posts) (conf :rss-max-posts)))
                        :title title
                        :feed-url rss-url
-                       :feed-updated-at (clown:post-published-at (first posts)))))
+                       :feed-updated-at (post-published-at (first posts)))))
     (clown-slick:write-html-to-file dest html)
     (clown-slick:write-to-file feed-dest rss)))
 
@@ -119,9 +119,9 @@
    3. Listing page with all the posts"
   (let ((tagged-posts (make-hash-table :test 'equal))
         (categorized-posts (make-hash-table :test 'equal))
-        (all-posts (remove-if-not #'clown:post-category (publish-recent-posts -1))))
+        (all-posts (remove-if-not #'post-category (publish-recent-posts -1))))
     (loop :for post :in all-posts
-          :for cat := (clown:post-category post)
+          :for cat := (post-category post)
           :do (loop
                 :for tag :in (post-tags post)
                 :do (if (gethash tag tagged-posts)
