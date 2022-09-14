@@ -49,7 +49,7 @@
                    (:file "post")
                    (:file "listing")
                    (:file "home")))
-                 (:file "main"))))
+                 (:file "build"))))
   :description ""
   :in-order-to ((test-op (test-op "cl-ownpress/tests"))))
 

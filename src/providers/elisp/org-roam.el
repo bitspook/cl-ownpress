@@ -69,12 +69,16 @@
   (let* ((file (org-roam-node-file node))
          (meta (clown--get-post-meta file))
          (cat (or (alist-get "category" meta) "blog")))
-    (push `("category" . ,cat) meta)
+    (push `(category . ,cat) meta)
+    (when (not (alist-get 'slug meta))
+      (push `(slug . ,(clown--node-slug node)) meta))
 
     `(:id ,(org-roam-node-id node)
           :metadata ,(json-encode-alist meta)
           :body_raw ,(org-file-contents file)
           :body_html ,(clown--org-to-html file))))
+
+(clown--collect-node (first (clown--roam-nodes-with-tags '("elisp" "blog-post"))))
 
 (defun clown--collect (tags)
   "Collect all the org-roam notes which have TAGS."

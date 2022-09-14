@@ -7,7 +7,7 @@
                               :generator "cl-ownpress"
                               :image (conf :avatar))
       (mapcar (lambda (post)
-                (let ((post-url (clown:join-paths (conf :site-url) (post-output-path post))))
+                (let ((post-url (clown:join-paths (conf :site-url) (post-public-path post))))
                   (xml:rss-item
                    (post-title post)
                    :guid (post-id post)

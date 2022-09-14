@@ -87,7 +87,7 @@
            (:span :class (str:concat "li-icon li-icon--" (post-category post)))
            (:div.li-conent
             (:a.li-title
-             :href (post-output-path post)
+             :href (post-public-path post)
              (post-title post))
             (:span.li-meta
              (:span :class "meta-item date"

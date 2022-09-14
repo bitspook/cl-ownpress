@@ -82,7 +82,7 @@
             (,@selectors :max-width 100%
                         :padding 0 4%))))
 
-(defparameter button-css
+(defun button-css ()
   `((.btn :display inline-flex
           :border 2px solid
           :border-radius 25px

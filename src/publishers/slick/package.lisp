@@ -4,15 +4,11 @@
   (:export
    *conf* conf conf-merge
    *debug-transpiles*
-   *css-vars*
-   css-var
-   css-color
-   font-css
-   top-level-css
-   adjustable-width-css
-   build
-   write-to-file
-   write-html-to-file))
+   *css-vars* css-var css-color font-css top-level-css adjustable-width-css to-css-str button-css
+   post-id post-slug post-title post-tags post-category post-published-at post-html-content fetch-posts
+   published-post post-public-path
+   write-to-file write-html-to-file
+   build))
 (in-package :clown-slick)
 
 (clown:make-conf
@@ -28,8 +24,8 @@
    :site-url nil
    :mixpanel-token nil
    :rss-max-posts 10
-   :control-tags '("blog-post" "published")
-   :exclude-tags "draft"))
+   :control-tags ("blog-post" "published")
+   :exclude-tags ("draft")))
 
 (defparameter *debug-transpiles* t)
 
@@ -46,3 +42,12 @@
                    (str:concat dest "/index.html")
                    dest)))
     (write-to-file dest html)))
+
+(defun copy-dirs (src dest)
+  (uiop:run-program (format nil "cp -r ~a ~a" (ppath:join src "*") dest)
+                    :output *standard-output*
+                    :error-output *standard-output*))
+
+(defun ensure-dirname (name)
+  "Ensure that NAME is a drectory name i.e ends with a `/`."
+  (if (str:ends-with? "/" name) name (str:concat name "/")))

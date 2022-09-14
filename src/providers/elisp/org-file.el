@@ -57,8 +57,9 @@
 
 (defun clown--org-file-to-post (file)
   (let ((meta (clown--get-post-meta file)))
-    `(
-      :id ,(or (alist-get 'slug meta) (clown--file-slug file))
+    (when (not (alist-get 'slug meta))
+      (push `(slug . ,(clown--file-slug file)) meta))
+    `(:id ,(alist-get 'slug meta)
       :filepath ,file
       :metadata ,(json-encode-alist meta)
       :body_raw ,(org-file-contents file)

@@ -1,14 +1,5 @@
 (in-package :clown-slick)
 
-(defun copy-dirs (src dest)
-  (uiop:run-program (format nil "cp -r ~a ~a" (ppath:join src "*") dest)
-                    :output *standard-output*
-                    :error-output *standard-output*))
-
-(defun ensure-dirname (name)
-  "Ensure that NAME is a drectory name i.e ends with a `/`."
-  (if (str:ends-with? "/" name) name (str:concat name "/")))
-
 (defun build (&key (clean-dest? t) (clean-urls? t))
   "Use slick publisher to build a publishable bundle to DEST"
   (let ((dest (ensure-dirname (conf :dest)))

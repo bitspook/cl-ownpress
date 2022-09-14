@@ -77,38 +77,19 @@ present at execution"
   (defun publish-post (post)
     "Publish a POST. It writes the HTML to a file, update database. Returns
    `published-post'."
-    (with-slots (slug tags) post
-      (let* ((output-path (ppath:normpath (str:concat "/" (post-category post) "/" slug "/")))
-             (dest (str:concat (conf :dest) output-path)))
-        (clown-slick:write-html-to-file dest (post-html))
+    (let* ((public-path (ppath:normpath (str:concat "/" (post-category post) "/" (post-slug post) "/")))
+           (dest (str:concat (conf :dest) public-path)))
+      (clown-slick:write-html-to-file dest (post-html))
 
-        (let ((conn (clown:make-connection)))
-          (multiple-value-bind (stmt values)
-              (sxql:yield
-               (sxql:update :inputs
-                 (sxql:set= :out_path output-path)
-                 (sxql:where (:= :id (post-id post)))))
-            (dbi:fetch-all (dbi:execute (dbi:prepare conn stmt) values))))
-
-        (make-instance 'published-post
-                       :title (post-title post)
-                       :id (post-id post)
-                       :slug slug
-                       :tags tags
-                       :output-path output-path
-                       :category (post-category post)
-                       :published-at (post-published-at post)
-                       :html-content (post-html-content post)))))
+      (make-instance 'clown-slick:published-post
+                     :title (post-title post)
+                     :id (post-id post)
+                     :slug (post-slug post)
+                     :tags (post-tags post)
+                     :public-path public-path
+                     :category (post-category post)
+                     :published-at (post-published-at post)
+                     :html-content (post-html-content post))))
 
   (defun publish-recent-posts (&optional (limit 5))
-    (loop
-      :with fetcher := (fetch-recent-posts
-                        limit
-                        (if (conf :exclude-tags)
-                            `(:and ,@(loop :for tag :in (conf :exclude-tags)
-                                           :collect
-                                           `(:not (:like :tags ,(format nil "%\"~a\"%" tag)))))
-                            1))
-      :for post := (funcall fetcher)
-      :while post
-      :collect (publish-post post))))
+    (mapcar #'publish-post (fetch-posts (sxql:limit limit)))))

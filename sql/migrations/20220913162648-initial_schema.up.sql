@@ -21,5 +21,5 @@ CREATE TABLE IF NOT EXISTS processed_content (
   updated_at DATETIME NOT NULL default datetime,
   FOREIGN KEY(prov_cont_id) REFERENCES provided_content(id),
   PRIMARY KEY (prov_cont_id, type, processor)
-);
+) WITHOUT ROWID;
 --;;
