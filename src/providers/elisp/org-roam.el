@@ -1,7 +1,3 @@
-(defconst *provider-name* "org-roam")
-
-(setq inhibit-message t)
-
 (require 'seq)
 (require 'cl-lib)
 (require 'org-roam)
@@ -70,33 +66,31 @@
 
 (defun clown--collect-node (node)
   "Collect a single org-roam NODE."
-  (let ((meta (clown--get-post-meta (org-roam-node-file node))))
+  (let* ((file (org-roam-node-file node))
+         (meta (clown--get-post-meta file))
+         (cat (or (alist-get "category" meta) "blog")))
+    (push `("category" . ,cat) meta)
+
     `(:id ,(org-roam-node-id node)
-      :slug ,(or (alist-get 'slug meta) (clown--node-slug node))
-      :title ,(alist-get 'title meta)
-      :tags ,(json-encode-list (alist-get 'tags meta))
-      :category ,(or (alist-get "category" meta) "blog")
-      :metadata ,(json-encode-alist meta)
-      :provider ,*provider-name*
-      :published-at ,(alist-get 'date meta)
-      :content_raw ,(org-file-contents (org-roam-node-file node))
-      :content_html ,(clown--org-to-html (org-roam-node-file node)))))
+          :metadata ,(json-encode-alist meta)
+          :body_raw ,(org-file-contents file)
+          :body_html ,(clown--org-to-html file))))
 
-(defun clown--collect ()
-  "Collect all the org-roam notes which should be provided to cl-ownpress."
-  (mapcar #'clown--collect-node (clown--roam-nodes-with-tags '("blog-post"))))
+(defun clown--collect (tags)
+  "Collect all the org-roam notes which have TAGS."
+  (mapcar #'clown--collect-node (clown--roam-nodes-with-tags tags)))
 
-(defun clown--main ()
-  "Main function called from cl-ownpress."
+(defun clown--main (&key tags)
+  "Main function called from cl-ownpress for providing notes with TAGS."
   (let ((conn (make-network-process
                :name "clown-rpc"
                :buffer nil
                :host "localhost"
                :service 8192))
-        (inputs (clown--collect)))
+        (notes (clown--collect tags)))
 
-    (cl-dolist (input inputs)
-      (process-send-string conn (json-encode input))
+    (cl-dolist (note notes)
+      (process-send-string conn (json-encode note))
       (process-send-string conn "<<<<RPC-EOM>>>>"))
 
     (process-send-string conn "DONE")
