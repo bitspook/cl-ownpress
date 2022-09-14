@@ -19,12 +19,14 @@
                     :provider (provider-name *org-file-provider*)
                     :metadata (with-output-to-string (str) (yason:encode meta str))
                     :body (gethash "body_raw" msg)
-                    :type "org-mode")))
+                    :type "org-mode")
+                   :conflict-cols (:id)))
                (insert-into :processed_content
                  (:prov_cont_id (gethash "id" msg)
                   :type "html"
                   :processor "emacs"
-                  :body (gethash "body_html" msg)))))
+                  :body (gethash "body_html" msg))
+                 :conflict-cols (:prov_cont_id :type :processor))))
       (with-rpc-server
           (:processor #'process-rpc-message)
         (uiop:run-program (format nil "emacsclient -e '(load \"~a\")' ~

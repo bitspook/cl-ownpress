@@ -53,17 +53,6 @@
            (sxql:on-conflict-do-nothing)))
       (dbi:fetch-all (dbi:execute (dbi:prepare conn stmt) values)))))
 
-(defmacro insert-into (table values)
-  "Utility to cut some boilerplate to insert a set of values into a table.
-Insert into TABLE VALUES represented as a plist."
-  `(let ((conn (clown:make-connection)))
-     (multiple-value-bind (stmt vals)
-         (sxql:yield
-          (sxql:insert-into ,table
-            (sxql:set= ,@values)
-            (sxql:on-conflict-do-nothing)))
-       (dbi:fetch-all (dbi:execute (dbi:prepare conn stmt) vals)))))
-
 (defmacro with-rpc-server ((&key processor) &body body)
   "Run BODY with a running rpc-server, and wait until the server stops. Stopping
 the server is responsibility of BODY. If BODY don't stop the server, a call to
