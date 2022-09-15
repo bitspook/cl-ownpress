@@ -2,7 +2,7 @@
 
 (defun newsletter-css ()
   `(,@(clown-slick:adjustable-width-css ".postamble")
-    ,@button-css
+    ,@(button-css)
     (.postamble
      :font-family monospace
      :color "#666"
