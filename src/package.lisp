@@ -1,6 +1,6 @@
 (defpackage cl-ownpress
   (:nicknames :clown)
-  (:use :cl)
+  (:use :cl :serapeum/bundle)
   (:export
    *conf* conf conf-merge
    make-connection run-pending-migrations create-new-migration

@@ -4,28 +4,114 @@ Practically, cl-ownpress is a static site generator.
 
 Theoretically, its primary objective is to
 #+begin_quote
-Give user the ability to publish their content while maintaining its ownership.
+Give hackers the ability to publish their content while maintaining its
+ownership.
 #+end_quote
-
-Examples:
-- Download your tweets and publish them on your own blog as micro-posts
-- Download the comments made on your blog post shared on hacker-news and publish
-  them on your blog
-- Download comments you made on reddit and publish them on your own site,
-  essentially creating a feed of your activity
 
 ** Goals
 
 1. Paramount Hack-ability
 
+   Tweaking isn't sufficient. Hackers should have the freedom of extend, replace
+   and bend the system to their will.
+
 2. Friction-free development experience
-   
+
+   Ability to hack isn't sufficient. Hacking experience should be pleasant. 
+
 3. Just-works user experience
 
-   Although cl-ownpress primarily targets software developers as users, but that
-   does not mean it gets to ignore user-experience. Only using the software (i.e
-   without any desire to hack it further) should achieve the "just works"
-   standard.
+   Although cl-ownpress primarily targets software hackers, that does not mean
+   it gets to ignore user-experience. Only using the software (i.e without any
+   desire to hack it further) should achieve the "just works" standard.
+
+4. Content ownership
+
+   As users of the internet, we publish a lot of content on the web. It almost
+   always end up on a walled platform, at the mercy of someone-not-you's whims.
+   Cl-ownpress should make effort to bring ownership of user's published content
+   back to user.
+
+** Current state
+
+I am using cl-ownpress to create [[https://bitspook.in/][my personal website]]. Right now cl-ownpress is
+moving forward to allow me achieve my desired publishing workflow.
+
+- Publish with full power of Emacs
+  
+  Most of my writing happens in org-mode. I often tinker it to a great extent,
+  to keep capturing my thoughts/experiments fluent in my computing workflow.
+  I want to turn this liability into an asset. 
+
+  #+begin_quote 
+  *Status*: Done
+
+  *org-file-provider* allow publishing a directory full of org files to HTML,
+  delegating the responsibility of actual org->HTML conversion to Emacs itself.
+  #+end_quote
+
+- Publish a subset of my notes on my blog
+
+  I have a fluent [[https://en.wikipedia.org/wiki/Zettelkasten][zettlekasten]]-like note-taking system for capturing my
+  thoughts. Almost all my blog posts are edited versions of these. I want to
+  publish notes which mature enough.
+
+  I also want to publish any linked notes, but in a "certain" way. e.g they
+  should be published, but not listed anywhere on the blog/rss-feeds etc.
+  
+  #+begin_quote
+  *Status*: In Progress
+
+  *org-roam-provider* allow publishing notes with specific tags to be published
+  as blog posts, but it doesn't handle linked notes yet.
+  #+end_quote
+
+- Publish my personal projects
+
+  In addition to taking ownership of where my projects are presented (I might
+  switch away from Github), I want a place where I can express more about my
+  projects. A place to document inception of an idea, its evolution, fantasies
+  about a glorious future; things which aren't exactly documentation.
+
+  It is easily achievable with just a tag on a blog-post, but I think much can
+  be achieved with better presentation.
+
+  #+begin_quote
+  *Status*: TODO
+  #+end_quote
+
+- Publish my tweets
+
+  Tweeting is convenient, I want my tweets published as micro-posts on my blog
+  until I can turn it around and build a mobile app to publish my micro-blog
+  posts on twitter instead.
+
+  #+begin_quote
+  *Status*: TODO
+  #+end_quote
+
+- Publish discussions from other platforms
+
+  Often, a lot of value can be found in the discussions that a piece of content
+  births on platforms like Hacker News and Reddit. I want these tracked and
+  presented with the published content itself.
+
+  I am still debating whether the discussions themselves should also be
+  retrieved and published along with the content.
+
+  #+begin_quote
+  *Status*: TODO
+  #+end_quote
+
+- Publish my personal growth
+
+  This is one of the trickiest, and most unclear things I want to achieve on my
+  personal site. I am letting it stay in the back of my head and brew for now.
+
+  #+begin_quote
+  *Status*: TODO
+  #+end_quote
+
 
 * Software Architecture
 
@@ -36,23 +122,23 @@ its various components.
 1. Provider
 
    A provider provides content. It reaches the source, collect, sanitize and
-   stores the content user wants ownership on. For example =*fs-provider*=
-   allows the ability to provide blog posts saved as text files on user's
+   stores the content hacker wants ownership on. For example =*fs-provider*=
+   allows the ability to provide blog posts saved as text files on hacker's
    file-system.
 
-2. Processor
-
-   A processor converts collected content into formats different than original.
-   e.g a processor might convert org-mode content to HTML.
-
-3. Publisher
+2. Publisher
 
    A publisher converts saved content into publishable assets. To publish
    something has a very vague meaning, and that is intentional. e.g a publisher
    might create a complete blog website ready to be shared online.
 
-4. Distributors
+** Why sqlite?
 
-   A distributor takes the published content, and distributes (deploys) it so it
-   can reach an audience. e.g a distributor might take a website produced by a
-   publisher, and uploads it to github pages.
+- For momentum. Things sqlite is being used for right now can very well be done
+  without it, but it'll take work.
+- For prototyping. I have some ideas I want to explore, and sqlite requires
+  minimum amount of work to do that.
+  
+Once I have a good hold on the scope of the project, we'll revisit the decision
+of having a database file, or operate only on files in filesystem to build a
+form of in-memory database every time.

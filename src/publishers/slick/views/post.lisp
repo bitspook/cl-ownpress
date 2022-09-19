@@ -19,7 +19,7 @@ present at execution"
                 :margin 0 auto
                 :padding 0 124px)
       ,@(clown-slick:adjustable-width-css ".content")
-      (.content-header (h1 :margin-bottom 1rem))
+      (.content-header (h1 :margin-bottom 1rem :font-size 2em))
       (.content-meta :margin-top 0
                      :margin-bottom 2rem
                      :font-family "Roboto, sans-serif"

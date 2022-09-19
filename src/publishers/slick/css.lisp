@@ -63,13 +63,19 @@
                 :border-left 4px solid ,(css-color :secondary)
                 :font-size 1.2em)
     (pre :overflow auto
-         :padding 1em)
+         :padding 1em
+         :font-family monospace
+         :font-size 1.2rem)
+    (code :font-family monospace
+          :color ,(css-color :cta)
+          :font-size 1rem)
     (.title :margin 2rem 0
             (h1 :font-family "Roboto" sans-serif
                 :font-weight bold
                 :font-size 1.7em
                 :line-height 1.2
-                :text-transform capitalize))))
+                :text-transform capitalize))
+    (video :width 100%)))
 
 (defun adjustable-width-css (&rest selectors)
   `((,@selectors :max-width ,(css-var :width-xl)
