@@ -3,6 +3,7 @@
   :author "Charanjit Singh"
   :license "AGPL"
   :depends-on ("alexandria"
+               "serapeum"
                "cl-dbi"
                "cl-migratum"
                "cl-migratum.provider.local-path"

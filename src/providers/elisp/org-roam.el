@@ -48,6 +48,23 @@
 
     props))
 
+(defun clown--export-org-id-link (path desc backend)
+  "Handle exporting links for inserted org-roam nodes.
+Requirements: A variable named *linked-roam-nodes* must be a list
+and present in scope. All the linked org-roam nodes are pushed
+into this list."
+  (cond
+   ((eq backend 'html)
+    (let* ((node (org-roam-node-from-id path))
+           (public-path (when node (clown--node-public-path node))))
+
+      (if (not public-path) desc
+        (push node *linked-roam-nodes*)
+        (format "<a href=\"%s\" title=\"%s\">%s</a>" public-path desc desc))))))
+
+(defun clown--node-public-path (node)
+  (format "/blog/%s" (clown--node-slug node)))
+
 (defun clown--org-to-html (filename)
   "Return content of FILENAME named org file as HTML."
   (let ((org-export-with-section-numbers nil)
@@ -60,29 +77,51 @@
         (org-export-with-drawers nil)
         (org-export-show-temporary-export-buffer nil)
         (org-export-use-babel nil))
+
     (with-temp-buffer
       (insert org-content)
       (org-export-as 'html nil nil t))))
 
 (defun clown--collect-node (node)
   "Collect a single org-roam NODE."
-  (let* ((file (org-roam-node-file node))
-         (meta (clown--get-post-meta file))
-         (cat (or (alist-get "category" meta) "blog")))
-    (push `(category . ,cat) meta)
-    (when (not (alist-get 'slug meta))
-      (push `(slug . ,(clown--node-slug node)) meta))
+  (cl-block 'clown--collect-node
+    (let* ((file (org-roam-node-file node))
+           (meta (clown--get-post-meta file))
+           (cat (or (alist-get "category" meta) "blog"))
+           (*linked-roam-nodes* nil)
+           (id (org-roam-node-id node))
+           (body-html nil))
+      (push `(category . ,cat) meta)
+      (when (not (alist-get 'slug meta))
+        (push `(slug . ,(clown--node-slug node)) meta))
 
-    `(:id ,(org-roam-node-id node)
-          :metadata ,(json-encode-alist meta)
-          :body_raw ,(org-file-contents file)
-          :body_html ,(clown--org-to-html file))))
+      (when (seq-contains-p *collected-ids* id)
+        (cl-return-from 'clown--collect-node))
 
-(clown--collect-node (first (clown--roam-nodes-with-tags '("elisp" "blog-post"))))
+      (setf body-html (clown--org-to-html file))
+      (push id *collected-ids*)
+
+      (cl-concatenate
+       'list
+       (list (list
+              :id id
+              :metadata (json-encode-alist meta)
+              :body_raw (org-file-contents file)
+              :body_html body-html))
+       (mapcan #'clown--collect-node
+               *linked-roam-nodes*)))))
 
 (defun clown--collect (tags)
   "Collect all the org-roam notes which have TAGS."
-  (mapcar #'clown--collect-node (clown--roam-nodes-with-tags tags)))
+  (let ((original-id-exporter (org-link-get-parameter "id" :export))
+        *collected-ids*
+        collectd-notes)
+    ;; Handle linked notes
+    (org-link-set-parameters "id" :export #'clown--export-org-id-link)
+
+    (setf collected-notes (mapcan #'clown--collect-node (clown--roam-nodes-with-tags tags)))
+    (org-link-set-parameters "id" :export original-id-exporter)
+    collected-notes))
 
 (defun clown--main (&key tags)
   "Main function called from cl-ownpress for providing notes with TAGS."
