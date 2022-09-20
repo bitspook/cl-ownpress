@@ -40,8 +40,10 @@
           (sxql:where (:= "html" :proc.type))
           (sxql:order-by (:desc :published_at))
           (sxql:where (if (conf :exclude-tags)
-                          `(:and ,@(loop :for tag :in (conf :exclude-tags) :collect
-                                         `(:not (:like :tags ,(format nil "%\"~a\"%" tag)))))
+                          `(:and
+                            (:or (:is-null :tags)
+                                 ,@(loop :for tag :in (conf :exclude-tags) :collect
+                                         `(:not (:like :tags ,(format nil "%\"~a\"%" tag))))))
                           1))
           ,@query-frags))
      (log:d "Executing SQL: ~a ~%[With vals: ~a]" stmt vals)
