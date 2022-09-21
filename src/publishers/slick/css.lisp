@@ -6,15 +6,15 @@
     (:width-md . "840px")
     (:width-sm . "480px")
     (:colors . (:background "#fcfcfc"
-               :background-dark1 "#f9f9f9"
-               :background-dark2 "#efefef"
-               :primary "#006992"
-               :secondary "#465c69"
-               :cta "#b75d69"
-               :cta-dark1 "#b75d69"
-               :cta-dark2 "#b75d69"
-               :primary-text "#010400"
-               :separator "#6f6f6fd1"))))
+                :background-dark1 "#f9f9f9"
+                :background-dark2 "#efefef"
+                :primary "#006992"
+                :secondary "#465c69"
+                :cta "#b75d69"
+                :cta-dark1 "#b75d69"
+                :cta-dark2 "#b75d69"
+                :primary-text "#010400"
+                :separator "#6f6f6fd1"))))
 
 (defun css-var (name)
   (cdr (assoc name *css-vars*)))
@@ -75,7 +75,11 @@
                 :font-size 1.7em
                 :line-height 1.2
                 :text-transform capitalize))
-    (video :width 100%)))
+    (video :width 100%)
+    (col :min-width 10rem)
+    ((:and tr (:nth-child even))
+     :background-color ,(css-color :background-dark2))
+    (td :padding .4em .8em)))
 
 (defun adjustable-width-css (&rest selectors)
   `((,@selectors :max-width ,(css-var :width-xl)
