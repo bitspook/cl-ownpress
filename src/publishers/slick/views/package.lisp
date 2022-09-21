@@ -1,11 +1,11 @@
 (defpackage :clown-slick.views
   (:nicknames :slick-views)
   (:local-nicknames (:xml :xml-emitter))
-  (:use :cl :alexandria :clown-slick)
+  (:use :cl :serapeum/bundle :clown-slick)
   (:import-from :spinneret :with-html-string)
   (:export home-html
            post-html
-           publish-post-listings))
+           publish-post-listings publish-unlisted-posts))
 (in-package :slick-views)
 
 (defmacro html-str ((&key title css (rss-url nil)) &body dom)

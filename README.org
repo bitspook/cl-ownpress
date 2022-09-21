@@ -1,5 +1,9 @@
 * Cl-ownpress 
 
+#+begin_quote
+/⚠️Warning⚠️/: Under active development. API/architecture might change without warning.
+#+end_quote
+
 Practically, cl-ownpress is a static site generator.
 
 Theoretically, its primary objective is to
@@ -60,10 +64,11 @@ moving forward to allow me achieve my desired publishing workflow.
   should be published, but not listed anywhere on the blog/rss-feeds etc.
   
   #+begin_quote
-  *Status*: In Progress
+  *Status*: Done
 
   *org-roam-provider* allow publishing notes with specific tags to be published
-  as blog posts, but it doesn't handle linked notes yet.
+  as blog posts. Any notes linked inside these notes are published, but not
+  listed (configurable) in any listings (tags, categories, home-page).
   #+end_quote
 
 - Publish my personal projects

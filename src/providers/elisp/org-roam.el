@@ -5,6 +5,8 @@
 (require 'jsonrpc)
 (require 'htmlize)
 
+(defvar *clown--roam-node-category-fn* nil)
+
 (defun clown--roam-nodes-with-tags (tags)
   "Find all org-roam nodes which have all TAGS."
   (let ((nodes (seq-filter
@@ -18,6 +20,10 @@
 (defun clown--node-slug (node)
   "Get slug for org-roam NODE."
   (string-replace "_" "-" (org-roam-node-slug node)))
+
+(defun clown--node-public-path (node)
+  (let ((cat (funcall *clown--roam-node-category-fn* node)))
+    (format "/%s/%s" cat (clown--node-slug node))))
 
 (defun clown--get-org-file-props (filename)
   "Get file-level org props for FILENAME."
@@ -62,9 +68,6 @@ into this list."
         (push node *linked-roam-nodes*)
         (format "<a href=\"%s\" title=\"%s\">%s</a>" public-path desc desc))))))
 
-(defun clown--node-public-path (node)
-  (format "/blog/%s" (clown--node-slug node)))
-
 (defun clown--org-to-html (filename)
   "Return content of FILENAME named org file as HTML."
   (let ((org-export-with-section-numbers nil)
@@ -87,7 +90,8 @@ into this list."
   (cl-block 'clown--collect-node
     (let* ((file (org-roam-node-file node))
            (meta (clown--get-post-meta file))
-           (cat (or (alist-get "category" meta) "blog"))
+           (cat (or (alist-get "category" meta)
+                    (funcall *clown--roam-node-category-fn* node)))
            (*linked-roam-nodes* nil)
            (id (org-roam-node-id node))
            (body-html nil))
@@ -115,7 +119,7 @@ into this list."
   "Collect all the org-roam notes which have TAGS."
   (let ((original-id-exporter (org-link-get-parameter "id" :export))
         *collected-ids*
-        collectd-notes)
+        collected-notes)
     ;; Handle linked notes
     (org-link-set-parameters "id" :export #'clown--export-org-id-link)
 
@@ -123,8 +127,22 @@ into this list."
     (org-link-set-parameters "id" :export original-id-exporter)
     collected-notes))
 
-(defun clown--main (&key tags)
-  "Main function called from cl-ownpress for providing notes with TAGS."
+(cl-defun clown--main (&key tags listed-category unlisted-category)
+  "Main function called from cl-ownpress for providing notes with TAGS.
+LISTED-CATEGORY and UNLISTED-CATEGORY are used to mark
+notes which should be published and those which are only linked
+from published notes. They are also used to create links for
+linked notes following the url scheme: /<category>/<slug>"
+  (setf *clown--roam-node-category-fn*
+        (lambda (node)
+          (cl-labels ((contains-subseq-p (seq1 seq2)
+                        (eq
+                         (length (seq-intersection seq1 seq2))
+                         (length seq2))))
+            (if (contains-subseq-p (org-roam-node-tags node) tags)
+                listed-category
+              unlisted-category))))
+
   (let ((conn (make-network-process
                :name "clown-rpc"
                :buffer nil

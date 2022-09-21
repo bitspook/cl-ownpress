@@ -25,7 +25,8 @@
    :mixpanel-token nil
    :rss-max-posts 10
    :control-tags ("blog-post" "published")
-   :exclude-tags ("draft")))
+   :exclude-tags ("draft")
+   :unlisted-categories nil))
 
 (defparameter *debug-transpiles* t)
 

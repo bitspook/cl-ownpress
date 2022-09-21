@@ -189,5 +189,7 @@
   (let ((styles '((top-level-css)
                   (button-css)
                   home-css)))
-    `(html-str (:title ("~a's online home" (conf :author)) :css ,styles :rss-url (clown:join-paths (conf :site-url) "archive/feed.xml"))
+    `(html-str (:title ("~a's online home" (conf :author))
+                :css ,styles
+                :rss-url (clown:join-paths (conf :site-url) "archive/feed.xml"))
        ,home-dom)))

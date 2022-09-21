@@ -17,6 +17,7 @@
       (copy-dirs user-assets-dir dest))
 
     (slick-views:publish-post-listings)
+    (slick-views:publish-unlisted-posts)
 
     (write-html-to-file
      (ppath:join dest "index.html") (slick-views:home-html) :clean-urls? clean-urls?)))

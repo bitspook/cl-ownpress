@@ -92,4 +92,8 @@ present at execution"
                      :html-content (post-html-content post))))
 
   (defun publish-recent-posts (&optional (limit 5))
+    (mapcar #'publish-post (fetch-posts (sxql:limit limit)
+                                        (sxql:where (:not-in :category (conf :unlisted-categories))))))
+
+  (defun publish-unlisted-posts (&optional (limit -1))
     (mapcar #'publish-post (fetch-posts (sxql:limit limit)))))
