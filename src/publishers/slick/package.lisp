@@ -2,7 +2,7 @@
   (:use :cl :alexandria)
   (:import-from :spinneret :with-html-string)
   (:export
-   *conf* conf conf-merge
+   *conf* conf conf-merge with-conf
    *debug-transpiles*
    *css-vars* css-var css-color font-css top-level-css adjustable-width-css to-css-str button-css
    post-id post-slug post-title post-tags post-category post-published-at post-html-content fetch-posts
