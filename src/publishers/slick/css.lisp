@@ -14,7 +14,8 @@
                 :cta-dark1 "#b75d69"
                 :cta-dark2 "#b75d69"
                 :primary-text "#010400"
-                :separator "#6f6f6fd1"))))
+                :separator "#6f6f6fd1"
+                :separator-light "#6f6f6f29"))))
 
 (defun css-var (name)
   (cdr (assoc name *css-vars*)))
@@ -79,7 +80,13 @@
     (col :min-width 10rem)
     ((:and tr (:nth-child even))
      :background-color ,(css-color :background-dark2))
-    (td :padding .4em .8em)))
+    (td :padding .4em .8em)
+    (.src :font-size 1rem
+          :padding 1em
+          :border 1px solid ,(css-color :separator-light)
+          :border-radius 8px
+          :box-sizing scroll
+          :margin 2em 0)))
 
 (defun adjustable-width-css (&rest selectors)
   `((,@selectors :max-width ,(css-var :width-xl)

@@ -143,6 +143,10 @@ its various components.
   without it, but it'll take work.
 - For prototyping. I have some ideas I want to explore, and sqlite requires
   minimum amount of work to do that.
+- To maintain a snapshot of content to be published, since the source of content
+  might not be available all the time, or is costly to retrieve. (This could
+  also be done by creating new files on filesystem though, I am still debating
+  whether that should be the way to go)
   
 Once I have a good hold on the scope of the project, we'll revisit the decision
 of having a database file, or operate only on files in filesystem to build a
