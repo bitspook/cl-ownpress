@@ -2,7 +2,7 @@
   (:use :cl)
   (:export
    provider invoke-provider
-   *org-roam-provider* *org-file-provider*))
+   org-roam-provider *org-file-provider*))
 (in-package :clown-providers)
 
 (defmacro insert-into (table values &key conflict-cols)
