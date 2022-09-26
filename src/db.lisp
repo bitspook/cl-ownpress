@@ -27,6 +27,10 @@ instead.")
   (when *conn* (return-from make-connection *conn*))
 
   (setq *conn* (dbi:connect :sqlite3 :database-name (conf :db-name)))
+  ;; WAL PRAGMA cannot be set using migrations, because migrations are ran
+  ;; inside transactions, and sqlite won't set this pragma from inside a
+  ;; transaction
+  (dbi:execute (dbi:prepare *conn* "PRAGMA journal_mode=WAL;"))
   *conn*)
 
 (defun run-pending-migrations ()

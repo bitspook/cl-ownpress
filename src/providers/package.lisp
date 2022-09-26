@@ -25,10 +25,27 @@ Insert into TABLE VALUES represented as a plist."
     :type string
     :initarg :name
     :initform (error "Provider must have a name")
-    :reader provider-name)))
+    :reader provider-name)
+   (purge-strategy
+    :initarg :purge-strategy
+    :initform 'purge-all-before-invoke)))
 
 (defgeneric invoke-provider (provider &key)
   (:documentation "Execute a provider."))
 
 (defmethod invoke-provider :before (provider &key)
-  (clown:run-pending-migrations))
+  (clown:run-pending-migrations)
+  (with-slots (purge-strategy name) provider
+    (when (eq purge-strategy 'purge-all-before-invoke)
+      (multiple-value-bind (stmt vals)
+          (sxql:yield
+           (sxql:delete-from :provided_content
+             (sxql:where (:= :provider name))))
+        (log:d "Purge query: ~a ~a" stmt vals)
+        (let ((conn (clown:make-connection)))
+          (dbi:execute (dbi:prepare conn stmt) vals))))))
+
+(defmethod invoke-provider :after (provider &key)
+  (with-slots (purge-strategy) provider
+    (when (and (functionp purge-strategy) purge-strategy)
+      (funcall purge-strategy provider))))
