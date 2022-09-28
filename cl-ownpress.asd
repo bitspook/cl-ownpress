@@ -32,8 +32,12 @@
                   ((:file "package")
                    (:file "rpc-server")
                    (:file "org-file-provider")
-                   (:file "org-roam-provider")))))
-               (:module "src/publishers/slick"
+                   (:file "org-roam-provider")))
+                 (:module "publishers"
+                  :serial t
+                  :components
+                  ((:file "package")))))
+               (:module "src/publishers/blog"
                 :serial t
                 :components
                 ((:file "package")
@@ -50,7 +54,7 @@
                    (:file "post")
                    (:file "listing")
                    (:file "home")))
-                 (:file "build"))))
+                 (:file "publish"))))
   :description ""
   :in-order-to ((test-op (test-op "cl-ownpress/tests"))))
 

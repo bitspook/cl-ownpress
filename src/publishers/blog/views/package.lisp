@@ -1,12 +1,11 @@
-(defpackage :clown-slick.views
-  (:nicknames :slick-views)
+(defpackage :clown-blog.views
+  (:nicknames :blog-views)
   (:local-nicknames (:xml :xml-emitter))
-  (:use :cl :serapeum/bundle :clown-slick)
+  (:use :cl :serapeum/bundle :clown-blog)
   (:import-from :spinneret :with-html-string)
-  (:export home-html
-           post-html
-           publish-post-listings publish-unlisted-posts))
-(in-package :slick-views)
+  (:import-from #:clown conf)
+  (:export home-html post-html listing-html rss-str))
+(in-package :blog-views)
 
 (defmacro html-str ((&key title css (rss-url nil)) &body dom)
   `(let ((spinneret:*suppress-inserted-spaces* t)

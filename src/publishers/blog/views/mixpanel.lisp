@@ -1,4 +1,4 @@
-(in-package :clown-slick.views)
+(in-package :clown-blog.views)
 
 (defun mixpanel-dom ()
   '(when (conf :mixpanel-token)

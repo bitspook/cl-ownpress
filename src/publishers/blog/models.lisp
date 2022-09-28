@@ -1,4 +1,4 @@
-(in-package :clown-slick)
+(in-package :clown-blog)
 
 (defclass post ()
   ((id :initarg :id :reader post-id)
@@ -11,7 +11,7 @@
 
 (defun post-tags (post)
   "Return list of valid `post' tags.
-`clown-slick' reserves some tags to be \"control\" tags (configured as
+`clown-blog' reserves some tags to be \"control\" tags (configured as
 `:control-tags' in `*conf'), which aren't published."
   (remove-if (lambda (tag) (find tag (conf :control-tags) :test #'equal)) (slot-value post 'tags)))
 
@@ -23,8 +23,21 @@
   (print-unreadable-object (obj out)
     (format out "Post: title={~a}" (post-title obj))))
 
-(defclass published-post (post)
-  ((public-path :initarg :public-path :accessor post-public-path)))
+(defun db-to-post (row)
+  "Try to make a `post' from a database row."
+  (let ((pub-date (or (uiop:if-let ((date (getf row :|published_at|)))
+                        (local-time:parse-timestring date :date-time-separator #\Space)
+                        nil)
+                      (local-time:now))))
+    (make-instance
+     'post
+     :id (getf row :|id|)
+     :title (getf row :|title|)
+     :slug (getf row :|slug|)
+     :tags (when-let ((tags (getf row :|tags|))) (yason:parse tags))
+     :category (getf row :|category|)
+     :published-at pub-date
+     :html-content (getf row :|content_html|))))
 
 (defmacro fetch-posts (&rest query-frags)
   `(multiple-value-bind (stmt vals)
@@ -51,18 +64,9 @@
             (query (dbi:execute (dbi:prepare conn stmt) vals)))
        (mapcar #'db-to-post (dbi:fetch-all query)))))
 
-(defun db-to-post (row)
-  "Try to make a `post' from a database row."
-  (let ((pub-date (or (uiop:if-let ((date (getf row :|published_at|)))
-                        (local-time:parse-timestring date :date-time-separator #\Space)
-                        nil)
-                      (local-time:now))))
-    (make-instance
-     'post
-     :id (getf row :|id|)
-     :title (getf row :|title|)
-     :slug (getf row :|slug|)
-     :tags (when-let ((tags (getf row :|tags|))) (yason:parse tags))
-     :category (getf row :|category|)
-     :published-at pub-date
-     :html-content (getf row :|content_html|))))
+(defun fetch-recent-posts (&optional (limit 5))
+  (fetch-posts (sxql:limit limit)
+               (sxql:where (:not-in :category (conf :unlisted-categories)))))
+
+(defun fetch-unlisted-posts (&optional (limit -1))
+  (fetch-posts (sxql:limit limit)))

@@ -17,6 +17,9 @@
                        f)))
            f))))
 
+(defun system-local (path)
+  (namestring (asdf:system-relative-pathname "cl-ownpress" path)))
+
 (defun recursive-directory-files (start-dir)
   (let ((files (uiop:directory-files start-dir))
         (subdirs (uiop:subdirectories start-dir)))

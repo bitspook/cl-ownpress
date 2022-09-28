@@ -1,6 +1,6 @@
-(in-package :clown-slick.views)
+(in-package :clown-blog.views)
 
-(defun rss-str (posts &key title feed-url feed-updated-at)
+(defun rss-str (title posts)
   (with-output-to-string (str)
     (xml:with-rss2 (str)
       (xml:rss-channel-header title (conf :site-url)

@@ -4,7 +4,7 @@
   (:export
    *conf* conf conf-merge with-conf
    make-connection run-pending-migrations create-new-migration
-   join-paths make-conf recursive-directory-files))
+   join-paths system-local recursive-directory-files))
 (in-package :cl-ownpress)
 
 (require :cl-migratum)
@@ -19,34 +19,17 @@
 
 (setf lparallel:*kernel* (lparallel:make-kernel 4))
 
-(defmacro make-conf (initial-value)
-  "Create a trivial configuration management functionality.
+(defparameter *conf* '(:db-name "clownpress.db"))
 
-In the context of current package, it creates:
+(defun conf (key)
+  "Get configuration value corresponding to KEY."
+  (getf *conf* key))
 
-1. A variable named `*conf*' which should be a plist initialized with INITIAL-VALUE
-2. A function `conf' for getting/setting a configuration value saved in a KEY
-3. A non-destructive function `conf-merge' for merging a subset of configuration
-with present configuration"
-  (let ((global-conf (intern "*CONF*" (sb-int:sane-package)))
-        (conf (intern "CONF" (sb-int:sane-package)))
-        (conf-merge (intern "CONF-MERGE" (sb-int:sane-package)))
-        (with-conf (intern "WITH-CONF" (sb-int:sane-package)))
-        (key (gensym "KEY"))
-        (val (gensym "VAL"))
-        (body (gensym "BODY")))
-    `(progn
-       (defparameter ,global-conf ,initial-value)
+(defun (setf conf) (val key)
+  (setf (getf *conf* key) val))
 
-       (defun ,conf (,key)
-         "Get configuration value corresponding to KEY."
-         (getf ,global-conf ,key))
-
-       (defun (setf ,conf) (,val ,key)
-         (setf (getf ,global-conf ,key) ,val))
-
-       (defun ,conf-merge (,val)
-         "Merge NEW-CONF into default `*conf*' and return the result.
+(defun conf-merge (val)
+  "Merge NEW-CONF into default `*conf*' and return the result.
 
 ## Example
 
@@ -54,10 +37,4 @@ with present configuration"
 (let ((*conf* (conf-merge `((:site-url \"https://mysite.com/\")))))
   (build))
 ```"
-         (concatenate 'list ,val ,global-conf))
-
-       (defmacro ,with-conf (,val &body ,body)
-         (list 'let (list (list ',global-conf (list ',conf-merge ,val)))
-               `(progn ,@,body))))))
-
-(make-conf '(:db-name "clownpress.db"))
+  (concatenate 'list val *conf*))

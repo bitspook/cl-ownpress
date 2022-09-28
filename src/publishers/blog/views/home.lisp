@@ -1,4 +1,4 @@
-(in-package :clown-slick.views)
+(in-package :clown-blog.views)
 
 ;; Need these available at compile time for the home-html macro
 (eval-when (:compile-toplevel :load-toplevel :execute)
@@ -177,7 +177,7 @@
        (:section :class "recent-content"
         (:header (:h2 "Recent Content"))
         (:ul :class "recent-content-list"
-         (dolist (rp (publish-recent-posts 5))
+         (dolist (rp recent-posts)
            (:li (:a :href (post-public-path rp)
                     :class (format nil "recent-content-item content-type--~a" (post-category rp))
                     (post-title rp)))))
@@ -185,11 +185,11 @@
                      :href "/archive"
                   "See all")))))))
 
-(defmacro home-html ()
+(defmacro home-html (&key title)
   (let ((styles '((top-level-css)
                   (button-css)
                   home-css)))
-    `(html-str (:title ("~a's online home" (conf :author))
+    `(html-str (:title ,title
                 :css ,styles
                 :rss-url (clown:join-paths (conf :site-url) "archive/feed.xml"))
        ,home-dom)))

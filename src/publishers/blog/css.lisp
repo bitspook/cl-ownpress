@@ -1,4 +1,4 @@
-(in-package :clown-slick)
+(in-package :clown-blog)
 
 (defparameter *css-vars*
   '((:width-xl . "1080px")
