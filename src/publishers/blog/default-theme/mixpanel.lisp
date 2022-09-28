@@ -1,4 +1,4 @@
-(in-package :clown-blog.views)
+(in-package :default-theme)
 
 (defun mixpanel-dom ()
   '(when (conf :mixpanel-token)

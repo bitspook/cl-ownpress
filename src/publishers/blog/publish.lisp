@@ -1,10 +1,5 @@
 (in-package #:clown-blog)
 
-(import 'clown-blog.views:home-html)
-(import 'clown-blog.views:listing-html)
-(import 'clown-blog.views:post-html)
-(import 'clown-blog.views:rss-str)
-
 (defun write-html-to-file (dest html &key (clean-urls? t))
   "Write HTML to DEST. If CLEAN-URL?, write as dest/index.html"
   (let* ((dest (if (and clean-urls? (not (string= (ppath:basename dest) "index.html")))
@@ -12,30 +7,31 @@
                    dest)))
     (publish-file dest html)))
 
+(defun render (t-fn &rest args)
+  (apply (funcall t-fn (conf :theme)) args))
+
 (defun publish-rss-feed (title posts &key (filepath "feed.xml"))
   (publish-file filepath (rss-str title posts)))
 
 (defun publish-listing (title posts &key filepath rss-url)
   (let* ((rss-url (or rss-url (clown:join-paths "/" filepath "feed.xml")))
-         (html (listing-html title posts :rss-url rss-url)))
+         (html (render #'theme-listing-template title posts :rss-url rss-url)))
     (publish-html-file filepath html)))
 
 (defun publish-post (post)
-  (publish-html-file (post-public-path post) (post-html post)))
+  (publish-html-file (post-public-path post) (render #'theme-post-template post)))
 
-(defun publish-home (&key title)
-  (let ((clown-blog.views::recent-posts (fetch-recent-posts 5)))
-    (declare (ignorable clown-blog.views::recent-posts))
-    (publish-html-file "index.html" (home-html :title title))))
+(defun publish-home (title)
+  (publish-html-file "index.html" (render #'theme-home-template title (fetch-recent-posts 5))))
 
 (defun publish-blog (title)
-  (publish-static (clown:system-local "src/publishers/blog/assets"))
+  (publish-static (theme-assets-dir (conf :theme)))
   (mapcar #'publish-static (conf :static-dirs))
 
   (let ((tagged-posts (make-hash-table :test 'equal))
         (categorized-posts (make-hash-table :test 'equal))
-        (all-posts (remove-if-not #'post-category (fetch-recent-posts -1))))
-    (loop :for post :in all-posts
+        (listed-posts (remove-if-not #'post-category (fetch-recent-posts -1))))
+    (loop :for post :in listed-posts
           :for cat := (post-category post)
           :do (loop
                 :for tag :in (post-tags post)
@@ -62,10 +58,10 @@
          (publish-rss-feed title posts :filepath (format nil "~a/feed.xml" cat))))
      categorized-posts)
 
-    (publish-listing "All content" all-posts :filepath "archive/")
-    (publish-rss-feed "All content" all-posts :filepath "archive/feed.xml")
+    (publish-listing "All content" listed-posts :filepath "archive/")
+    (publish-rss-feed "All content" listed-posts :filepath "archive/feed.xml")
 
-    (mapcar #'publish-post all-posts))
+    (mapcar #'publish-post listed-posts)
+    (mapcar #'publish-post (fetch-unlisted-posts)))
 
-
-  (publish-home :title title))
+  (publish-home title))

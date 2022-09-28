@@ -1,4 +1,4 @@
-(in-package :clown-blog.views)
+(in-package :default-theme)
 
 (defmacro listing-html (title posts &key rss-url)
   (let ((css '((top-level-css)
@@ -10,7 +10,7 @@
 
 (eval-when (:compile-toplevel :load-toplevel :execute)
   (defun listing-css ()
-    `(,@(clown-blog:adjustable-width-css ".content")
+    `(,@(adjustable-width-css ".content")
       (.content (h1 :display flex
                     :align-items center
                     (.rss-sub :margin 0
@@ -89,17 +89,17 @@ Required context:
          (:ul.listing
           (dolist (post posts)
             (:li
-             (:span :class (str:concat "li-icon li-icon--" (post-category post)))
+             (:span :class (str:concat "li-icon li-icon--" (clown-blog:post-category post)))
              (:div.li-conent
               (:a.li-title
-               :href (post-public-path post)
-               (post-title post))
+               :href (clown-blog:post-public-path post)
+               (clown-blog:post-title post))
               (:span.li-meta
                (:span :class "meta-item date"
                       (local-time:format-timestring
-                       nil (post-published-at post)
+                       nil (clown-blog:post-published-at post)
                        :format '(:long-month " " :day ", " :year)))
-               (when-let ((tags (post-tags post)))
+               (when-let ((tags (clown-blog:post-tags post)))
                  (:span :class "meta-item tags"
                         (dolist (tag tags)
                           (:a :href (str:concat "/tags/" tag) (str:concat "#" (str:downcase tag)))))))))

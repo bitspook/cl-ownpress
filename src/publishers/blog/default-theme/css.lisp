@@ -1,4 +1,4 @@
-(in-package :clown-blog)
+(in-package :default-theme)
 
 (defparameter *css-vars*
   '((:width-xl . "1080px")
@@ -90,14 +90,14 @@
 
 (defun adjustable-width-css (&rest selectors)
   `((,@selectors :max-width ,(css-var :width-xl)
-                :padding 0 124px
-                :margin 0 auto)
+                 :padding 0 124px
+                 :margin 0 auto)
     (:media ,(format nil "(max-width: ~a)" (css-var :width-md))
             (,@selectors :max-width 100%
-                        :padding 0 8%))
+                         :padding 0 8%))
     (:media ,(format nil "(max-width: ~a)" (css-var :width-sm))
             (,@selectors :max-width 100%
-                        :padding 0 4%))))
+                         :padding 0 4%))))
 
 (defun button-css ()
   `((.btn :display inline-flex

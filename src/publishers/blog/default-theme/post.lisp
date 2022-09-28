@@ -1,4 +1,4 @@
-(in-package :clown-blog.views)
+(in-package :default-theme)
 
 (defmacro post-html (post)
   "Produce HTML required for publishing a `post'. A variable named 'post' must be
@@ -6,7 +6,7 @@ present at execution"
   (let ((styles '((top-level-css)
                   (post-css))))
     `(let ((post ,post))
-       (html-str (:title (post-title post) :css ,styles)
+       (html-str (:title (clown-blog:post-title post) :css ,styles)
          ,(post-dom post)))))
 
 (eval-when (:compile-toplevel :load-toplevel :execute)
@@ -19,7 +19,7 @@ present at execution"
                 :line-height 1.4
                 :margin 0 auto
                 :padding 0 124px)
-      ,@(clown-blog:adjustable-width-css ".content")
+      ,@(adjustable-width-css ".content")
       (.content-header (h1 :margin-bottom 1rem :font-size 2em))
       (.content-meta :margin-top 0
                      :margin-bottom 2rem
@@ -65,15 +65,15 @@ present at execution"
               :class "content"
               (:header
                :class "content-header"
-               (:h1 (post-title post))
+               (:h1 (clown-blog:post-title post))
                (:span
                 :class "content-meta"
                 (:span
                  :class "meta-item date"
                  (local-time:format-timestring
-                  nil (post-published-at post)
+                  nil (clown-blog:post-published-at post)
                   :format '(:long-month " " :day ", " :year)))
-                (when-let ((tags (post-tags post)))
+                (when-let ((tags (clown-blog:post-tags post)))
                   (:ul
                    :class "meta-item tags"
                    (dolist (tag tags)
@@ -82,5 +82,5 @@ present at execution"
                           (str:concat "/tags/" tag)
                           (str:concat "#" (str:downcase tag)))))))))
               (:article :class "main-article"
-                        (:raw (post-html-content post))))
+                        (:raw (clown-blog:post-html-content post))))
              ,(footer-dom)))))

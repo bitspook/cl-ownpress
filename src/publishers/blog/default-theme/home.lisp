@@ -1,4 +1,4 @@
-(in-package :clown-blog.views)
+(in-package :default-theme)
 
 ;; Need these available at compile time for the home-html macro
 (eval-when (:compile-toplevel :load-toplevel :execute)
@@ -137,7 +137,7 @@
                      (.sidebar :width 100%)
                      (.main :width 100%)))))
 
-  (defparameter home-dom
+  (defun home-dom ()
     '(:div :class "home"
       (:div :class "sidebar"
        (:div :class "author"
@@ -178,18 +178,19 @@
         (:header (:h2 "Recent Content"))
         (:ul :class "recent-content-list"
          (dolist (rp recent-posts)
-           (:li (:a :href (post-public-path rp)
-                    :class (format nil "recent-content-item content-type--~a" (post-category rp))
-                    (post-title rp)))))
+           (:li (:a :href (clown-blog:post-public-path rp)
+                    :class (format nil "recent-content-item content-type--~a" (clown-blog:post-category rp))
+                    (clown-blog:post-title rp)))))
         (:footer (:a :class "btn btn-primary read-more-btn"
                      :href "/archive"
                   "See all")))))))
 
-(defmacro home-html (&key title)
+(defmacro home-html (title posts)
   (let ((styles '((top-level-css)
                   (button-css)
                   home-css)))
-    `(html-str (:title ,title
-                :css ,styles
-                :rss-url (clown:join-paths (conf :site-url) "archive/feed.xml"))
-       ,home-dom)))
+    `(let ((recent-posts ,posts))
+       (html-str (:title ,title
+                  :css ,styles
+                  :rss-url (clown:join-paths (conf :site-url) "archive/feed.xml"))
+         ,(home-dom)))))

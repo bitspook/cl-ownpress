@@ -1,4 +1,4 @@
-(in-package :clown-blog.views)
+(in-package :default-theme)
 
 (defun navbar-dom ()
   `(:nav :class "top-nav"
@@ -47,4 +47,4 @@
             (.top-nav :padding-right 1em
                       (a :font-size 1.2em)))
 
-    ,@(clown-blog:adjustable-width-css ".top-nav")))
+    ,@(adjustable-width-css ".top-nav")))

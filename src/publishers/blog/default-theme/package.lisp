@@ -1,11 +1,7 @@
-(defpackage :clown-blog.views
-  (:nicknames :blog-views)
-  (:local-nicknames (:xml :xml-emitter))
-  (:use :cl :serapeum/bundle :clown-blog)
-  (:import-from :spinneret :with-html-string)
-  (:import-from #:clown conf)
-  (:export home-html post-html listing-html rss-str))
-(in-package :blog-views)
+;; Package itself is defined in blog/package.lisp to solve circular-dependency
+(in-package :default-theme)
+
+(defparameter *debug-transpiles* t)
 
 (defmacro html-str ((&key title css (rss-url nil)) &body dom)
   `(let ((spinneret:*suppress-inserted-spaces* t)
@@ -22,3 +18,4 @@
          (:style (:raw styles)))
         (:body ,@dom)
         ,(mixpanel-dom)))))
+

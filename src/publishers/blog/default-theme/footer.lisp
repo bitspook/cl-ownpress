@@ -1,7 +1,7 @@
-(in-package :clown-blog.views)
+(in-package :default-theme)
 
 (defun newsletter-css ()
-  `(,@(clown-blog:adjustable-width-css ".postamble")
+  `(,@(adjustable-width-css ".postamble")
     ,@(button-css)
     (.postamble
      :font-family monospace

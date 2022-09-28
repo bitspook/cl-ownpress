@@ -1,14 +1,14 @@
-(in-package :clown-blog.views)
+(in-package :clown-blog)
 
 (defun rss-str (title posts)
   (with-output-to-string (str)
-    (xml:with-rss2 (str)
-      (xml:rss-channel-header title (conf :site-url)
+    (xml-emitter:with-rss2 (str)
+      (xml-emitter:rss-channel-header title (conf :site-url)
                               :generator "cl-ownpress"
                               :image (conf :avatar))
       (mapcar (lambda (post)
                 (let ((post-url (clown:join-paths (conf :site-url) (post-public-path post))))
-                  (xml:rss-item
+                  (xml-emitter:rss-item
                    (post-title post)
                    :guid (post-id post)
                    :category (post-category post)

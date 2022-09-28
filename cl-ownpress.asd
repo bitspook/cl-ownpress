@@ -21,40 +21,38 @@
                "yason"
                "xml-emitter")
   :components ((:module "src"
-                :serial t
+                :serial nil
                 :components
                 ((:file "package")
                  (:file "utils")
                  (:file "db")
                  (:module "providers"
                   :serial t
-                  :components
-                  ((:file "package")
-                   (:file "rpc-server")
-                   (:file "org-file-provider")
-                   (:file "org-roam-provider")))
+                  :components ((:file "package")
+                               (:file "rpc-server")
+                               (:file "org-file-provider")
+                               (:file "org-roam-provider")))
                  (:module "publishers"
                   :serial t
-                  :components
-                  ((:file "package")))))
-               (:module "src/publishers/blog"
+                  :components ((:file "package")))))
+               (:module
+                "src/publishers/blog"
                 :serial t
-                :components
-                ((:file "package")
-                 (:file "models")
-                 (:file "css")
-                 (:module "views"
-                  :serial t
-                  :components
-                  ((:file "package")
-                   (:file "rss")
-                   (:file "navbar")
-                   (:file "mixpanel")
-                   (:file "footer")
-                   (:file "post")
-                   (:file "listing")
-                   (:file "home")))
-                 (:file "publish"))))
+                :components ((:file "package")
+                             (:file "models")
+                             (:file "rss")
+                             (:file "publish")))
+               (:module "src/publishers/blog/default-theme"
+                :serial t
+                :components ((:file "package")
+                             (:file "css")
+                             (:file "navbar")
+                             (:file "mixpanel")
+                             (:file "footer")
+                             (:file "post")
+                             (:file "listing")
+                             (:file "home")
+                             (:file "theme"))))
   :description ""
   :in-order-to ((test-op (test-op "cl-ownpress/tests"))))
 

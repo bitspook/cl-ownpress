@@ -12,6 +12,7 @@
                     :error-output *standard-output*))
 
 (defun publish-static (dir)
+  (ensure-directories-exist (conf :dest))
   (copy-dirs dir (conf :dest)))
 
 (defun publish-file (dest content)
