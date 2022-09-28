@@ -34,25 +34,26 @@
                                (:file "org-roam-provider")))
                  (:module "publishers"
                   :serial t
-                  :components ((:file "package")))))
-               (:module
-                "src/publishers/blog"
-                :serial t
-                :components ((:file "package")
-                             (:file "models")
-                             (:file "rss")
-                             (:file "publish")))
-               (:module "src/publishers/blog/default-theme"
-                :serial t
-                :components ((:file "package")
-                             (:file "css")
-                             (:file "navbar")
-                             (:file "mixpanel")
-                             (:file "footer")
-                             (:file "post")
-                             (:file "listing")
-                             (:file "home")
-                             (:file "theme"))))
+                  :components ((:file "package")))
+                 (:module
+                  "publishers/blog"
+                  :serial t
+                  :components ((:file "package")
+                               (:file "models")
+                               (:file "rss")
+                               (:file "publish")))
+                 (:module "publishers/blog/default-theme"
+                  :serial t
+                  :components ((:file "package")
+                               (:file "css")
+                               (:file "navbar")
+                               (:file "mixpanel")
+                               (:file "footer")
+                               (:file "post")
+                               (:file "listing")
+                               (:file "home")
+                               (:file "theme")))
+                 (:file "publishers/convinient-blog-re-exports"))))
   :description ""
   :in-order-to ((test-op (test-op "cl-ownpress/tests"))))
 

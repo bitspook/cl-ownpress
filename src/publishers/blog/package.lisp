@@ -3,19 +3,11 @@
   (:import-from :spinneret :with-html-string)
   (:import-from #:clown *conf* conf-merge conf)
   (:export
-   post-id post-slug post-title post-tags post-category post-published-at post-html-content fetch-posts
+   post-id post-slug post-title post-tags post-category post-published-at post-html-content
+   fetch-posts fetch-recent-posts fetch-unlisted-posts
    post-public-path
    blog-theme theme-home-template theme-listing-template theme-post-template theme-assets-dir
-   publish-blog))
-
-(defpackage :clown-blog.themes.default
-  (:nicknames :default-theme)
-  (:local-nicknames (:xml :xml-emitter))
-  (:use :cl :serapeum/bundle)
-  (:import-from :spinneret :with-html-string)
-  (:import-from #:clown conf system-local)
-  (:import-from #:clown-blog blog-theme)
-  (:export *debug-transpiles* theme))
+   publish-blog publish-listing publish-post publish-rss-feed))
 (in-package #:clown-blog)
 
 (setf *conf* (conf-merge
@@ -34,7 +26,7 @@
                 :control-tags ("blog-post" "published")
                 :exclude-tags ("draft")
                 :unlisted-categories nil
-                :theme ,clown-blog.themes.default:theme)))
+                :theme nil)))
 
 (defun post-public-path (post)
   (with-accessors ((cat post-category) (slug post-slug)) post

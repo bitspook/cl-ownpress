@@ -1,4 +1,11 @@
-;; Package itself is defined in blog/package.lisp to solve circular-dependency
+(defpackage :clown-blog.themes.default
+  (:nicknames :default-theme)
+  (:local-nicknames (:xml :xml-emitter))
+  (:use :cl :serapeum/bundle)
+  (:import-from :spinneret :with-html-string)
+  (:import-from #:clown conf system-local)
+  (:import-from #:clown-blog blog-theme)
+  (:export *debug-transpiles* theme))
 (in-package :default-theme)
 
 (defparameter *debug-transpiles* t)
