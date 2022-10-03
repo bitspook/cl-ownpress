@@ -51,14 +51,8 @@
       (insert org-content)
       (org-export-as 'html nil nil t))))
 
-(defun clown--file-slug (file)
-  "Slug for the file named FILE."
-  (s-replace "_" "-" (file-name-base file)))
-
 (defun clown--org-file-to-post (file)
   (let ((meta (clown--get-post-meta file)))
-    (when (not (alist-get 'slug meta))
-      (push `(slug . ,(clown--file-slug file)) meta))
     `(:id ,(alist-get 'slug meta)
       :filepath ,file
       :metadata ,(json-encode-alist meta)

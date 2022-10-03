@@ -31,6 +31,7 @@
                   :components ((:file "package")
                                (:file "rpc-server")
                                (:file "org-file-provider")
+                               (:file "denote-provider")
                                (:file "org-roam-provider")))
                  (:module "publishers"
                   :serial t

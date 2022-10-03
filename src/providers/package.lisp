@@ -1,8 +1,8 @@
 (defpackage clown-providers
-  (:use :cl)
+  (:use :cl :serapeum/bundle)
   (:export
-   provider invoke-provider
-   org-roam-provider org-file-provider))
+   provider invoke-provider categorize identify slugify
+   org-roam-provider org-file-provider denote-provider))
 (in-package :clown-providers)
 
 (defmacro insert-into (table values &key conflict-cols)
@@ -32,6 +32,13 @@ Insert into TABLE VALUES represented as a plist."
 
 (defgeneric invoke-provider (provider &key)
   (:documentation "Execute a provider."))
+
+(defgeneric slugify (provider &key msg)
+  (:documentation "Create slug for a MSG provided by PROVIDER."))
+(defgeneric identify (provider &key msg)
+  (:documentation "Create id for a MSG provided by PROVIDER."))
+(defgeneric categorize (provider &key msg)
+  (:documentation "Create category for a MSG provided by PROVIDER."))
 
 (defmethod invoke-provider :before (provider &key)
   (clown:run-pending-migrations)

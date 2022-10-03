@@ -8,6 +8,7 @@
          :with max-idx := (1- (length frags))
          :for idx :from 0
          :for f :in frags
+         :when (not (equal f ""))
          :collect
          (let* ((f (if (and (not (eq 0 idx)) (str:starts-with-p sep f))
                        (str:substring 1 (length f) f)

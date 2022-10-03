@@ -30,7 +30,7 @@
 
 (defun post-public-path (post)
   (with-accessors ((cat post-category) (slug post-slug)) post
-    (clown:join-paths (or cat "") slug "/")))
+    (clown:join-paths "/" (or cat "") slug "/")))
 
 (defclass blog-theme ()
   ((home :initform (error "Home view is required")

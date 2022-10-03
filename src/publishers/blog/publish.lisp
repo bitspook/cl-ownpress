@@ -1,12 +1,5 @@
 (in-package #:clown-blog)
 
-(defun write-html-to-file (dest html &key (clean-urls? t))
-  "Write HTML to DEST. If CLEAN-URL?, write as dest/index.html"
-  (let* ((dest (if (and clean-urls? (not (string= (ppath:basename dest) "index.html")))
-                   (str:concat dest "/index.html")
-                   dest)))
-    (publish-file dest html)))
-
 (defun render (t-fn &rest args)
   (apply (funcall t-fn (conf :theme)) args))
 

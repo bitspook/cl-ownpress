@@ -16,7 +16,7 @@
   (copy-dirs dir (conf :dest)))
 
 (defun publish-file (dest content)
-  (let ((dest (ppath:join (conf :dest) dest)))
+  (let ((dest (clown:join-paths (conf :dest) dest)))
     (ensure-directories-exist dest)
     (str:to-file dest content)))
 
