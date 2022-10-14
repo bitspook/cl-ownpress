@@ -5,7 +5,6 @@ pkgs.mkShell {
   buildInputs = with pkgs; [
     # sbcl
     sqlite
-    sqlitebrowser
   ];
 
   shellHook = ''

@@ -1,8 +1,10 @@
-(defpackage :clown-blog.themes.default
+(defpackage :clown-blog.theme.default
   (:nicknames :default-theme)
   (:local-nicknames (:xml :xml-emitter))
-  (:use :cl :serapeum/bundle)
-  (:import-from :spinneret :with-html-string)
+  (:use :cl :serapeum/bundle :clown-theme)
+  (:import-from :spinneret
+   with-html-string
+   with-html)
   (:import-from #:clown conf system-local)
   (:import-from #:clown-blog blog-theme)
   (:export *debug-transpiles* theme))

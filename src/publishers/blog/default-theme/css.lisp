@@ -5,6 +5,8 @@
     (:width-l . "990px")
     (:width-md . "840px")
     (:width-sm . "480px")
+    (:title-font-family . "Roboto")
+    (:content-font-family . "Cantarell")
     (:colors . (:background "#fcfcfc"
                 :background-dark1 "#f9f9f9"
                 :background-dark2 "#efefef"
@@ -14,7 +16,8 @@
                 :cta-dark1 "#b75d69"
                 :cta-dark2 "#b75d69"
                 :primary-text "#010400"
-                :separator "#6f6f6fd1"
+                :dim-text "#6f6f6f"
+                :separator "#888"
                 :separator-light "#6f6f6f29"))))
 
 (defun css-var (name)
@@ -44,10 +47,12 @@
     ("*" :margin 0
          :padding 0
          :box-sizing "border-box")
-    (body :font-family "Roboto"
+    (body :font-family ,(css-var :content-font-family)
           :font-size "14px"
           :background ,(css-color :background)
           :color ,(css-color :primary-text))
+    ((:or .title header)
+     :font-family ,(css-var :title-font-family))
     (a :text-decoration "underline"
        :color ,(css-color :primary-text))
     ((:or h1 h2 h3 h4 h5 h6)
@@ -103,14 +108,17 @@
   `((.btn :display inline-flex
           :border 2px solid
           :border-radius 25px
-          :padding 0 2.1em
+          :padding 0 2.1rem
           :cursor pointer
           :font-family "Roboto"
           :font-weight normal
-          :line-height 2.2em
+          :line-height 2.2rem
           :align-items center
           :text-align center
+          :background-color ,(css-color :background)
           :text-decoration none)
+
+    (|.btn:hover| :background-color ,(css-color :background-dark2))
 
     (.btn-cta :border-color ,(css-color :cta)
               :background ,(css-color :cta)

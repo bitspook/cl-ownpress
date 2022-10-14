@@ -27,43 +27,44 @@
                        :padding 0.4rem 0.8rem)))
 
 (defun newsletter-dom ()
-  `(:div#mc_embed_signup
-    (:form :action "https://bitspook.us14.list-manage.com/subscribe/post?u=de25614414d7e23ac4c3ea700&id=b8b47d5b6e"
-           :method "post"
-           :id  "mc-embedded-subscribe-form"
-           :name "mc-embedded-subscribe-form"
-           :class "validate"
-           :target "_blank"
+  (spinneret:with-html
+    (:div#mc_embed_signup
+     (:form :action "https://bitspook.us14.list-manage.com/subscribe/post?u=de25614414d7e23ac4c3ea700&id=b8b47d5b6e"
+            :method "post"
+            :id  "mc-embedded-subscribe-form"
+            :name "mc-embedded-subscribe-form"
+            :class "validate"
+            :target "_blank"
 
-           (:div#mc_embed_signup_scroll
-            (:h2 "Get updates via email")
-            (:div.mc-field-group
-             (:input :type "email" :value ""
-                     :placeholder "Email Address"
-                     :name "EMAIL"
-                     :class "required email newsletter-email"
-                     :id "mce-EMAIL"))
-            (:div :style "position: absolute; left: -5000px;"
-                  :aria-hidden "true"
-                  (:input :type "text"
-                          :name "b_de25614414d7e23ac4c3ea700_b8b47d5b6e"
-                          :tabindex "-1"
-                          :value ""))
-            (:div#mce-responses
-             :class "clear foot"
-             (:div :class "response"
-                   :id "mce-error-response"
-                   :style "display: none")
-             (:div :class "response"
-                   :id "mce-success-response"
-                   :style "display: none"))
-            (:div :class "optionalParent"
-                  (:div :class "clear foot"
-                        (:input :type "submit"
-                                :value "Subscribe"
-                                :name "subscribe"
-                                :id "mc-embedded-subscribe"
-                                :class "btn btn-primary")))))))
+            (:div#mc_embed_signup_scroll
+             (:h2 "Get updates via email")
+             (:div.mc-field-group
+              (:input :type "email" :value ""
+                      :placeholder "Email Address"
+                      :name "EMAIL"
+                      :class "required email newsletter-email"
+                      :id "mce-EMAIL"))
+             (:div :style "position: absolute; left: -5000px;"
+                   :aria-hidden "true"
+                   (:input :type "text"
+                           :name "b_de25614414d7e23ac4c3ea700_b8b47d5b6e"
+                           :tabindex "-1"
+                           :value ""))
+             (:div#mce-responses
+              :class "clear foot"
+              (:div :class "response"
+                    :id "mce-error-response"
+                    :style "display: none")
+              (:div :class "response"
+                    :id "mce-success-response"
+                    :style "display: none"))
+             (:div :class "optionalParent"
+                   (:div :class "clear foot"
+                         (:input :type "submit"
+                                 :value "Subscribe"
+                                 :name "subscribe"
+                                 :id "mc-embedded-subscribe"
+                                 :class "btn btn-primary"))))))))
 
 (defun footer-css ()
   `(,@(newsletter-css)
@@ -78,12 +79,13 @@
                        :background-size contain)))))
 
 (defun footer-dom ()
-  `(:footer.site-footer.postamble
-    ,(newsletter-dom)
-    (:p.rss-sub
-     (:a :href "/archive/feed.xml"
-         :title "Follow via RSS"
-         :target "blank"
-         (:span.rss) "Or Follow via RSS"))
-    (:p ("Author: ~a " (conf :author))
-        (:a :href (conf :twitter) ("@~a" (conf :handle))))))
+  (spinneret:with-html
+    (:footer.site-footer.postamble
+     (newsletter-dom)
+     (:p.rss-sub
+      (:a :href "/archive/feed.xml"
+          :title "Follow via RSS"
+          :target "blank"
+          (:span.rss) "Or Follow via RSS"))
+     (:p ("Author: ~a " (conf :author))
+         (:a :href (conf :twitter) ("@~a" (conf :handle)))))))
