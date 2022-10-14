@@ -1,33 +1,32 @@
 (in-package :default-theme)
 
-(defun newsletter-css ()
-  `(,@(adjustable-width-css ".postamble")
-    ,@(button-css)
-    (.postamble
-     :font-family monospace
-     :color "#666"
-     :margin 4rem auto
+(defwidget newsletter-widget ()
+  :styles `(,@(adjustable-width-css ".postamble")
+              ,@(button-css)
+              (.postamble
+               :font-family monospace
+               :color "#666"
+               :margin 4rem auto
 
-     (.validation :display none))
-    (:media ,(format nil "(max-width: ~a)" (css-var 'width-md))
-            (.postamble
-             :max-width 100%
-             :padding 0 8%))
-    (:media ,(format nil "(max-width: ~a)" (css-var 'width-sm))
-            (.postamble
-             :max-width 100%
-             :padding 0 4%))
-    ("#mc_embed_signup" :max-width 600px
-                        :background transparent
-                        :margin-bottom 4rem)
-    (.newsletter-email :border 1px solid ,(css-color :secondary)
-                       :border-radius 25px
-                       :width 100%
-                       :margin-bottom 1rem
-                       :padding 0.4rem 0.8rem)))
-
-(defun newsletter-dom ()
-  (spinneret:with-html
+               (.validation :display none))
+              (:media ,(format nil "(max-width: ~a)" (css-var 'width-md))
+                      (.postamble
+                       :max-width 100%
+                       :padding 0 8%))
+              (:media ,(format nil "(max-width: ~a)" (css-var 'width-sm))
+                      (.postamble
+                       :max-width 100%
+                       :padding 0 4%))
+              ("#mc_embed_signup" :max-width 600px
+                                  :background transparent
+                                  :margin-bottom 4rem)
+              (.newsletter-email :border 1px solid ,(css-color :secondary)
+                                 :border-radius 25px
+                                 :width 100%
+                                 :margin-bottom 1rem
+                                 :padding 0.4rem 0.8rem))
+  :render
+  (with-html
     (:div#mc_embed_signup
      (:form :action "https://bitspook.us14.list-manage.com/subscribe/post?u=de25614414d7e23ac4c3ea700&id=b8b47d5b6e"
             :method "post"
@@ -66,22 +65,21 @@
                                  :id "mc-embedded-subscribe"
                                  :class "btn btn-primary"))))))))
 
-(defun footer-css ()
-  `(,@(newsletter-css)
-    (.rss-sub :margin 2rem 0
-              (a :display flex
-                 :align-items center
-                 (.rss :width 24px
-                       :height 24px
-                       :margin-right 1rem
-                       :background "url(\"/images/icons/rss.svg\")"
-                       :background-repeat no-repeat
-                       :background-size contain)))))
-
-(defun footer-dom ()
-  (spinneret:with-html
+(defwidget footer-widget ()
+  :styles `(,@(newsletter-css)
+              (.rss-sub :margin 2rem 0
+                        (a :display flex
+                           :align-items center
+                           (.rss :width 24px
+                                 :height 24px
+                                 :margin-right 1rem
+                                 :background "url(\"/images/icons/rss.svg\")"
+                                 :background-repeat no-repeat
+                                 :background-size contain))))
+  :render
+  (with-html
     (:footer.site-footer.postamble
-     (newsletter-dom)
+     (render newsletter-widget)
      (:p.rss-sub
       (:a :href "/archive/feed.xml"
           :title "Follow via RSS"

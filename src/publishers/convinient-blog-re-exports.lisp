@@ -1,6 +1,5 @@
 (defpackage #:clown-publishers.blog
-  (:use #:cl #:clown #:clown-blog)
-  (:import-from #:default-theme *debug-transpiles*)
+  (:use #:cl #:clown #:clown-theme #:clown-blog)
   (:export
    *conf* conf conf-merge
    publish-static publish-file publish-html-file

@@ -38,17 +38,17 @@
                   :serial t
                   :components ((:file "package")))
                  (:module
+                  "publishers/blog/theme"
+                  :serial t
+                  :components ((:file "package")
+                               (:file "widget")))
+                 (:module
                   "publishers/blog"
                   :serial t
                   :components ((:file "package")
                                (:file "models")
                                (:file "rss")
                                (:file "publish")))
-                 (:module
-                  "publishers/blog/theme"
-                  :serial t
-                  :components ((:file "package")
-                               (:file "widget")))
                  (:module "publishers/blog/default-theme"
                   :serial t
                   :components ((:file "package")

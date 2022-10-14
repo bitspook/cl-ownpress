@@ -1,7 +1,7 @@
 (defpackage :clown-blog
   (:use :cl :alexandria :clown-publishers)
-  (:import-from :spinneret :with-html-string)
   (:import-from #:clown *conf* conf-merge conf)
+  (:import-from #:clown-blog.theme with-html-string)
   (:export
    post-id post-slug post-title post-tags post-category post-published-at post-html-content
    fetch-posts fetch-recent-posts fetch-unlisted-posts
