@@ -137,9 +137,3 @@
                     :background ,(css-color :background))
     (".btn-secondary:hover" :background ,(css-color :background-dark1))
     (".btn-secondary:active" :background ,(css-color :background-dark2))))
-
-(defun to-css-str (&rest defs)
-  (let ((lass:*pretty* *debug-transpiles*))
-    (str:join
-     (if *debug-transpiles* #\Newline #\Space)
-     (mapcar #'lass:compile-and-write (apply #'concatenate 'list defs)))))
