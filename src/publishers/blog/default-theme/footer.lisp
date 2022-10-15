@@ -66,16 +66,17 @@
                                  :class "btn btn-primary"))))))))
 
 (defwidget footer-widget ()
-  :styles `(,@(newsletter-css)
-              (.rss-sub :margin 2rem 0
-                        (a :display flex
-                           :align-items center
-                           (.rss :width 24px
-                                 :height 24px
-                                 :margin-right 1rem
-                                 :background "url(\"/images/icons/rss.svg\")"
-                                 :background-repeat no-repeat
-                                 :background-size contain))))
+  :styles
+  `((.rss-sub
+     :margin 2rem 0
+     (a :display flex
+        :align-items center
+        (.rss :width 24px
+              :height 24px
+              :margin-right 1rem
+              :background "url(\"/images/icons/rss.svg\")"
+              :background-repeat no-repeat
+              :background-size contain))))
   :render
   (with-html
     (:footer.site-footer.postamble

@@ -61,7 +61,7 @@
                                (:file "project")
                                (:file "projects")
                                (:file "post")
-                               (:file "listing")
+                               (:file "posts-listing-page")
                                (:file "home")
                                (:file "theme")))
                  (:file "publishers/convinient-blog-re-exports"))))
