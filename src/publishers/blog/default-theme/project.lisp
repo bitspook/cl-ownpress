@@ -82,5 +82,5 @@
 
         (:div#explore
          (:h2.title "Related blog posts")
-         (render listing-widget)))
+         (render posts-listing-widget)))
        (footer-dom))))))

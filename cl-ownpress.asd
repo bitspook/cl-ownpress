@@ -57,7 +57,7 @@
                                (:file "mixpanel")
                                (:file "footer")
                                (:file "oracle-nav-widget")
-                               (:file "listing-widget")
+                               (:file "posts-listing-widget")
                                (:file "project")
                                (:file "projects")
                                (:file "post")

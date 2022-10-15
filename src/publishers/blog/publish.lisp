@@ -15,7 +15,9 @@
   (publish-html-file (post-public-path post) (render #'theme-post-template post)))
 
 (defun publish-home (title)
-  (publish-html-file "index.html" (with-html-string (render #'theme-home-template title (fetch-recent-posts 5)))))
+  (publish-html-file
+   "index.html"
+   (with-html-string (render #'theme-home-template title (fetch-recent-posts 5)))))
 
 (defun publish-blog (title)
   (publish-static (theme-assets-dir (conf :theme)))

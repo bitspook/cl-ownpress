@@ -5,6 +5,7 @@
   (concatenate
    'list
    (top-level-css)
+   (button-css)
    `((.home
       :display flex
       (.sidebar
@@ -202,12 +203,7 @@
         (:section
          :class "recent-content"
          (:header (:h2 "Recent Content"))
-         (:ul
-          :class "recent-content-list"
-          (dolist (rp recent-posts)
-            (:li (:a :href (clown-blog:post-public-path rp)
-                     :class (format nil "recent-content-item content-type--~a" (clown-blog:post-category rp))
-                     (clown-blog:post-title rp)))))
+         (render posts-listing-widget :posts recent-posts)
          (:footer
           (:a :class "btn btn-primary read-more-btn"
               :href "/archive"

@@ -1,6 +1,6 @@
 (in-package #:default-theme)
 
-(defwidget listing-widget (items)
+(defwidget posts-listing-widget (posts)
   :styles `((.listing
              :list-style-type none
              :font-family "Cantarell, sans-serif"
@@ -54,13 +54,17 @@
                   :background-size contain))
   :render (with-html
             (:ul.listing
-             (:li
-              (:span :class "li-icon li-icon--blog")
-              (:div.li-content
-               (:a.li-title
-                :href "/blog/post"
-                "I am a blog post")
-               (:span.li-meta
-                (:span :class "meta-item date" "January 21, 2022")
-                (:span :class "meta-item tags"
-                       (:a :href "tags/lol" "#lol"))))))))
+             (dolist (post posts)
+               (:li
+                (:span :class (format nil "li-icon li-icon--~a" (clown-blog:post-category post)))
+                (:div.li-content
+                 (:a.li-title :href (clown-blog:post-public-path post) (clown-blog:post-title post))
+                 (:span.li-meta
+                  (:span :class "meta-item date"
+                         (local-time:format-timestring
+                          nil (clown-blog:post-published-at post)
+                          :format '(:long-month " " :day ", " :year)))
+                  (when-let ((tags (clown-blog:post-tags post)))
+                    (:span :class "meta-item tags"
+                           (dolist (tag tags)
+                             (:a :href (str:concat "/tags/" tag) (str:concat "#" (str:downcase tag)))))))))))))
