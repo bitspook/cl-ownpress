@@ -13,7 +13,9 @@
     (publish-html-file filepath html)))
 
 (defun publish-post (post)
-  (publish-html-file (post-public-path post) (render #'theme-post-template post)))
+  (publish-html-file
+   (post-public-path post)
+   (with-html-string (render #'theme-post-template post))))
 
 (defun publish-home (title)
   (publish-html-file
@@ -57,7 +59,6 @@
     (publish-listing "All content" listed-posts :filepath "archive/")
     (publish-rss-feed "All content" listed-posts :filepath "archive/feed.xml")
 
-    ;; (mapcar #'publish-post listed-posts)
-    ;; (mapcar #'publish-post (fetch-unlisted-posts)))
-    )
+    (mapcar #'publish-post listed-posts)
+    (mapcar #'publish-post (fetch-unlisted-posts)))
   (publish-home title))

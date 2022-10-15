@@ -60,9 +60,9 @@
                                (:file "posts-listing-widget")
                                (:file "project")
                                (:file "projects")
-                               (:file "post")
+                               (:file "post-page")
                                (:file "posts-listing-page")
-                               (:file "home")
+                               (:file "home-page")
                                (:file "theme")))
                  (:file "publishers/convinient-blog-re-exports"))))
   :description ""
