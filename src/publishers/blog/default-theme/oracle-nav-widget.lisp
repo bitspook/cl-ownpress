@@ -1,6 +1,6 @@
 (in-package #:default-theme)
 
-(defwidget oracle-nav ()
+(defwidget oracle-nav-widget ()
   :styles `((.oracle-container
              :margin 2rem 0
 

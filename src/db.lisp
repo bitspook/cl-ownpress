@@ -40,6 +40,8 @@ instead.")
   "Create new up+down migrations with DESC as description.
 This function is supposed to be used interactively, in the spirit of maximum
 hackability."
+  (when (not *migratum-provider*)
+    (prep-migrations))
   (let ((mid (migratum:make-migration-id)))
     (migratum:provider-create-migration
      :up :sql *migratum-provider* mid desc
