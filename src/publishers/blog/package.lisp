@@ -6,6 +6,9 @@
    post-id post-slug post-title post-tags post-category post-published-at post-html-content
    fetch-posts fetch-recent-posts fetch-unlisted-posts
    post-public-path
+   project-id project-html-description project-html-content project-docs project-slug project-name
+   project-issue-tracker project-languages project-public-path project-tagline project-updated-at
+   fetch-projects fetch-all-projects
    blog-theme theme-home-template theme-listing-template theme-post-template theme-assets-dir
    publish-blog publish-listing publish-post publish-rss-feed))
 (in-package #:clown-blog)

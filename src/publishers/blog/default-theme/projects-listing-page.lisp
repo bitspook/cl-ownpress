@@ -1,6 +1,6 @@
 (in-package #:default-theme)
 
-(defwidget projects-widget ()
+(defwidget projects-widget (projects title description)
   :styles
   (concatenate
    'list
@@ -59,33 +59,29 @@
   (with-html
     (:html
      (:head
-      (:title "@bitspook's projects")
+      (:title title)
       (:style (:raw (compile-and-write-lass-blocks (styles-of projects-widget)))))
      (:body
       (render navbar-widget)
       (:article.main
-       (:h1.title "Featured Projects")
-       (:div.description "Listed on this page are projects which I find most interesting, want to
-showcase, or are close to my heart. You can find a complete list of all my open
-source work on " (:a :href (conf :github) "my github profile") ".")
+       (:h1.title title)
+       (:div.description
+        (or description
+            (:p "Listed on this page are projects which I find most interesting, want to
+             showcase, or are close to my heart. You can find a complete list of
+             all my open source work on " (:a :href (conf :github) "my github profile") ".")))
        (:ul.projects-list
-        (:li.project
-         (:header (:h2.project-title (:a :href "/projects/spookfox" "Spookfox"))
-                  (:p.subtitle "Tinkerer's bridge between Emacs and Firefox.")
-                  (:div.languages
-                   (:span.lang.emacs-lisp
-                    (:i :style "background: #952994")
-                    (:span.lang-name "Emacs Lisp"))
-                   (:span.lang.typescript
-                    (:i :style "background-color: #452134")
-                    (:span.lang-name "Typescript"))))
-         (:article
-          (:p "Spookfox is a Firefox extension and an Emacs package, which allow Emacs and
-Firefox to communicate with each other. Its primary goal is to offer an Emacs
-tinkerer similar (to Emacs) framework to tinker their browser.")
-          (:p "I use Spookfox as my daily driver to enable a number of workflow enhancements,
-e.g capturing articles I read and Youtube videos I watch, and also to organize
-hundreds tabs using org-mode."))
-         (:footer
-          (:div.last-update "Last updated on Oct 12, 2022")))))
+        (dolist (project projects)
+          (:li.project
+           (:header (:h2.project-title (:a :href (project-public-path project) (project-name project)))
+                    (when (project-tagline project) (:p.subtitle (project-tagline project)))
+                    (:div.languages
+                     (dolist (lang (project-languages project))
+                       (:span.lang
+                        (:i :style (format nil "background: ~a" (gethash lang +gh-lang-colors+)))
+                        (:span.lang-name lang)))))
+           (:article (:raw (project-html-description project)))
+           (:footer
+            (when (project-updated-at project)
+              (:div.last-update "Last updated on " (project-updated-at project))))))))
       (render footer-widget)))))
