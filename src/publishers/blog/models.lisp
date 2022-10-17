@@ -51,6 +51,7 @@
           (sxql:from (:as :provided_content :prov))
           (sxql:left-join (:as :processed_content :proc) :on (:= :prov.id :proc.prov_cont_id))
           (sxql:where (:= "html" :proc.type))
+          (sxql:where (:not (:= "project" :category)))
           (sxql:order-by (:desc :published_at))
           (sxql:where (if (conf :exclude-tags)
                           `(:and
@@ -70,3 +71,65 @@
 
 (defun fetch-unlisted-posts (&optional (limit -1))
   (fetch-posts (sxql:limit limit)))
+
+(defclass project ()
+  ((id :initarg :id :reader project-id)
+   (slug :initarg :slug :accessor project-slug)
+   (name :initarg :name :accessor project-name)
+   (html-description :initarg :html-description :accessor project-html-description)
+   (languages :initarg :languages :accessor project-languages)
+   (source-code :initarg :source-code :accessor project-source-code)
+   (documentation :initarg :documentation :accessor project-docs)
+   (issue-tracker :initarg :issue-tracker :accessor project-issue-tracker)
+   (html-content :initarg :html-content :accessor project-html-content)))
+
+(defmethod print-object ((obj project) out)
+  (print-unreadable-object (obj out)
+    (format out "Project: name={~a}" (project-name obj))))
+
+(defun db-to-project (row)
+  "Try to make a `project' from a database row."
+  (make-instance
+   'project
+   :id (getf row :|id|)
+   :slug (getf row :|slug|)
+   :name (getf row :|name|)
+   :html-description (getf row :|html_description|)
+   :languages (when-let ((langauges (getf row :|langauges|))) (yason:parse langauges))
+   :source-code (getf row :|source_code|)
+   :documentation (getf row :|documentation|)
+   :issue-tracker (getf row :|issue-tracker|)
+   :html-content (getf row :|html_content|)))
+
+(defmacro fetch-projects (&rest query-frags)
+  `(multiple-value-bind (stmt vals)
+       (sxql:yield
+        (sxql:select (:prov.id
+                      (:as :proc.body :html_content)
+                      (:as (:raw "json_extract(metadata, \"$.title\")") :name)
+                      (:as (:raw "json_extract(metadata, \"$.category\")") :category)
+                      (:as (:raw "json_extract(metadata, \"$.tags\")") :tags)
+                      (:as (:raw "json_extract(metadata, \"$.languages\")") :languages)
+                      (:as (:raw "json_extract(metadata, \"$.source_code\")") :source_code)
+                      (:as (:raw "json_extract(metadata, \"$.issue_tracker\")") :issue_tracker)
+                      (:as (:raw "json_extract(metadata, \"$.documentation\")") :documentation)
+                      (:as (:raw "json_extract(metadata, \"$.slug\")") :slug)
+                      (:as (:raw "json_extract(metadata, \"$.description_html\")") :html_description))
+          (sxql:from (:as :provided_content :prov))
+          (sxql:left-join (:as :processed_content :proc) :on (:= :prov.id :proc.prov_cont_id))
+          (sxql:where (:= "html" :proc.type))
+          (sxql:where (:= "project" :category))
+          (sxql:where (if (conf :exclude-tags)
+                          `(:and
+                            (:or (:is-null :tags)
+                                 ,@(loop :for tag :in (conf :exclude-tags) :collect
+                                         `(:not (:like :tags ,(format nil "%\"~a\"%" tag))))))
+                          1))
+          ,@query-frags))
+     (log:d "Executing SQL: ~a ~%[With vals: ~a]" stmt vals)
+     (let* ((conn (clown:make-connection))
+            (query (dbi:execute (dbi:prepare conn stmt) vals)))
+       (mapcar #'db-to-project (dbi:fetch-all query)))))
+
+(defun fetch-all-projects (&optional (limit -1))
+  (fetch-projects (sxql:limit limit)))
