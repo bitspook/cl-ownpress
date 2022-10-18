@@ -1,6 +1,6 @@
 (in-package #:default-theme)
 
-(defwidget oracle-nav-widget ()
+(defwidget oracle-nav-widget (spec realm)
   :styles `((.oracle-container
              :margin 2rem 0
 
@@ -13,90 +13,130 @@
                :border-bottom 2px solid ,(css-color :primary-text)
                :min-width 10rem)))
   :render
-  (with-html
-    (:div.oracle-container
-     :style "display:none;"
-     (:span.placeholder "I am")
-     (:select :onchange (ps:ps (handle-select-role (ps:@ event target value)))
-       (:option :value "universal" "one with the universe")
-       (:option :value "developer" "a developer")
-       (:option :value "surfer" "web surfer"))
-     (:span#developer-placeholder.placeholder "who wants to")
+  (labels ((role-intents (role) (cdr (assoc role spec :test 'equal))))
+    (let ((roles (mapcar #'first spec))
+          (ps:*js-target-version* "7.0.0"))
+      (ps:import-macros-from-lisp 'op)
+      (with-html
+        (:div.oracle-container
+         :style "display:none;"
+         (:span.placeholder "I am")
+         (:select#roles :onchange (ps:ps (handle-select-role (ps:@ event target value)))
+                        (dolist (role roles)
+                          (:option :value role role)))
 
-     (:span#surfer-placeholder.placeholder "who wants to")
-     (:select#surfer-intent
-      :onchange (ps:ps (handle-select-intent (ps:@ event target value)))
-      (:option :value "know-more" "know more about Spookfox"))
+         (:span.placeholder "who wants to")
 
-     (:select#developer-intent
-      :onchange (ps:ps (handle-select-intent (ps:@ event target value)))
-      (:option :value "know-more" "know more about Spookfox")
-      (:option :value "use" "use Spookfox")
-      (:option :value "develop" "develop Spookfox")
-      (:option :value "hack" "hack with Spookfox")
-      (:option :value "contribute" " contribute to Spookfox"))
-     (:script
-      (:raw
-       (ps:ps
-         (defun dom-el (selector &optional select-all)
-           ((ps:@ document
-                  (if select-all
-                      'query-selector-all
-                      'query-selector))
-            selector))
-         (defun display (el)
-           (ps:@ el style display))
-         (defun (setf display) (val el)
-           (setf (ps:@ el style display) val))
+         (dolist (role roles)
+           (:select.intents
+            :data-role role
+            :onchange (ps:ps (handle-select-intent (ps:@ event target value)))
+            (dolist (intent (role-intents role))
+              (:option :value (first intent) (first intent)))))
 
-         (defmacro with-elements (selector-forms &body body)
-           `(let ,(loop :for form :in selector-forms
-                        :collect `(,(first form) (dom-el ,(second form))))
-              ,@body))
-         (defmacro with-all-elements (selector-forms &body body)
-           `(with-elements ,selector-forms
-              (when (and ,@(mapcar #'first selector-forms)) ,@body)))
+         (:script
+          (:raw (ps:ps* ps:*ps-lisp-library*))
+          (:raw (ps:ps* `(ps:var +spec+ (ps:[] ,@spec))))
+          (:raw
+           (ps:ps
+             (defun is-array (obj)
+               ((ps:chain -array is-array) obj))
 
-         (defvar +roles+ '(developer surfer universal))
-         (defvar +intents+ '(universal use develop contribute explore feature-request bug-report))
-         (defvar +role-intents+
-           (ps:create
-            surfer '(explore contribute)
-            universal '(universal)
-            developer  '(use develop contribute bug-report feature-request)))
-         (defparameter *state* (ps:create))
+             (defun display (el)
+               (ps:@ el style display))
 
-         (defun activate-role (role)
-           (dolist (r +roles+)
-             (with-all-elements ((el (+ "#" r "-intent"))) (setf (display el) "none"))
-             (with-all-elements ((el (+ "#" r "-placeholder"))) (setf (display el) "none")))
-           (with-elements ((intent-el (+ "#" role "-intent"))
-                           (ph-el (+ "#" role "-placeholder")))
-             (when intent-el (setf (display intent-el) "inline-block"))
-             (when ph-el (setf (display ph-el) "inline-block")))
-           (setf (ps:@ *state* "active-role") role))
+             (defun (setf display) (val el)
+               (setf (ps:@ el style display) val))
 
-         (defun active-intents ()
-           (ps:@ +role-intents+ (ps:@ *state* "active-role")))
+             (defmacro dom-select (selector &optional (parent 'document))
+               `((ps:chain ,parent query-selector) ,selector))
 
-         (defun activate-intent (intent)
-           (dolist (i +intents+)
-             (with-all-elements ((el (+ "#" i)))
-               (setf (display el) "none"))
-             (dolist (i (active-intents))
-               (with-all-elements ((el (+ "#" i)))
-                 (setf (display el) "block")))))
+             (defmacro dom-select-all (selector &optional (parent 'document))
+               `((ps:chain -array from) ((ps:chain ,parent query-selector-all) ,selector)))
 
-         (defun handle-select-role (role)
-           (activate-role role)
-           (activate-intent (ps:@ (ps:getprop +role-intents+ role) 0)))
+             (defun first (list)
+               (when (and list (> (ps:chain list length) 0))
+                 (ps:@ list 0)))
+             (ps:var car first)
 
-         (defun handle-select-intent (intent)
-           (activate-intent intent))
+             (defun cdr (list)
+               (when (and list (> (ps:chain list length) 1))
+                 ((ps:chain list slice) 1)))
 
-         (defun init ()
-           (with-all-elements ((el ".oracle-container"))
-             (setf (display el) "flex"))
-           (activate-role 'surfer))
+             (defun cdadr (list)
+               (cdr (car (cdr list))))
 
-         (init)))))))
+             (defun find-if (pred seq)
+               ((ps:chain seq find) pred))
+
+             (defun c-log (&rest args)
+               (apply (ps:chain console log) args))
+
+             (defun array-from (obj)
+               ((ps:chain -array from) obj))
+
+             (defun roles ()
+               (loop :for item :in +spec+
+                     :collect (first item)))
+
+             (defun role-intents (role)
+               (loop :for item :in +spec+
+                     :when (equal (first item) role)
+                       :return (cdr item)))
+
+             (defun active-role ()
+               (ps:@ ((ps:chain document get-element-by-id) "roles") value))
+
+             (defun activate-role (role)
+               (let ((els (dom-select-all ".intents")))
+                 (dolist (el els) (setf (display el) "none")))
+               (let ((intent-els (dom-select-all (+ ".intents[data-role='" role "']"))))
+                 (dolist (el intent-els) (setf (display el) "inline-block"))))
+
+             (defun activate-intent (intent-spec)
+               (let* ((realm-el (dom-select (ps:lisp realm)))
+                      (realm-children (array-from (ps:@ realm-el children))))
+                 (dolist (el realm-children)
+                   (setf (display el) "none"))
+
+                 (dolist (sel (cdadr intent-spec))
+                   (case sel
+                     ("all" (dolist (el realm-children)
+                              (setf (display el) "block")))
+                     (t (dolist (el (dom-select-all sel realm-el))
+                          (setf (display el) "block")))))))
+
+             (defun handle-select-role (role)
+               (activate-role role)
+               (dom-reset-intents-el))
+
+             (defun handle-select-intent (intent)
+               (let ((intent-spec (find-if
+                                   (op (equal (car _) intent))
+                                   (role-intents (active-role)))))
+                 (activate-intent intent-spec)))
+
+             (defun dom-reset-select-el (selector)
+               (let ((el (dom-select selector)))
+                 (setf (ps:@ el selected-index) 0)
+                 ((ps:@ el dispatch-event) (ps:new (-event "change")))))
+
+             (defun dom-reset-intents-el ()
+               (dom-reset-select-el (+ ".intents[data-role='" (active-role) "']")))
+
+             (defun init ()
+               (let ((els (dom-select-all ".oracle-container")))
+                 (dolist (el els) (setf (display el) "flex")))
+               ;; Timeout because this widget might render before the `realm' is
+               ;; rendered in DOm
+               (set-timeout
+                (op
+                  ;; We need to reset the select elements in DOM manually.
+                  ;; Otherwise browser shows previously selected values but
+                  ;; don't trigger 'onchange' event for the select element;
+                  ;; putting Javascript code out of sync.
+                  (dom-reset-select-el "#roles")
+                  (dom-reset-intents-el))
+                0))
+
+             (init)))))))))

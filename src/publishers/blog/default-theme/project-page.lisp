@@ -1,6 +1,6 @@
 (in-package #:default-theme)
 
-(defwidget project-widget (project)
+(defwidget project-widget (project related-posts oracle-spec)
   :styles
   (concatenate
    'list
@@ -51,36 +51,37 @@
       (.btn-docs (.icon :background-image (url "/images/icons/docs.svg"))))))
   :render
   (with-html
+    (:doctype)
     (:html
      (:head (:title "Spookfox - @bitspook's project")
             (:style (:raw (compile-and-write-lass-blocks (styles-of project-widget)))))
      (:body
       (render navbar-widget)
-      (:section.container
-       (:header.main
-        (:h1.title "Spookfox")
-        (:p.subtitle "Tinkerer's bridge between Emacs to Firefox"))
-       (:article.main
-        (:p "Spookfox is a Firefox extension and an Emacs package, which allow Emacs and
-             Firefox to communicate with each other. Its primary goal is to
-             offer an Emacs tinkerer similar (to Emacs) framework to tinker
-             their browser.")
-        (:p "I use Spookfox as my daily driver to enable a number of workflow enhancements,
-             e.g capturing articles I read and Youtube videos I watch, and also
-             to organize hundreds tabs using org-mode.")
-        (:ul.elsewhere-buttons
-         (:li (:a.btn.btn-github :href (conf :github) (:i.icon) (:span "Source Code")))
-         (:li (:a.btn.btn-issues :href (conf :github) (:i.icon) (:span "Issue tracker")))
-         (:li (:a.btn.btn-docs :href (conf :github) (:i.icon) (:span "Documentation"))))
+      (with-accessors ((name project-name)
+                       (tagline project-tagline)
+                       (html-description project-html-description)
+                       (html-content project-html-content)
+                       (source-code project-source-code)
+                       (issue-tracker project-issue-tracker)
+                       (docs project-docs)) project
+        (:section.container
+         (:header.main
+          (:h1.title name)
+          (when tagline (:p.subtitle tagline)))
+         (:article.main
+          (:raw html-description)
+          (:ul.elsewhere-buttons
+           (when source-code (:li (:a.btn.btn-github :href source-code (:i.icon) (:span "Source Code"))))
+           (when issue-tracker (:li (:a.btn.btn-issues :href issue-tracker (:i.icon) (:span "Issue tracker"))))
+           (when docs (:li (:a.btn.btn-docs :href docs (:i.icon) (:span "Documentation")))))
 
-        (:div#oracle-nav
-         (render oracle-nav-widget))
+          (render oracle-nav-widget :spec oracle-spec :realm "#oracle-realm")
 
-        (:div#use
-         (:h2.title "Usage")
-         (:div "Use this in emacs. Use this in Firefox." ))
+          (:div#oracle-realm
+           (dolist (section (html-sections html-content "outline-2"))
+             (:raw section))
 
-        (:div#explore
-         (:h2.title "Related blog posts")
-         (render posts-listing-widget)))
-       (render footer-widget))))))
+           (:div#explore
+            (:h2.title "Related content")
+            (render posts-listing-widget :posts related-posts))))
+         (render footer-widget)))))))

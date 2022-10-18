@@ -20,7 +20,8 @@
                "lparallel"
                "usocket"
                "yason"
-               "xml-emitter")
+               "xml-emitter"
+               "plump")
   :components ((:module "src"
                 :serial nil
                 :components
