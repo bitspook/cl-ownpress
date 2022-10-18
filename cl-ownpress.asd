@@ -34,6 +34,7 @@
                                (:file "rpc-server")
                                (:file "org-file-provider")
                                (:file "denote-provider")
+                               (:file "org-project-provider")
                                (:file "org-roam-provider")))
                  (:module "publishers"
                   :serial t

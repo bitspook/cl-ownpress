@@ -9,7 +9,7 @@
 (defun clown--get-org-file-props (filename)
   "Get file-level org props for FILENAME."
   (with-temp-buffer
-    (insert-file filename)
+    (insert-file-contents filename)
     (org-mode)
     (let ((props (org-element-map (org-element-parse-buffer 'greater-element)
                      '(keyword)
@@ -17,8 +17,14 @@
                      (let ((data (cadr kwd)))
                        (cons (downcase (plist-get data :key))
                              (plist-get data :value))))))
-          (description (clown--org-buffer-description)))
+          (description (clown--org-buffer-description))
+          (oracle-spec (progn
+                         (org-babel-goto-named-src-block "oracle-spec")
+                         (string-trim (org-element-property :value (org-element-at-point))))))
       (push (cons "description" description) props)
+      (when (and oracle-spec (not (string-empty-p oracle-spec)))
+        (push (cons "oracle_spec" oracle-spec) props))
+
       props)))
 
 (defun clown--org-buffer-description ()
@@ -60,7 +66,7 @@
         (org-export-with-properties nil)
         (org-export-with-drawers nil)
         (org-export-show-temporary-export-buffer nil)
-        (org-export-use-babel nil))
+        (org-export-use-babel t))
     (with-temp-buffer
       (insert org-content)
       (org-mode)

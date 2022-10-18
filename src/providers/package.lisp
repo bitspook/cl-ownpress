@@ -2,7 +2,7 @@
   (:use :cl :serapeum/bundle)
   (:export
    provider invoke-provider categorize identify slugify
-   org-roam-provider org-file-provider denote-provider))
+   org-roam-provider org-file-provider denote-provider org-project-provider))
 (in-package :clown-providers)
 
 (defmacro insert-into (table values &key conflict-cols)

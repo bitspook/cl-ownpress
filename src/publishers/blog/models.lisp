@@ -83,6 +83,7 @@
    (documentation :initarg :documentation :accessor project-docs)
    (issue-tracker :initarg :issue-tracker :accessor project-issue-tracker)
    (html-content :initarg :html-content :accessor project-html-content)
+   (oracle-spec :initarg :oracle-spec :accessor project-oracle-spec)
    (updated-at :initarg :updated-at :accessor project-updated-at)))
 
 (defmethod print-object ((obj project) out)
@@ -104,6 +105,9 @@
    :documentation (getf row :|documentation|)
    :issue-tracker (getf row :|issue_tracker|)
    :html-content (getf row :|html_content|)
+   :oracle-spec (when-let* ((spec (getf row :|oracle_spec|))
+                            (_t (not (str:emptyp spec))))
+                  (read-from-string spec))
    :updated-at (getf row :|updated_at|)))
 
 (defmacro fetch-projects (&rest query-frags)
@@ -121,6 +125,7 @@
                       (:as (:raw "json_extract(metadata, \"$.documentation\")") :documentation)
                       (:as (:raw "json_extract(metadata, \"$.slug\")") :slug)
                       (:as (:raw "json_extract(metadata, \"$.description_html\")") :html_description)
+                      (:as (:raw "json_extract(metadata, \"$.oracle_spec\")") :oracle_spec)
                       (:as (:raw "json_extract(metadata, \"$.updated_at\")") :updated_at))
           (sxql:from (:as :provided_content :prov))
           (sxql:left-join (:as :processed_content :proc) :on (:= :prov.id :proc.prov_cont_id))

@@ -8,7 +8,12 @@
     :initarg :test
     :initform (lambda (fpath) (declare (ignorable fpath)) t)
     :documentation "Function to determine whether to include a file or not.
-It is called with the path of every file in `content-dir'")))
+It is called with the path of every file in `content-dir'")
+   (elisp-script
+    :initarg :elisp-script
+    :documentation "Elisp script to execute in Emacs."))
+  (:default-initargs
+   :elisp-script (asdf:system-relative-pathname "cl-ownpress" "./src/providers/elisp/org-file.el")))
 
 (defmethod categorize ((prov org-file-provider) &key msg meta filepath)
   "Return parent directory of the `filepath' as its category."
@@ -31,12 +36,11 @@ It is called with the path of every file in `content-dir'")))
    (slugify prov :msg msg :meta meta :filepath filepath)))
 
 (defmethod invoke-provider ((provider org-file-provider) &key)
-  (with-slots (content-dir keep-file-if identify categorize slugify) provider
+  (with-slots (content-dir keep-file-if identify categorize slugify elisp-script) provider
     (let* ((content-dir (namestring (uiop:truename* content-dir)))
            (content-files (remove-if-not
                            (op (funcall keep-file-if (file-namestring _)))
-                           (clown:recursive-directory-files content-dir)))
-           (script-path (asdf:system-relative-pathname "cl-ownpress" "./src/providers/elisp/org-file.el")))
+                           (clown:recursive-directory-files content-dir))))
       (labels ((process-rpc-message (msg)
                  (let ((meta (yason:parse (gethash "metadata" msg)))
                        (filepath (str:replace-first content-dir "" (gethash "filepath" msg))))
@@ -59,11 +63,12 @@ It is called with the path of every file in `content-dir'")))
                         :processor "emacs"
                         :body (gethash "body_html" msg))
                        :conflict-cols (:prov_cont_id :type :processor))))))
-        (with-rpc-server
-            (:processor #'process-rpc-message)
+        (with-rpc-server (:processor #'process-rpc-message)
+          (log:d "RUNNING SCRIPT: ~a" elisp-script)
           (uiop:run-program (format nil "emacsclient -e '(load \"~a\")' ~
                                        '(clown--main ~
                                           :files (list ~{\"~a\" ~}))'"
-                                    script-path content-files)
+                                    elisp-script
+                                    content-files)
                             :output *standard-output*
                             :error-output *standard-output*))))))

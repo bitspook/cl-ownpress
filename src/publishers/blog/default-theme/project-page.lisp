@@ -1,6 +1,6 @@
 (in-package #:default-theme)
 
-(defwidget project-widget (project related-posts oracle-spec)
+(defwidget project-widget (project related-posts)
   :styles
   (concatenate
    'list
@@ -63,7 +63,8 @@
                        (html-content project-html-content)
                        (source-code project-source-code)
                        (issue-tracker project-issue-tracker)
-                       (docs project-docs)) project
+                       (docs project-docs)
+                       (oracle-spec project-oracle-spec)) project
         (:section.container
          (:header.main
           (:h1.title name)
