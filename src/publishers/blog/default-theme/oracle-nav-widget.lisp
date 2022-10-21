@@ -3,6 +3,7 @@
 (defwidget oracle-nav-widget (spec realm)
   :styles `((.oracle-container
              :margin 2rem 0
+             :margin-top 4rem
 
              (select
                  :border none

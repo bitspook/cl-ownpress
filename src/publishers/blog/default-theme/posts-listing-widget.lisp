@@ -54,6 +54,8 @@
                   :background-size contain))
   :render (with-html
             (:ul.listing
+             (when (or (not posts) (eq posts nil))
+               (:div "No posts yet 😕"))
              (dolist (post posts)
                (:li
                 (:span :class (format nil "li-icon li-icon--~a" (clown-blog:post-category post)))

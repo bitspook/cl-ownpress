@@ -47,4 +47,4 @@
           (:div
            (:ul (:li (:a :href "/blog" "Blog"))
                 (:li (:a :href "/poems" "Poems"))
-                (:li (:a :href (conf :github) "Projects")))))))
+                (:li (:a :href "/projects" "Projects")))))))

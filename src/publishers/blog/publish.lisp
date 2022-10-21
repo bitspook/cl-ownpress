@@ -22,6 +22,18 @@
    "index.html"
    (with-html-string (render #'theme-home-template title (fetch-recent-posts 5)))))
 
+(defun publish-projects ()
+  (let ((projects (clown-blog:fetch-all-projects)))
+    (clown-publishers:publish-html-file
+     "projects/index.html"
+     (with-html-string (render #'theme-projects-listing-template "Projects" projects)))
+
+    (loop :for project :in projects
+          :do
+             (clown-publishers:publish-html-file
+              (clown-blog:project-public-path project)
+              (with-html-string (render #'theme-project-template project))))))
+
 (defun publish-blog (title)
   (publish-static (theme-assets-dir (conf :theme)))
   (mapcar #'publish-static (conf :static-dirs))
@@ -60,5 +72,7 @@
     (publish-rss-feed "All content" listed-posts :filepath "archive/feed.xml")
 
     (mapcar #'publish-post listed-posts)
-    (mapcar #'publish-post (fetch-unlisted-posts)))
+    (mapcar #'publish-post (fetch-unlisted-posts))
+
+    (publish-projects))
   (publish-home title))

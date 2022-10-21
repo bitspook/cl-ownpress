@@ -46,6 +46,12 @@
    (post :initform (error "Post view is required")
          :initarg :post
          :accessor theme-post-template)
+   (project :initform (error "Project template is required")
+            :initarg :project
+            :accessor theme-project-template)
+   (projects-listing :initform (error "Projects-listing template is required")
+                     :initarg :projects-listing
+                     :accessor theme-projects-listing-template)
    (assets-dir :initform (error "Assets directory is required")
                :initarg :assets-dir
                :accessor theme-assets-dir)))

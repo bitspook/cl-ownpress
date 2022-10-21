@@ -16,20 +16,8 @@
                    (lambda (kwd)
                      (let ((data (cadr kwd)))
                        (cons (downcase (plist-get data :key))
-                             (plist-get data :value))))))
-          (description (clown--org-buffer-description)))
-      (push (cons "description" description) props)
+                             (plist-get data :value)))))))
       props)))
-
-(defun clown--org-buffer-description ()
-  "Get description for `current-buffer'."
-  (org-forward-paragraph)
-  (let ((begin (point))
-        (end (progn
-               (search-forward-regexp (rx line-start "*") nil t)
-               (beginning-of-line)
-               (point))))
-    (buffer-substring begin end)))
 
 (defun clown--get-post-meta (org-file)
   "Get post metadata for org file with ORG-FILE published to PUBLISHED-FILE."
@@ -38,12 +26,10 @@
       (let ((key (downcase (car pcell)))
             (val (cdr pcell)))
         (pcase key
-          ("date" (push (cons 'date (format-time-string "%Y-%m-%d %H:%M:%S" (org-time-string-to-time val))) props))
-          ("filetags" (push (cons 'tags (split-string val " " t "[ \t]")) props))
-          ("description"
-           (push
-            (cons 'description_html (clown--org-to-html val))
-            props)))))
+          ("date"
+           (setf props (cl-remove-if (lambda (cell) (equal (car cell) "date")) props))
+           (push (cons 'date (format-time-string "%Y-%m-%d %H:%M:%S" (org-time-string-to-time val))) props))
+          ("filetags" (push (cons 'tags (split-string val "[ :]" t "[ \t]")) props)))))
 
     (when (not (assq 'date props))
       (push (cons 'date (format-time-string "%Y-%m-%d %H:%M:%S" (current-time))) props))

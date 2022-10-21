@@ -1,6 +1,6 @@
 (in-package #:default-theme)
 
-(defwidget project-widget (project related-posts)
+(defwidget project-page (project related-posts)
   :styles
   (concatenate
    'list
@@ -54,7 +54,7 @@
     (:doctype)
     (:html
      (:head (:title "Spookfox - @bitspook's project")
-            (:style (:raw (compile-and-write-lass-blocks (styles-of project-widget)))))
+            (:style (:raw (compile-and-write-lass-blocks (styles-of project-page)))))
      (:body
       (render navbar-widget)
       (with-accessors ((name project-name)

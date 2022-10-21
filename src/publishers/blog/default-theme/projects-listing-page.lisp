@@ -1,6 +1,6 @@
 (in-package #:default-theme)
 
-(defwidget projects-widget (projects title description)
+(defwidget projects-listing-page (projects title description)
   :styles
   (concatenate
    'list
@@ -60,7 +60,7 @@
     (:html
      (:head
       (:title title)
-      (:style (:raw (compile-and-write-lass-blocks (styles-of projects-widget)))))
+      (:style (:raw (compile-and-write-lass-blocks (styles-of projects-listing-page)))))
      (:body
       (render navbar-widget)
       (:article.main
