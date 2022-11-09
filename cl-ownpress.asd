@@ -63,6 +63,7 @@
                                (:file "gh-language-colors")
                                (:file "projects-listing-page")
                                (:file "project-page")
+                               (:file "journeys-listing-page")
                                (:file "post-page")
                                (:file "posts-listing-page")
                                (:file "home-page")
