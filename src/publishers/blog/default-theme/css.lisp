@@ -5,20 +5,20 @@
     (:width-l . "990px")
     (:width-md . "840px")
     (:width-sm . "480px")
-    (:title-font-family . "Roboto")
-    (:content-font-family . "Cantarell")
-    (:colors . (:background "#fcfcfc"
-                :background-dark1 "#f9f9f9"
-                :background-dark2 "#efefef"
-                :primary "#006992"
-                :secondary "#465c69"
-                :cta "#b75d69"
-                :cta-dark1 "#b75d69"
-                :cta-dark2 "#b75d69"
-                :primary-text "#010400"
-                :dim-text "#6f6f6f"
-                :separator "#888"
-                :separator-light "#6f6f6f29"))))
+    (:title-font-family . "Roboto, sans-serif")
+    (:content-font-family . "Cantarell, sans-serif")
+    (:colors . (:background "var(--bg)"
+                :background-dark1 "var(--bg-d1)"
+                :background-dark2 "var(--bg-d2)"
+                :primary "var(--primary)"
+                :secondary "var(--secondary)"
+                :cta "var(--cta)"
+                :cta-dark1 "var(--cta-em1)"
+                :cta-dark2 "var(--cta-em2)"
+                :primary-text "var(--primary-text)"
+                :dim-text "var(--dim-text)"
+                :separator "var(--separator)"
+                :separator-light "var(--separator-em1)"))))
 
 (defun css-var (name)
   (cdr (assoc name *css-vars*)))
@@ -35,6 +35,7 @@
          :font-family ,family
          :font-style ,style
          :font-weight ,weight
+         :font-display "swap"
          :src (url ,(format nil "/fonts/~a" asset)))))
    '(("Roboto" "normal" 300 "roboto-thin.woff2")
      ("Roboto" "normal" 500 "roboto-regular.woff2")
@@ -43,7 +44,21 @@
      ("Cantarell" "normal" "regular" "Cantarell-Regular.ttf"))))
 
 (defun top-level-css ()
-  `(,@font-css
+  `((":root"
+     :--bg "#fcfcfc"
+     :--bg-d1 "#f9f9f9"
+     :--bg-d2 "#efefef"
+     :--primary "#006992"
+     :--secondary "#465c69"
+     :--cta "#b75d69"
+     :--cta-em1 "#b75d69"
+     :--cta-em2 "#b75d69"
+     :--primary-text "#010400"
+     :--dim-text "#6f6f6f"
+     :--separator "#888"
+     :--separator-em1 "#6f6f6f29")
+
+    ,@font-css
     ("*" :margin 0
          :padding 0
          :box-sizing "border-box")
@@ -56,7 +71,7 @@
     (a :text-decoration "underline"
        :color ,(css-color :primary-text))
     ((:or h1 h2 h3 h4 h5 h6)
-     :font-family "Roboto, sans-serif"
+     :font-family ,(css-var :title-font-family)
      :margin "4rem 0 2rem 0")
     ((:or img figure)
      (figcaption

@@ -18,6 +18,11 @@
        :text-align center
        :border-right 0.2px solid ,(css-color :separator))
 
+      (.avatar :width 300px
+               :height 300px
+               :border-radius 50%
+               :overflow hidden)
+
       (.name
        :font-size 2em
        :margin-top 2.6em

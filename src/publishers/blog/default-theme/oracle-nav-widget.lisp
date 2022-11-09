@@ -1,5 +1,6 @@
 (in-package #:default-theme)
 
+(ps:import-macros-from-lisp 'op)
 (defwidget oracle-nav-widget (spec realm)
   :styles `((.oracle-container
              :margin 2rem 0
@@ -17,7 +18,6 @@
   (labels ((role-intents (role) (cdr (assoc role spec :test 'equal))))
     (let ((roles (mapcar #'first spec))
           (ps:*js-target-version* "7.0.0"))
-      (ps:import-macros-from-lisp 'op)
       (with-html
         (:div.oracle-container
          :style "display:none;"
