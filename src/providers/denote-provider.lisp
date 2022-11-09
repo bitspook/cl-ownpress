@@ -3,7 +3,7 @@
 (defclass denote-provider (org-file-provider)
   ((keep-file-if
     :initarg :keep-file-if
-    :initform (op (< 0 (ppcre:count-matches "_blog-post_" _))))))
+    :initform (op (< 0 (ppcre:count-matches "_blog-post" _))))))
 
 (defmethod categorize ((prov denote-provider) &key msg meta filepath)
   (or (call-next-method prov :msg msg :meta meta :filename filepath)
