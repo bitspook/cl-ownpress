@@ -15,6 +15,9 @@
                 :cta "var(--cta)"
                 :cta-dark1 "var(--cta-em1)"
                 :cta-dark2 "var(--cta-em2)"
+                :success "var(--success)"
+                :warning "var(--warning)"
+                :error "var(--error)"
                 :primary-text "var(--primary-text)"
                 :dim-text "var(--dim-text)"
                 :separator "var(--separator)"
@@ -56,7 +59,10 @@
      :--primary-text "#010400"
      :--dim-text "#6f6f6f"
      :--separator "#888"
-     :--separator-em1 "#6f6f6f29")
+     :--separator-em1 "#6f6f6f29"
+     :--success "green"
+     :--warning "orange"
+     :--error "red")
 
     ,@font-css
     ("*" :margin 0

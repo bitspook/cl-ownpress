@@ -40,8 +40,8 @@
                   :color ,(css-color :dim-text)
                   :padding 0.4rem 1rem)
 
-       (.grade :border 1rem solid ,(css-color :primary)
-               :color ,(css-color :primary-text)
+       (.grade :border 1rem solid ,(css-color :success)
+               :color ,(css-color :success)
                :border-radius 50%
                :height 10rem
                :width 10rem
@@ -74,7 +74,8 @@
       (render navbar-widget)
       (:article.main
        (:h1.title title)
-       (:p "A journey is a long term commitment to an objective, with or without a clear end.")
+       (:p "A journey is a commitment to move forward. Sometimes to reach a
+            destination/goal, and sometimes just for the sake of movement.")
 
        (:ul.main-list
         (:li.journey

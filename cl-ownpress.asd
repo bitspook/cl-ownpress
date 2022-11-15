@@ -39,6 +39,9 @@
                  (:module "publishers"
                   :serial t
                   :components ((:file "package")))
+                 (:module "publishers/journey"
+                  :serial t
+                  :components ((:file "package")))
                  (:module
                   "publishers/blog/theme"
                   :serial t
@@ -64,6 +67,7 @@
                                (:file "projects-listing-page")
                                (:file "project-page")
                                (:file "journeys-listing-page")
+                               (:file "journey-page")
                                (:file "post-page")
                                (:file "posts-listing-page")
                                (:file "home-page")
