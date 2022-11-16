@@ -161,6 +161,7 @@
       (:title title)
       (when rss-url
         (:link :rel "alternate" :type "application/atom+xml" :title "RSS Feed" :href rss-url))
+      (:meta :name "viewport" :content  "width=device-width, initial-scale=1")
       (:style (:raw (compile-and-write-lass-blocks (styles-of home)))))
      (:body
       (:div

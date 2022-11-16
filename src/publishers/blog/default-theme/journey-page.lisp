@@ -42,33 +42,38 @@
 
       (.btn-github (.icon :background-image (url "/images/icons/github.svg")))
 
-      (.notebook
-       :padding 1rem
-       :max-width 25rem
-       :width 100%
+      (.insight-btns
        :display flex
-       :margin 2rem 0
-       :border-color ,(css-color :separator-light)
 
-       (.icon :width 8rem
-              :height 4rem)
-       (.icon-nb :background-image (url "/images/icons/nb.svg"))
+       (.btn
+        :padding 1rem
+        :width 25rem
+        :height 8rem
+        :display flex
+        :margin 2rem 0
+        :border-color ,(css-color :separator-light)
 
-       (.title
-        :margin 0
-        :margin-left 0.8rem
-        :text-align left
+        (.icon :width 8rem
+               :height 4rem)
+        (.icon-nb :background-image (url "/images/icons/nb.svg"))
+        (.icon-friends :background-image (url "/images/icons/friends.svg"))
 
-        (h2 :margin 0
-            :margin-bottom 0.6rem
-            :font-size 1.8rem))
+        (.title
+         :margin 0
+         :margin-left 0.8rem
+         :text-align left
 
-       (.meta :color ,(css-color :dim-text)
-              :font-size 1rem
-              :line-height 1.2
-              (.count :margin-right 0.3rem)))
+         (h2 :margin 0
+             :margin-bottom 0.6rem
+             :font-size 1.8rem))
+
+        (.meta :color ,(css-color :dim-text)
+               :font-size 1rem
+               :line-height 1.2
+               (.count :margin-right 0.3rem))))
 
       (.activity
+       :margin 4rem 0
 
        (.title
         :font-size 2rem
@@ -106,6 +111,7 @@
         (.date
          :font-size 1rem
          :color ,(css-color :dim-text)
+         :padding 0.2rem 0
          :margin-bottom 0.8rem)
         (.events :list-style-type none
                  (li :margin-bottom 0.4rem))))
@@ -138,13 +144,21 @@
          (:article.main
           (:raw html-description)
 
-          (:button.btn.notebook
-           (:i.icon.icon-nb)
-           (:div.title
-            (:h2 "Notebook")
-            (:div.meta
-             (:span.count "20")
-             (:span "notes with tags #infosec #cryptography #ctf #wargame and 24 more"))))
+          (:div.insight-btns
+           (:button.btn
+            (:i.icon.icon-nb)
+            (:div.title
+             (:h2 "Notebook")
+             (:div.meta
+              (:span.count "20")
+              (:span "notes with tags #infosec #cryptography #ctf #wargame and 24 more"))))
+           (:button.btn
+            (:i.icon.icon-friends)
+            (:div.title
+             (:h2 "Companions")
+             (:div.meta
+              (:span.count "3")
+              (:span "of us are helping each other")))))
 
           (:section.activity
            (:header.title (:span "Activity log for") (:select.log-time
@@ -152,8 +166,8 @@
                                                       (:option :value "this-month" "this month")))
            (:article
             (:div.activity-graph
-             :style "display: none;"
-             (:img :src "/images/journey-example-punch-card.png"))
+             (:div.graph-placeholder
+              (:p "TODO Add data visualization here")))
 
             (:div.activity-log
              (:div.activity-item
