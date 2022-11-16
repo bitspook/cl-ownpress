@@ -130,7 +130,17 @@
        :content ""
        :position absolute
        :left 0 :top 0 :bottom 0
-       :background-color ,(css-color :separator-light)))))
+       :background-color ,(css-color :separator-light))
+
+      (.graph-placeholder :width 60%
+                          :height 25rem
+                          :border 2px solid ,(css-color :separator-light)
+                          :display flex
+                          :align-items center
+                          :padding 2rem
+                          :margin 1rem 0
+                          :border-radius 1rem
+                          :color ,(css-color :separator)))))
   :render
   (with-html
     (:doctype)
@@ -167,7 +177,8 @@
              (:h2 "Companions")
              (:div.meta
               (:span.count "3")
-              (:span "of us are helping each other"))))
+              (:span "of us are helping each other")
+              (:div "pss...wanna be a h4x0r? Join me"))))
            (:button.btn
             :disabled t
             (:i.icon.icon-flame)
