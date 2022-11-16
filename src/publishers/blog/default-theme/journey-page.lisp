@@ -66,7 +66,57 @@
        (.meta :color ,(css-color :dim-text)
               :font-size 1rem
               :line-height 1.2
-              (.count :margin-right 0.3rem))))))
+              (.count :margin-right 0.3rem)))
+
+      (.activity
+
+       (.title
+        :font-size 2rem
+        :font-weight bold)
+
+       (select :border none
+         :background white
+         :font-size 1.7rem
+         :padding 0.4rem 0
+         :border-bottom 2px solid ,(css-color :primary-text)
+         :min-width 10rem))
+
+      (.activity-log
+       :font-size 1.2rem
+
+       (.activity-item
+        :padding 1rem 0
+        :position relative
+        :display flex
+
+        (.icon-simple-cal
+         :width 2rem
+         :height 2rem
+         :z-index 1
+         :background ,(css-color :background-dark1) no-repeat
+         :background-image (url "/images/icons/simple-cal.svg")
+         :background-size 50%
+         :background-position 50% 50%
+         :margin-right 1rem
+         :margin-left -1rem
+         :border 2px solid ,(css-color :separator-light)
+         :border-radius 50%))
+
+       (.activity-body
+        (.date
+         :font-size 1rem
+         :color ,(css-color :dim-text)
+         :margin-bottom 0.8rem)
+        (.events :list-style-type none
+                 (li :margin-bottom 0.4rem))))
+
+      (".activity-item::before"
+       :width 2px
+       :height 100%
+       :content ""
+       :position absolute
+       :left 0 :top 0 :bottom 0
+       :background-color ,(css-color :separator-light)))))
   :render
   (with-html
     (:doctype)
@@ -96,8 +146,50 @@
              (:span.count "20")
              (:span "notes with tags #infosec #cryptography #ctf #wargame and 24 more"))))
 
-          (dolist (section (html-sections html-content "outline-2"))
-            (:raw section))
+          (:section.activity
+           (:header.title (:span "Activity log for") (:select.log-time
+                                                      (:option :value "last-week" "last week")
+                                                      (:option :value "this-month" "this month")))
+           (:article
+            (:div.activity-graph
+             :style "display: none;"
+             (:img :src "/images/journey-example-punch-card.png"))
+
+            (:div.activity-log
+             (:div.activity-item
+              (:span.icon.icon-simple-cal)
+              (:div.activity-body
+               (:div.date "Wednesday 15 Nov, 2022")
+               (:ul.events
+                (:li
+                 (:a :href "#" "1 commit")
+                 " made to project "
+                 (:a :href "#" "slurp"))
+                (:li
+                 "Created "
+                 (:a :href "#" "1 new note")))))
+             (:div.activity-item
+              (:span.icon.icon-simple-cal)
+              (:div.activity-body
+               (:div.date "Wednesday 16 Nov, 2022")
+               (:ul.events
+                (:li
+                 (:a :href "#" "2 commits")
+                 " made to project "
+                 (:a :href "#" "cl-ownpress"))
+                (:li
+                 "Modified "
+                 (:a :href "#" "4 notes"))
+                (:li
+                 "Created "
+                 (:a :href "#" "2 new notes"))
+                (:li
+                 "Pwned "
+                 (:a :href "#" "Supermo")
+                 " box on "
+                 (:a :href "#" "HackTheBox"))))))))
+
+          (:raw html-content)
 
           (:div#explore
            (:h2.title "Related content")
