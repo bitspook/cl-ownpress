@@ -43,7 +43,7 @@
       (.btn-github (.icon :background-image (url "/images/icons/github.svg")))
 
       (.insight-btns
-       :display flex
+       :display inline-flex
 
        (.btn
         :padding 1rem
@@ -51,17 +51,25 @@
         :height 8rem
         :display flex
         :margin 2rem 0
+        :margin-right 1rem
         :border-color ,(css-color :separator-light)
+        :flex 1
 
-        (.icon :width 8rem
-               :height 4rem)
+        (.icon :min-width 4rem
+               :height 4rem
+               :margin-right 1rem)
         (.icon-nb :background-image (url "/images/icons/nb.svg"))
         (.icon-friends :background-image (url "/images/icons/friends.svg"))
+        (.icon-flame :background ,(css-color :cta) no-repeat
+                     :mask-size contain
+                     :mask-image (url "/images/icons/flame.svg")
+                     (svg#flame :fill-color magenta))
 
         (.title
          :margin 0
          :margin-left 0.8rem
          :text-align left
+         :overflow hidden
 
          (h2 :margin 0
              :margin-bottom 0.6rem
@@ -128,6 +136,7 @@
     (:doctype)
     (:html
      (:head (:title "infosec - @bitspook's journey")
+            (:meta :name "viewport" :content  "width=device-width, initial-scale=1")
             (:style (:raw (compile-and-write-lass-blocks (styles-of journey-page)))))
      (:body
       (render navbar-widget)
@@ -158,7 +167,15 @@
              (:h2 "Companions")
              (:div.meta
               (:span.count "3")
-              (:span "of us are helping each other")))))
+              (:span "of us are helping each other"))))
+           (:button.btn
+            :disabled t
+            (:i.icon.icon-flame)
+            (:div.title
+             (:h2 "Streak")
+             (:div.meta
+              (:span.count "3")
+              (:span "days of daily progress!")))))
 
           (:section.activity
            (:header.title (:span "Activity log for") (:select.log-time

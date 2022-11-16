@@ -54,6 +54,7 @@
     (:html
      (:head
       (:title (clown-blog:post-title post))
+      (:meta :name "viewport" :content  "width=device-width, initial-scale=1")
       (:link :rel "alternate" :type "application/atom+xml" :title "RSS Feed" :href "/archive/feed.xml")
       (:style (:raw (compile-and-write-lass-blocks (styles-of post-page)))))
      (:body

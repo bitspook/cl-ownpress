@@ -49,8 +49,8 @@
 (defun top-level-css ()
   `((":root"
      :--bg "#fcfcfc"
-     :--bg-d1 "#f9f9f9"
-     :--bg-d2 "#efefef"
+     :--bg-d1 "#efefef"
+     :--bg-d2 "#ececec"
      :--primary "#006992"
      :--secondary "#465c69"
      :--cta "#b75d69"
@@ -138,23 +138,26 @@
           :text-align center
           :background-color ,(css-color :background)
           :text-decoration none)
-
-    (|.btn:hover| :background-color ,(css-color :background-dark2))
+    (|.btn:hover| :background-color ,(css-color :background-dark1))
+    (".btn:active" :background ,(css-color :background-dark2))
+    (".btn[disabled]:hover" :background ,(css-color :background)
+                            :cursor default)
 
     (.btn-cta :border-color ,(css-color :cta)
               :background ,(css-color :cta)
               :color ,(css-color :background))
     (".btn-cta:hover" :background ,(css-color :cta-dark1))
-    (".btn-cta:active" :background ,(css-color :cta-dark2))
 
+    (".btn-cta:active" :background ,(css-color :cta-dark2))
     (.btn-primary :border-color ,(css-color :primary)
                   :color ,(css-color :primary)
                   :background ,(css-color :background))
     (".btn-primary:hover" :background ,(css-color :background-dark1))
-    (".btn-primary:active" :background ,(css-color :background-dark2))
 
+    (".btn-primary:active" :background ,(css-color :background-dark2))
     (.btn-secondary :border-color ,(css-color :secondary)
                     :color ,(css-color :secondary)
                     :background ,(css-color :background))
     (".btn-secondary:hover" :background ,(css-color :background-dark1))
+
     (".btn-secondary:active" :background ,(css-color :background-dark2))))

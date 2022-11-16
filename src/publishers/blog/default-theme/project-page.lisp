@@ -54,6 +54,7 @@
     (:doctype)
     (:html
      (:head (:title "Spookfox - @bitspook's project")
+            (:meta :name "viewport" :content  "width=device-width, initial-scale=1")
             (:style (:raw (compile-and-write-lass-blocks (styles-of project-page)))))
      (:body
       (render navbar-widget)

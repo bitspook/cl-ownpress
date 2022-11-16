@@ -60,6 +60,7 @@
     (:html
      (:head
       (:title title)
+      (:meta :name "viewport" :content  "width=device-width, initial-scale=1")
       (:style (:raw (compile-and-write-lass-blocks (styles-of projects-listing-page)))))
      (:body
       (render navbar-widget)

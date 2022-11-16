@@ -18,6 +18,7 @@
     (:html
      (:head
       (:title title)
+      (:meta :name "viewport" :content  "width=device-width, initial-scale=1")
       (when rss-url
         (:link :rel "alternate" :type "application/atom+xml" :title "RSS Feed" :href rss-url))
       (:style (:raw (compile-and-write-lass-blocks (styles-of posts-listing-page)))))
