@@ -38,7 +38,10 @@ ownership.
 
 ** Current state
 
-I am using cl-ownpress to create [[https://bitspook.in/][my personal website]]. Right now cl-ownpress is
+I am using cl-ownpress to create [[https://bitspook.in/][my personal website]]. You can follow [[https://infosec.exchange/@bitspook/109353596205512997][this thread on infosec.exchange]]
+if you're interested in see me build it publicly.
+
+Right now cl-ownpress is
 moving forward to allow me achieve my desired publishing workflow.
 
 - Publish with full power of Emacs
