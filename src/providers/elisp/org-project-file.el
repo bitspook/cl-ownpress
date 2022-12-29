@@ -1,3 +1,7 @@
+;;; org-project-file -- Import org files into cl-ownpress as projects
+;;; Commentary:
+;;; Code:
+
 (require 'seq)
 (require 'cl-lib)
 (require 'org)
@@ -6,7 +10,9 @@
 (require 'htmlize)
 (require 's)
 
-(defun clown--get-org-file-props (filename)
+(load-file (expand-file-name "./clown-common.el" (file-name-directory load-file-name)))
+
+(defun clown-get-org-file-props (filename)
   "Get file-level org props for FILENAME."
   (with-temp-buffer
     (insert-file-contents filename)
@@ -17,7 +23,7 @@
                      (let ((data (cadr kwd)))
                        (cons (downcase (plist-get data :key))
                              (plist-get data :value))))))
-          (description (clown--org-buffer-description))
+          (description (clown-org-buffer-description))
           (oracle-spec (progn
                          (org-babel-goto-named-src-block "oracle-spec")
                          (string-trim (org-element-property :value (org-element-at-point))))))
@@ -27,7 +33,7 @@
 
       props)))
 
-(defun clown--org-buffer-description ()
+(defun clown-org-buffer-description ()
   "Get description for `current-buffer'."
   (org-forward-paragraph)
   (let ((begin (point))
@@ -37,9 +43,9 @@
                (point))))
     (buffer-substring begin end)))
 
-(defun clown--get-post-meta (org-file)
+(defun clown-get-post-meta (org-file)
   "Get post metadata for org file with ORG-FILE published to PUBLISHED-FILE."
-  (let* ((props (clown--get-org-file-props org-file)))
+  (let* ((props (clown-get-org-file-props org-file)))
     (cl-dolist (pcell props)
       (let ((key (downcase (car pcell)))
             (val (cdr pcell)))
@@ -48,7 +54,7 @@
           ("filetags" (push (cons 'tags (split-string val " " t "[ \t]")) props))
           ("description"
            (push
-            (cons 'description_html (clown--org-to-html val))
+            (cons 'description_html (clown-org-to-html val))
             props)))))
 
     (when (not (assq 'date props))
@@ -56,7 +62,7 @@
 
     props))
 
-(defun clown--org-to-html (org-content)
+(defun clown-org-to-html (org-content)
   "Return ORG-CONTENT as HTML."
   (let ((org-export-with-section-numbers nil)
         (org-export-with-toc nil)
@@ -66,36 +72,33 @@
         (org-export-with-properties nil)
         (org-export-with-drawers nil)
         (org-export-show-temporary-export-buffer nil)
-        (org-export-use-babel t))
+        (org-export-use-babel t)
+        (org-export-with-broken-links t))
     (with-temp-buffer
       (insert org-content)
       (org-mode)
       (org-export-as 'html nil nil t))))
 
-(defun clown--org-file-to-msg (file)
+(defun clown-org-file-to-msg (file)
   "Convert org FILE to msg to be send to cl-ownpress."
-  (let ((meta (clown--get-post-meta file))
+  (let ((meta (clown-get-post-meta file))
         (org-content (org-file-contents file)))
     (list
      :id (alist-get 'slug meta)
      :filepath file
      :metadata (json-encode-alist meta)
      :body_raw org-content
-     :body_html (clown--org-to-html org-content))))
+     :body_html (clown-org-to-html org-content))))
 
-(cl-defun clown--main (&key files)
+(defun clown-main (files)
   "Main function called by cl-ownpress with FILES."
-  (let ((conn (make-network-process
-               :name "clown-rpc"
-               :buffer nil
-               :host "localhost"
-               :service 8192)))
-
+  (let ((conn (clown-rpc-server)))
     (cl-dolist (file files)
-      (process-send-string conn (json-encode (clown--org-file-to-msg file)))
-      (process-send-string conn "<<<<RPC-EOM>>>>"))
+      (jsonrpc-notify conn 'new-org-file (clown-org-file-to-msg file)))
 
-    (process-send-string conn "DONE")
-    (process-send-string conn "<<<<RPC-EOM>>>>")
+    (jsonrpc-notify conn 'close-connection nil)))
 
-    (delete-process conn)))
+;;; org-project-file.el ends here
+;; Local Variables:
+;; read-symbol-shorthands: (("clown" . "cl-ownpress-"))
+;; End:

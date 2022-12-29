@@ -8,6 +8,7 @@
                "cl-migratum"
                "cl-migratum.provider.local-path"
                "cl-migratum.driver.dbi"
+               "jsonrpc"
                "lass"
                "log4cl"
                "cffi"
@@ -34,8 +35,7 @@
                                (:file "rpc-server")
                                (:file "org-file-provider")
                                (:file "denote-provider")
-                               (:file "org-project-provider")
-                               (:file "org-roam-provider")))
+                               (:file "org-project-provider")))
                  (:module "publishers"
                   :serial t
                   :components ((:file "package")))

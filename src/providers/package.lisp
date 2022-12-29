@@ -2,7 +2,7 @@
   (:use :cl :serapeum/bundle)
   (:export
    provider invoke-provider categorize identify slugify
-   org-roam-provider org-file-provider denote-provider org-project-provider))
+   org-file-provider denote-provider org-project-provider))
 (in-package :clown-providers)
 
 (defmacro insert-into (table values &key conflict-cols)
@@ -15,9 +15,9 @@ Insert into TABLE VALUES represented as a plist."
             (sxql:set= ,@values)
             (sxql:on-conflict-do-update
              '(,@conflict-cols) (sxql:set=
-                  ,@values
-                  :updated_at (local-time:format-timestring
-                               nil (local-time:now))))))
+                                 ,@values
+                                 :updated_at (local-time:format-timestring
+                                              nil (local-time:now))))))
        (dbi:fetch-all (dbi:execute (dbi:prepare conn stmt) vals)))))
 
 (defclass provider ()

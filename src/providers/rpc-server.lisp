@@ -53,13 +53,48 @@
            (sxql:on-conflict-do-nothing)))
       (dbi:fetch-all (dbi:execute (dbi:prepare conn stmt) values)))))
 
-(defmacro with-rpc-server ((&key processor) &body body)
-  "Run BODY with a running rpc-server, and wait until the server stops. Stopping
-the server is responsibility of BODY. If BODY don't stop the server, a call to
-this macro will hang indefinitely until heap exhaustion."
-  ;; FIXME It shouldn't be BODY's responsibility to close the server
-  (let ((channel (gensym)))
-    `(let ((,channel (lparallel:make-channel)))
-       (lparallel:submit-task ,channel #'start-rpc-server ,processor)
-       ,@body
-       (lparallel:receive-result ,channel))))
+(defvar _rpc-server_ nil)
+
+(defun rpc-server ()
+  (when (not _rpc-server_)
+    (setf _rpc-server_ (jsonrpc:make-server))
+    (jsonrpc:server-listen _rpc-server_ :port 1337 :mode :tcp))
+
+  _rpc-server_)
+
+
+(defmacro with-rpc-server (server &body body)
+  (labels ((rpc-action-p (cell) (eq (car cell) 'rpc-action))
+           (rpc-final-action-p (_1) (eq (car _1) 'rpc-final-action))
+           (rpc-action-name (action) (second action))
+           (rpc-action-cb (action) (third action)))
+    (let ((server server)
+          (rpc-actions (remove-if-not #'rpc-action-p body))
+          (rpc-final-action (remove-if-not #'rpc-final-action-p body))
+          (body (remove-if (op (or (rpc-action-p _1) (rpc-final-action-p _1))) body)))
+      (setf rpc-final-action (first rpc-final-action))
+
+      ;; TODO Ensure that duplicates listeners aren't added
+      `(progn
+         ,@(loop :for action :in rpc-actions
+                 :collect `(jsonrpc:expose ,server ,(rpc-action-name action) ,(rpc-action-cb action)))
+
+         ;; When client wants to end it, handle the final request and clear all
+         ;; the request-handlers
+         (jsonrpc:expose
+          ,server ,(rpc-action-name rpc-final-action)
+          (compose (lambda (_)
+                     (declare (ignore _))
+                     ;; FIXME instead of clearing all callbacks, only remove the
+                     ;; ones added by this macro
+                     (jsonrpc:clear-methods ,server))
+                   ,(rpc-action-cb rpc-final-action)))
+
+         ,@body))))
+
+;; (with-rpc-server (rpc-server)
+;;   (rpc-action 'my-request-1 (lambda (msg) t))
+;;   (rpc-action 'my-request-2 (lambda (msg) t))
+;;   (rpc-final-action 'my-done-request (lambda (msg) 'done))
+
+;;   (uiop:run-program "emacsclient -e '(message \"Lol bro\")'"))

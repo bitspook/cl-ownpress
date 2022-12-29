@@ -1,4 +1,5 @@
-(defpackage :clown-blog
+(defpackage #:clown-pubishers.blog
+  (:nicknames #:clown-blog)
   (:use :cl :alexandria :clown-publishers)
   (:import-from #:clown *conf* conf-merge conf)
   (:import-from #:clown-blog.theme with-html-string)
