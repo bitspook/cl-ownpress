@@ -42,44 +42,42 @@
 
       (.btn-github (.icon :background-image (url "/images/icons/github.svg")))
 
+      (.btn
+       :padding 1rem
+       :width 25rem
+       :height 8rem
+       :display flex
+       :margin 2rem 0
+       :margin-right 1rem
+       :border-color ,(css-color :separator-light)
+       :flex 1
+
+       (.icon :min-width 4rem
+              :height 4rem
+              :margin-right 1rem)
+       (.icon-friends :background-image (url "/images/icons/friends.svg"))
+       (.icon-flame :background ,(css-color :cta) no-repeat
+                    :mask-size contain
+                    :mask-image (url "/images/icons/flame.svg")
+                    (svg#flame :fill-color magenta))
+
+       (.title
+        :margin 0
+        :margin-left 0.8rem
+        :text-align left
+        :overflow hidden
+
+        (h2 :margin 0
+            :margin-bottom 0.6rem
+            :font-size 1.8rem))
+
+       (.meta :color ,(css-color :dim-text)
+              :font-size 1rem
+              :line-height 1.2
+              (.count :margin-right 0.3rem)))
       (.insight-btns
        :display inline-flex
-       :max-width 100%
-
-       (.btn
-        :padding 1rem
-        :width 25rem
-        :height 8rem
-        :display flex
-        :margin 2rem 0
-        :margin-right 1rem
-        :border-color ,(css-color :separator-light)
-        :flex 1
-
-        (.icon :min-width 4rem
-               :height 4rem
-               :margin-right 1rem)
-        (.icon-nb :background-image (url "/images/icons/nb.svg"))
-        (.icon-friends :background-image (url "/images/icons/friends.svg"))
-        (.icon-flame :background ,(css-color :cta) no-repeat
-                     :mask-size contain
-                     :mask-image (url "/images/icons/flame.svg")
-                     (svg#flame :fill-color magenta))
-
-        (.title
-         :margin 0
-         :margin-left 0.8rem
-         :text-align left
-         :overflow hidden
-
-         (h2 :margin 0
-             :margin-bottom 0.6rem
-             :font-size 1.8rem))
-
-        (.meta :color ,(css-color :dim-text)
-               :font-size 1rem
-               :line-height 1.2
-               (.count :margin-right 0.3rem))))
+       :max-width 100%)
 
       (.activity
        :margin 4rem 0
@@ -155,7 +153,8 @@
             ((name journey-name)
              (tagline journey-tagline)
              (html-description journey-html-description)
-             (html-content journey-html-content))
+             (html-content journey-html-content)
+             (notes-with-tags journey-notes-with-tags))
           journey
         (:section.container
          (:header.main
@@ -165,21 +164,14 @@
           (spinneret:interpret-html-tree html-description)
 
           (:div.insight-btns
-           (:button.btn
-            (:i.icon.icon-nb)
-            (:div.title
-             (:h2 "Notebook")
-             (:div.meta
-              (:span.count "20")
-              (:span "notes with tags #infosec #cryptography #ctf #wargame and 24 more"))))
+           (render notebook-btn :tags notes-with-tags)
            (:button.btn
             (:i.icon.icon-friends)
             (:div.title
              (:h2 "Companions")
              (:div.meta
-              (:span.count "3")
-              (:span "of us are helping each other")
-              (:div "pss...wanna be a h4x0r? Join me"))))
+              (:span "We are a team of ")
+              (:span.count "3"))))
            (:button.btn
             :disabled t
             (:i.icon.icon-flame)
