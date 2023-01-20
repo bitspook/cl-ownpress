@@ -44,6 +44,7 @@
 
       (.insight-btns
        :display inline-flex
+       :max-width 100%
 
        (.btn
         :padding 1rem
@@ -161,7 +162,7 @@
           (:h1.title name)
           (when tagline (:p.subtitle tagline)))
          (:article.main
-          (:raw html-description)
+          (spinneret:interpret-html-tree html-description)
 
           (:div.insight-btns
            (:button.btn
@@ -231,7 +232,7 @@
                  " box on "
                  (:a :href "#" "HackTheBox"))))))))
 
-          (:raw html-content)
+          (spinneret:interpret-html-tree html-content)
 
           (:div#explore
            (:h2.title "Related content")
