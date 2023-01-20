@@ -18,7 +18,7 @@
 (setf *conf* (conf-merge
               `(:author nil
                 :avatar nil
-                :twitter nil
+                :mastodon nil
                 :linkedin nil
                 :github nil
                 :handle nil

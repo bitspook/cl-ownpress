@@ -72,7 +72,7 @@
 
        (.github :background (url "/images/icons/github.svg") no-repeat
                 :background-size contain)
-       (.twitter :background (url "/images/icons/twitter.svg") no-repeat
+       (.mastodon :background (url "/images/icons/mastodon.svg") no-repeat
                  :background-size contain)
        (.rss :background (url "/images/icons/rss.svg") no-repeat
              :background-size contain)
@@ -173,7 +173,7 @@
          (:img :class "avatar" :src (conf :avatar) :alt (conf :author))
          (:h2 :class "name" (conf :author))
          (:p :class "handle"
-             (:a :href (conf :twitter) "@" (conf :handle))))
+             (:a :href (conf :mastodon) "@" (conf :handle))))
         (:div :class "quote" "Math is the new sexy")
         (:div
          :class "social"
@@ -181,10 +181,11 @@
              :title (str:concat (conf :author) " on Github")
              :target "_blank"
              (:span :class "github"))
-         (:a :href (conf :twitter)
-             :title (format nil "~a on Twitter" (conf :author))
+         (:a :href (conf :mastodon)
+             :title (format nil "~a on Mastodon" (conf :author))
              :target "_blank"
-             (:span :class "twitter"))
+             :rel "me"
+             (:span :class "mastodon"))
          (:a :href (conf :linkedin)
              :title (format nil "~a on LinkedIn" (conf :author))
              :target "_blank" (:span :class "linkedin"))

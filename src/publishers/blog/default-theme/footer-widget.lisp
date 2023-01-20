@@ -87,5 +87,5 @@
           :target "blank"
           (:span.rss) "Or Follow via RSS"))
      (:p ("Author: ~a " (conf :author))
-         (:a :href (conf :twitter) ("@~a" (conf :handle)))))
+         (:a :href (conf :mastodon) ("@~a" (conf :handle)))))
     (render mixpanel-widget)))

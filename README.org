@@ -92,7 +92,7 @@ moving forward to allow me achieve my desired publishing workflow.
 
   Tweeting is convenient, I want my tweets published as micro-posts on my blog
   until I can turn it around and build a mobile app to publish my micro-blog
-  posts on twitter instead.
+  posts on mastodon/twitter instead.
 
   #+begin_quote
   *Status*: TODO
