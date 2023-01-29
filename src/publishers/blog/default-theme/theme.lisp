@@ -9,4 +9,5 @@
    :project (lambda (project) (render project-page :project project))
    :projects-listing (lambda (title projects)
                        (render projects-listing-page :title title :projects projects))
+   :about-me (lambda (body) (render about-page :body body))
    :assets-dir (system-local "src/publishers/blog/default-theme/assets")))

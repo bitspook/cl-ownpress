@@ -66,6 +66,7 @@
                                (:file "gh-language-colors")
                                (:file "projects-listing-page")
                                (:file "project-page")
+                               (:file "about-page")
                                (:file "widgets/notebook-btn")
                                (:file "journeys-listing-page")
                                (:file "journey-page")

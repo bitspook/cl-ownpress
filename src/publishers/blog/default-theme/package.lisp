@@ -10,11 +10,17 @@
   (:export theme))
 (in-package :default-theme)
 
+;; This package tries to implement the strategy that:
+;; - There should be no package-qualified imports anywhere.
+;; - All the imported entities used should be aliased as package level globals
+;;   in package.lisp
+
 (defalias parse-html #'plump:parse)
 (defalias html-children #'plump:children)
 (defalias serialize-to-html #'plump-dom:serialize)
 (defalias get-dom-attribute #'plump-dom:get-attribute)
 (defalias nesting-node-p #'plump-dom:nesting-node-p)
+(defalias interpret-html-tree #'spinneret:interpret-html-tree)
 
 (defun html-sections (html-content class)
   "Return sections from HTML-CONTENT which have CLASS."

@@ -34,6 +34,14 @@
               (clown-blog:project-public-path project)
               (with-html-string (render #'theme-project-template project))))))
 
+(defun publish-about-page ()
+  (clown-publishers:publish-html-file
+   "about"
+   (with-html-string
+     (render
+      #'theme-about-me-template
+      (conf :about-me)))))
+
 (defun publish-blog (title)
   (publish-static (theme-assets-dir (conf :theme)))
   (mapcar #'publish-static (conf :static-dirs))
@@ -72,7 +80,8 @@
     (publish-rss-feed "All content" listed-posts :filepath "archive/feed.xml")
 
     (mapcar #'publish-post listed-posts)
-    (mapcar #'publish-post (fetch-unlisted-posts))
+    (mapcar #'publish-post (fetch-unlisted-posts)))
 
-    (publish-projects))
+  (publish-about-page)
+  (publish-projects)
   (publish-home title))

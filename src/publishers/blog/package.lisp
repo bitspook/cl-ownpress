@@ -54,6 +54,9 @@
    (projects-listing :initform (error "Projects-listing template is required")
                      :initarg :projects-listing
                      :accessor theme-projects-listing-template)
+   (about-me :initform (error "About page template is required")
+             :initarg :about-me
+             :accessor theme-about-me-template)
    (assets-dir :initform (error "Assets directory is required")
                :initarg :assets-dir
                :accessor theme-assets-dir)))
