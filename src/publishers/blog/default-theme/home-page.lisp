@@ -202,10 +202,7 @@
          :class "about-me-snippet"
          (:header
           (:h2 "About Me"))
-         (:p "I write software to make a living. I have been on voluntary unemployment since March 26, 2022.")
-         (:p "I also enjoy writing, giving talks and discussing computers, security and politics.")
-         (:p "This website has things I am willing to share publicly. You can go through my "
-             (:a :href "/blog/" "blog") ", " (:a :href "/poems" "poems") ", " (:a :href "/projects" "projects") ", " (:a :href "/talks" "talks") ", and my " (:a :href (conf :resume) :target "_blank" "resume") " as well.")
+         (spinneret:interpret-html-tree (conf :about-me-short))
          (:footer "More " (:a :href "/about" "about me.")))
         (:section
          :class "recent-content"

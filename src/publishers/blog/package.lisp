@@ -30,6 +30,7 @@
                 :rss-max-posts 10
                 :control-tags ("blog-post" "published")
                 :exclude-tags ("draft")
+                :about-me-short nil
                 :unlisted-categories nil
                 :theme nil)))
 
