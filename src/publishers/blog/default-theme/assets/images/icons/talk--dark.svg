@@ -6,7 +6,7 @@
    fill="none"
    version="1.1"
    id="svg416"
-   sodipodi:docname="talk.svg"
+   sodipodi:docname="talk--dark.svg"
    inkscape:version="1.2.2 (b0a84865, 2022-12-01)"
    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
    xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
@@ -85,7 +85,8 @@
      d="M36.25 28.6815C36.25 29.0491 35.8535 29.5 35.1562 29.5H12.8438C12.1465 29.5 11.75 29.0491 11.75 28.6815V14.8185C11.75 14.4509 12.1465 14 12.8438 14H35.1562C35.8535 14 36.25 14.4509 36.25 14.8185V28.6815Z"
      fill="white"
      stroke="#465C69"
-     id="path408" />
+     id="path408"
+     style="fill:#000000" />
   <path
      d="M17.25 13.875H30.75"
      stroke="#788891"

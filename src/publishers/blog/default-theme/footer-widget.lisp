@@ -22,9 +22,14 @@
                                   :margin-bottom 4rem)
               (.newsletter-email :border 1px solid ,(css-color :secondary)
                                  :border-radius 25px
+                                 :background-color transparent
                                  :width 100%
                                  :margin-bottom 1rem
-                                 :padding 0.4rem 0.8rem))
+                                 :padding 0.4rem 0.8rem)
+
+              ((:or ".newsletter-email::-moz-placeholder"
+                    ".newsletter-email::-webkit-input-placeholder")
+               :color ,(css-color :dim-text)))
   :render
   (with-html
     (:div#mc_embed_signup

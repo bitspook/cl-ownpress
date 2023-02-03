@@ -47,22 +47,43 @@
      ("Cantarell" "normal" "regular" "Cantarell-Regular.ttf"))))
 
 (defun top-level-css ()
-  `((":root"
-     :--bg "#fcfcfc"
-     :--bg-d1 "#efefef"
-     :--bg-d2 "#ececec"
-     :--primary "#006992"
-     :--secondary "#465c69"
-     :--cta "#b75d69"
-     :--cta-em1 "#b75d69"
-     :--cta-em2 "#b75d69"
-     :--primary-text "#010400"
-     :--dim-text "#6f6f6f"
-     :--separator "#888"
-     :--separator-em1 "#6f6f6f29"
-     :--success "green"
-     :--warning "orange"
-     :--error "red")
+  `((:media
+     "(prefers-color-scheme: light)"
+     (":root"
+      :--bg "#fcfcfc"
+      :--bg-d1 "#efefef"
+      :--bg-d2 "#ececec"
+      :--primary "#006992"
+      :--secondary "#465c69"
+      :--cta "#b75d69"
+      :--cta-em1 "#b75d69"
+      :--cta-em2 "#b75d69"
+      :--primary-text "#010400"
+      :--dim-text "#6f6f6f"
+      :--separator "#888"
+      :--separator-em1 "#6f6f6f29"
+      :--success "green"
+      :--warning "orange"
+      :--error "red"))
+
+    (:media
+     "(prefers-color-scheme: dark)"
+     (":root"
+      :--bg "#0c0c0d"
+      :--bg-d1 "#19191cc4"
+      :--bg-d2 "#2f2f37"
+      :--primary "#006992"
+      :--secondary "#465c69"
+      :--cta "#b75d69"
+      :--cta-em1 "#b75d69"
+      :--cta-em2 "#b75d69"
+      :--primary-text "#a4a4a4"
+      :--dim-text "#6f6f6f"
+      :--separator "#888"
+      :--separator-em1 "#6f6f6f29"
+      :--success "green"
+      :--warning "orange"
+      :--error "red"))
 
     ,@font-css
     ("*" :margin 0

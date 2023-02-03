@@ -23,6 +23,10 @@
             (.li-icon--blog :background-image "url(/images/icons/post.svg)")
 
             (.li-icon--talks :background-image "url(/images/icons/talk.svg)")
+            (:media
+             "(prefers-color-scheme: dark)"
+             (.li-icon--talks :background-image "url(/images/icons/talk--dark.svg)"))
+
             (.li-icon--poems :background-image "url(/images/icons/poems.svg)")
             (.li-title :font-size 1.5rem)
 
