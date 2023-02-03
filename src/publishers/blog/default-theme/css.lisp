@@ -4,7 +4,7 @@
   '((:width-xl . "1080px")
     (:width-l . "990px")
     (:width-md . "840px")
-    (:width-sm . "480px")
+    (:width-sm . "520px")
     (:title-font-family . "Roboto, sans-serif")
     (:content-font-family . "Cantarell, sans-serif")
     (:colors . (:background "var(--bg)"
@@ -85,6 +85,9 @@
       :padding-top 0
       :border-bottom "2px solid" ,(css-color :secondary)
       :font-size "0.7em"))
+
+    ((:or ol ul) :padding-left 0.8rem)
+
     (blockquote :padding 0.01em 1em
                 :margin 1em 0
                 :border-left 4px solid ,(css-color :secondary)

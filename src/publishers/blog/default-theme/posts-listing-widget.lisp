@@ -21,9 +21,9 @@
                       :flex-shrink 0)
 
             (.li-icon--blog :background-image "url(/images/icons/post.svg)")
+
             (.li-icon--talks :background-image "url(/images/icons/talk.svg)")
             (.li-icon--poems :background-image "url(/images/icons/poems.svg)")
-
             (.li-title :font-size 1.5rem)
 
             (.li-meta :margin-top 0.5rem
@@ -38,9 +38,9 @@
                         :padding 0
                         :padding-right 1em
                         :border-right ,(format nil "1px solid ~a" (css-color :separator)))
+
             ((:and .meta-item :last-child) :padding-right 0
                                            :border none)
-
             (.tags :display flex
                    :flex-wrap wrap
 
@@ -51,7 +51,16 @@
                   :margin-right 1rem
                   :background "url(\"/images/icons/rss.svg\")"
                   :background-repeat no-repeat
-                  :background-size contain))
+                  :background-size contain)
+
+            (:media ,(format nil "(max-width: ~a)" (css-var :width-sm))
+                    (.li-icon :width 4rem)
+
+                    (li :margin-bottom 2.2rem)
+
+                    (.li-title :font-size 1.2rem)
+
+                    (.meta-item :padding-right 0.4rem)))
   :render (with-html
             (:ul.listing
              (when (or (not posts) (eq posts nil))

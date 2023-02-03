@@ -73,7 +73,7 @@
        (.github :background (url "/images/icons/github.svg") no-repeat
                 :background-size contain)
        (.mastodon :background (url "/images/icons/mastodon.svg") no-repeat
-                 :background-size contain)
+                  :background-size contain)
        (.rss :background (url "/images/icons/rss.svg") no-repeat
              :background-size contain)
        (.linkedin :background (url "/images/icons/linkedin.svg") no-repeat
@@ -146,14 +146,21 @@
        (.read-more-btn :font-size 1.3em
                        :margin 0.7em 0)))
 
+     (:media ,(format nil "(max-width: ~a)" (css-var :width-sm))
+             (.home (.avatar :width 15rem :height auto)))
+
      (:media ,(format nil "(max-width: ~a)" (css-var :width-l))
-             (.home (.sidebar :width 40%)
-                    (.main :width 60%)))
+             (.home
+              (.sidebar :width 40%)
+              (.main :width 60%)))
 
      (:media ,(format nil "(max-width: ~a)" (css-var :width-md))
              (.home :flex-direction column
                     (.sidebar :width 100%)
-                    (.main :width 100%)))))
+                    (.main :width 100%)))
+
+     (:media ,(format nil "(max-width: ~a)" (css-var :width-sm))
+             (.main :padding 0.8rem))))
   :render
   (with-html
     (:html
