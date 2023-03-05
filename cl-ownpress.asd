@@ -1,7 +1,7 @@
 (defsystem "cl-ownpress"
   :version "0.1.0"
   :author "Charanjit Singh"
-  :license "AGPL"
+  :license "AGPL-3.0-only"
   :depends-on ("alexandria"
                "serapeum"
                "cl-dbi"
@@ -73,18 +73,17 @@
                                (:file "post-page")
                                (:file "posts-listing-page")
                                (:file "home-page")
-                               (:file "theme")))
+                               (:file "default-theme")))
                  (:file "publishers/convinient-blog-re-exports"))))
   :description ""
   :in-order-to ((test-op (test-op "cl-ownpress/tests"))))
 
 (defsystem "cl-ownpress/tests"
   :author "Charanjit Singh"
-  :license "AGPL"
-  :depends-on ("cl-ownpress"
-               "rove")
+  :license "AGPL-3.0-only"
+  :depends-on (:cl-ownpress :parachute)
   :components ((:module "tests"
                 :components
-                ((:file "package"))))
+                ((:file "main"))))
   :description "Test system for cl-ownpress"
-  :perform (test-op (op c) (symbol-call :rove :run c)))
+  :perform (test-op (op c) (symbol-call :parachute :test :cl-ownpress/tests)))

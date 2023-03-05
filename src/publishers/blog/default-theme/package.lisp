@@ -2,12 +2,11 @@
   (:nicknames :default-theme)
   (:local-nicknames (:xml :xml-emitter))
   (:use :cl :serapeum/bundle
-        :clown-theme :clown-blog
+        :clown-blog.theme :clown-blog
         :clown.publishers.journey)
   (:import-from :spinneret with-html)
   (:import-from #:clown conf system-local)
-  (:import-from #:clown-blog blog-theme)
-  (:export theme))
+  (:export default-theme))
 (in-package :default-theme)
 
 ;; This package tries to implement the strategy that:

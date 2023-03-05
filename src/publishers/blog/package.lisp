@@ -1,8 +1,12 @@
 (defpackage #:clown-pubishers.blog
   (:nicknames #:clown-blog)
-  (:use :cl :alexandria :clown-publishers)
+  (:use :cl :alexandria)
+  (:use #:clown-publishers)
   (:import-from #:clown *conf* conf-merge conf)
-  (:import-from #:clown-blog.theme with-html-string)
+  (:import-from #:clown-blog.theme theme theme-home-template
+                theme-listing-template theme-post-template theme-assets-dir
+                theme-about-me-template theme-projects-listing-template theme-project-template
+                with-html-string compile-and-write-lass-blocks)
   (:export
    post-id post-slug post-title post-tags post-category post-published-at post-html-content
    fetch-posts fetch-recent-posts fetch-unlisted-posts
@@ -11,7 +15,6 @@
    project-issue-tracker project-languages project-public-path project-tagline
    project-source-code project-updated-at project-oracle-spec
    fetch-projects fetch-all-projects
-   blog-theme theme-home-template theme-listing-template theme-post-template theme-assets-dir
    publish-blog publish-listing publish-post publish-rss-feed))
 (in-package #:clown-blog)
 
@@ -37,26 +40,3 @@
 (defun post-public-path (post)
   (with-accessors ((cat post-category) (slug post-slug)) post
     (clown:join-paths "/" (or cat "") slug "/")))
-
-(defclass blog-theme ()
-  ((home :initform (error "Home view is required")
-         :initarg :home
-         :accessor theme-home-template)
-   (listing :initform (error "Listing view is required")
-            :initarg :listing
-            :accessor theme-listing-template)
-   (post :initform (error "Post view is required")
-         :initarg :post
-         :accessor theme-post-template)
-   (project :initform (error "Project template is required")
-            :initarg :project
-            :accessor theme-project-template)
-   (projects-listing :initform (error "Projects-listing template is required")
-                     :initarg :projects-listing
-                     :accessor theme-projects-listing-template)
-   (about-me :initform (error "About page template is required")
-             :initarg :about-me
-             :accessor theme-about-me-template)
-   (assets-dir :initform (error "Assets directory is required")
-               :initarg :assets-dir
-               :accessor theme-assets-dir)))

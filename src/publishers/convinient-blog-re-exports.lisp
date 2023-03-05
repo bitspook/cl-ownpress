@@ -9,5 +9,5 @@
    default-theme))
 (in-package #:clown-publishers.blog)
 
-(defparameter default-theme default-theme:theme)
+(defparameter default-theme default-theme:default-theme)
 
