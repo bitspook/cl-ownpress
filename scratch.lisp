@@ -1,9 +1,16 @@
+(asdf:load-system :cl-ownpress)
+(ql:quickload :40ants-doc-full)
 (in-package :cl-user)
 
-(ql:quickload '(:cl-project))
+(defparameter docs-dir (asdf:system-relative-pathname :cl-ownpress #p"docs/"))
 
-(cl-project:make-project
- #p"../cl-ownpress"
- :author "Charanjit Singh"
- :license "AGPL"
- :depends-on '(:cl-dbi :cl-migratum :lass))
+(defun build-doc ()
+  (let ((sections (list cl-ownpress::@index
+                        clown-providers::@providers
+                        clown-publishers::@publishers)))
+    (loop :for section :in sections
+          :do (40ants-doc-full/builder:render-to-files
+               section
+               :base-dir docs-dir))))
+
+(build-doc)

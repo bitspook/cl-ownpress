@@ -24,18 +24,18 @@
 
 (defun publish-projects ()
   (let ((projects (clown-blog:fetch-all-projects)))
-    (clown-publishers:publish-html-file
+    (publish-html-file
      "projects/index.html"
      (with-html-string (render #'theme-projects-listing-template "Projects" projects)))
 
     (loop :for project :in projects
           :do
-             (clown-publishers:publish-html-file
+             (publish-html-file
               (clown-blog:project-public-path project)
               (with-html-string (render #'theme-project-template project))))))
 
 (defun publish-about-page ()
-  (clown-publishers:publish-html-file
+  (publish-html-file
    "about"
    (with-html-string
      (render

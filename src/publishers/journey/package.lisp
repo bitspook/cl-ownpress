@@ -1,5 +1,5 @@
 (defpackage :clown.publishers.journey
-  (:use :cl :alexandria :clown-publishers)
+  (:use :cl :alexandria)
   (:export journey
            journey-id journey-name journey-tagline journey-slug
            journey-html-description journey-html-content

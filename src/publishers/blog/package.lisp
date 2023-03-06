@@ -1,7 +1,6 @@
 (defpackage #:clown-pubishers.blog
   (:nicknames #:clown-blog)
   (:use :cl :alexandria)
-  (:use #:clown-publishers)
   (:import-from #:clown *conf* conf-merge conf)
   (:import-from #:clown-blog.theme theme theme-home-template
                 theme-listing-template theme-post-template theme-assets-dir
@@ -36,6 +35,32 @@
                 :about-me-short nil
                 :unlisted-categories nil
                 :theme nil)))
+
+(defun copy-dirs (src dest)
+  (uiop:run-program (format nil "cp -r ~a ~a" (ppath:join src "*") dest)
+                    :output *standard-output*
+                    :error-output *standard-output*))
+
+(defun publish-static (dir)
+  "Recursively copy DIR into the published destination so they can be accessible
+as static assets."
+  (ensure-directories-exist (conf :dest))
+  (copy-dirs dir (conf :dest)))
+
+(defun publish-file (filepath content)
+  "Publish CONTENT to a file named FILEPATH.
+FILEPATH is a path relative to the published destination."
+  (let ((filepath (clown:join-paths (conf :dest) filepath)))
+    (ensure-directories-exist filepath)
+    (str:to-file filepath content)))
+
+(defun publish-html-file (filepath html &key (clean-urls? t))
+  "Publish HTML content (string) to FILEPATH file. If `CLEAN-URLS?` is non `nil', it
+ensures that FILEPATH is a clean HTML url (i.e it looks like FILEPATH/index.html)."
+  (let* ((filepath (if (and clean-urls? (not (string= (ppath:basename filepath) "index.html")))
+                   (clown:join-paths filepath "/index.html")
+                   filepath)))
+    (publish-file filepath html)))
 
 (defun post-public-path (post)
   (with-accessors ((cat post-category) (slug post-slug)) post

@@ -1,6 +1,6 @@
 (defpackage :clown-blog.theme
   (:nicknames :clown-theme)
-  (:use :cl :serapeum/bundle)
+  (:use :cl :serapeum/bundle :40ants-doc)
   (:export defwidget styles-of render compile-and-write-lass-blocks
            with-html-string *debug-transpiles*)
   ;; theme class
@@ -50,4 +50,5 @@ minification or obfuscation.")
              :accessor theme-about-me-template)
    (assets-dir :initform (error "Assets directory is required")
                :initarg :assets-dir
-               :accessor theme-assets-dir)))
+               :accessor theme-assets-dir))
+  (:documentation "A blog theme."))

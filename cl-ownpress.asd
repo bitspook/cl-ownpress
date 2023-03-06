@@ -22,7 +22,8 @@
                "usocket"
                "yason"
                "xml-emitter"
-               "plump")
+               "plump"
+               "40ants-doc")
   :components ((:module "src"
                 :serial nil
                 :components
@@ -75,7 +76,7 @@
                                (:file "home-page")
                                (:file "default-theme")))
                  (:file "publishers/convinient-blog-re-exports"))))
-  :description ""
+  :description "Personal publishing platform"
   :in-order-to ((test-op (test-op "cl-ownpress/tests"))))
 
 (defsystem "cl-ownpress/tests"

@@ -1,27 +1,21 @@
 (defpackage #:clown-publishers
-  (:use #:cl #:serapeum/bundle #:clown)
-  (:export
-   publish-static
-   publish-file
-   publish-html-file))
+  (:use #:cl #:serapeum/bundle #:clown #:40ants-doc))
 (in-package #:clown-publishers)
 
-(defun copy-dirs (src dest)
-  (uiop:run-program (format nil "cp -r ~a ~a" (ppath:join src "*") dest)
-                    :output *standard-output*
-                    :error-output *standard-output*))
+(defsection @publishers (:title "Publishers")
+  "A publisher publishes content collected in clown db.
 
-(defun publish-static (dir)
-  (ensure-directories-exist (conf :dest))
-  (copy-dirs dir (conf :dest)))
+Publishers are free to publish content in any shape and form. They are supposed
+to create artifacts which can then be published. For example, a publisher might
+create a website, or a pdf file.
 
-(defun publish-file (dest content)
-  (let ((dest (clown:join-paths (conf :dest) dest)))
-    (ensure-directories-exist dest)
-    (str:to-file dest content)))
+Here is a list of publishers packaged with cl-ownpress.
 
-(defun publish-html-file (dest html &key (clean-urls? t))
-  (let* ((dest (if (and clean-urls? (not (string= (ppath:basename dest) "index.html")))
-                   (clown:join-paths dest "/index.html")
-                   dest)))
-    (publish-file dest html)))
+## Publishers packaged with cl-ownpress
+
+- [clown-blog](/clown-blog-publisher) <br /> Creates a static HTML site which can be hosted on platforms
+  like Github pages. Meant for publishing personal blogs.
+
+## API"
+
+  (clown-publishers package))
