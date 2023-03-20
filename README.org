@@ -1,7 +1,14 @@
 * Cl-ownpress 
 
 #+begin_quote
-/⚠️Warning⚠️/: Under active development. API/architecture might change without warning.
+⚠️ Published documentation might be lying. I am in middle of re-doing the
+architecture (including the public API) of cl-ownpress, and am doing docs-first
+test-driven development. Once I am happy with it, I will create a 1.0 release
+and do future releases in release branches.
+#+end_quote
+
+#+begin_quote
+⚠️ Under active development. API/architecture might change without warning.
 #+end_quote
 
 Practically, cl-ownpress is a static site generator.
