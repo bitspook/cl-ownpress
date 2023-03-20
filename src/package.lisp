@@ -31,8 +31,6 @@ wherever, and add it to an sqlite database.
 
   "# API"
 
-  "## Package"
-
   (:clown package)
   "- Nicknames : `:clown`"
 

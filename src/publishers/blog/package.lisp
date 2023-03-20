@@ -1,6 +1,6 @@
 (defpackage #:clown-pubishers.blog
   (:nicknames #:clown-blog)
-  (:use :cl :alexandria)
+  (:use :cl :serapeum/bundle :40ants-doc)
   (:import-from #:clown *conf* conf-merge conf)
   (:import-from #:clown-blog.theme theme theme-home-template
                 theme-listing-template theme-post-template theme-assets-dir
@@ -16,6 +16,20 @@
    fetch-projects fetch-all-projects
    publish-blog publish-listing publish-post publish-rss-feed))
 (in-package #:clown-blog)
+
+(defsection @publishers-clown-blog (:title "clown-blog")
+  "Publish a static HTML blog from your collected blog posts, notes and projects."
+
+  "## Themes
+A blog is published based on a theme.
+
+Check the [blog-themes](/blog-themes) section for available themes, and how to create your own."
+
+  "## API"
+  (*conf* variable)
+
+  "### Utilities"
+  (publish-blog function))
 
 (setf *conf* (conf-merge
               `(:author nil
@@ -37,6 +51,8 @@
                 :theme nil)))
 
 (defun copy-dirs (src dest)
+  "Recursively copy SRC to DEST. It uses *nix `cp' under the hood, so don't use it
+on Windows maybe."
   (uiop:run-program (format nil "cp -r ~a ~a" (ppath:join src "*") dest)
                     :output *standard-output*
                     :error-output *standard-output*))

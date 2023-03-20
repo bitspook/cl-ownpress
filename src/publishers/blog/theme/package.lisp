@@ -9,11 +9,25 @@
    theme-about-me-template theme-project-template theme-projects-listing-template theme-assets-dir))
 (in-package :clown-theme)
 
+(defsection @blog-themes (:title "Blog Theme")
+  "A blog theme decides what shape and form Html for a blog is produced."
+
+  "A theme is represented by:"
+  (theme class)
+
+  "## API"
+  (*debug-transpiles* variable)
+
+  "## Utilities"
+  (compile-and-write-lass-blocks function)
+  (with-html-string macro))
+
 (defvar *debug-transpiles* t
   "Transpiling of HTML/JS/CSS should be done in debug mode i.e without
 minification or obfuscation.")
 
 (defun compile-and-write-lass-blocks (styles)
+  "Utility for converting lass STYLES to string. Respects `*debug-transpiles*`."
   (let ((lass:*pretty* *debug-transpiles*))
     (with-output-to-string (stream)
       (dolist (style-block styles)
@@ -22,6 +36,7 @@ minification or obfuscation.")
          :stream stream)))))
 
 (defmacro with-html-string (dom)
+  "Convert DOM spinneret form to an html string. Respects *debug-transpiles*."
   `(let ((spinneret:*suppress-inserted-spaces* t)
          (spinneret:*html-style* (if *debug-transpiles* :human :tree))
          (*print-pretty* *debug-transpiles*)
@@ -51,4 +66,4 @@ minification or obfuscation.")
    (assets-dir :initform (error "Assets directory is required")
                :initarg :assets-dir
                :accessor theme-assets-dir))
-  (:documentation "A blog theme."))
+  (:documentation "A theme is a."))

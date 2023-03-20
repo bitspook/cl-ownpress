@@ -39,7 +39,10 @@
                                (:file "org-project-provider")))
                  (:module "publishers"
                   :serial t
-                  :components ((:file "package")))
+                  :components ((:file "package")
+                               (:file "asset")
+                               (:file "blog-post")
+                               (:file "blog-post-listing")))
                  (:module "publishers/journey"
                   :serial t
                   :components ((:file "package")))
@@ -85,6 +88,7 @@
   :depends-on (:cl-ownpress :parachute)
   :components ((:module "tests"
                 :components
-                ((:file "main"))))
+                ((:file "main")
+                 (:file "publishers"))))
   :description "Test system for cl-ownpress"
   :perform (test-op (op c) (symbol-call :parachute :test :cl-ownpress/tests)))

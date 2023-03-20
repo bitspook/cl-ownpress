@@ -6,7 +6,9 @@
 (in-package :clown-providers)
 
 (defsection @providers (:title "clown-providers")
-  "A provider collects data to be published.
+  "A provider provides content to be published to a [publisher](/publishers).
+
+Providers can be composed together, to create new providers.
 
 ## API
 "
