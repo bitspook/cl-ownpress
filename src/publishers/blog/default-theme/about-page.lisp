@@ -8,12 +8,12 @@
    `((.content :font-family "Cantarell, sans-serif"
                :font-style normal
                :font-weight 500
-               :font-size 1.5em
+               :font-size 2rem
                :line-height 1.4
                :margin 0 auto
                :padding 0 124px)
      ,@(adjustable-width-css ".content")
-     (.content-header (h1 :margin-bottom 1rem :font-size 2em))
+     (.content-header (h1 :margin-bottom 1rem :font-size 4rem))
      (.content-meta :margin-top 0
                     :margin-bottom 2rem
                     :font-family "Roboto, sans-serif"
@@ -23,7 +23,7 @@
                     (.meta-item :border-right ,(format nil "1px solid ~a" (css-color :separator))
                                 :line-height 1
                                 :padding 0 1rem
-                                :font-size 0.8rem
+                                :font-size 1.2rem
                                 :display flex)
                     ((:and .meta-item :last-child) :padding-right 0
                                                    :border none)

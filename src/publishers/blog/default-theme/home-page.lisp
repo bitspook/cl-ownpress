@@ -143,8 +143,9 @@
         :background-image (url "/images/icons/poems.svg")
         :background-size contain)
 
-       (.read-more-btn :font-size 1.3em
-                       :margin 0.7em 0)))
+       (.read-more-btn :font-size 2rem
+                       :margin 0.7rem 0
+                       :padding 0.6rem 1.8rem)))
 
      (:media ,(format nil "(max-width: ~a)" (css-var :width-sm))
              (.home (.avatar :width 15rem :height auto)))

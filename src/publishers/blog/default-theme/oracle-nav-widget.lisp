@@ -10,7 +10,7 @@
                  :border none
                :background white
                :margin 0 1rem
-               :font-size 1.2rem
+               :font-size 1.6rem
                :padding 0.4rem 0
                :border-bottom 2px solid ,(css-color :primary-text)
                :min-width 10rem)))

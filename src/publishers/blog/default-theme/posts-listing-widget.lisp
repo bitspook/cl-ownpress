@@ -28,10 +28,10 @@
              (.li-icon--talks :background-image "url(/images/icons/talk--dark.svg)"))
 
             (.li-icon--poems :background-image "url(/images/icons/poems.svg)")
-            (.li-title :font-size 1.5rem)
+            (.li-title :font-size 2rem)
 
             (.li-meta :margin-top 0.5rem
-                      :font-size 1rem
+                      :font-size 1.2rem
                       :display flex)
 
             ((:and .li-meta (.li-meta a)) :font-family "Roboto, sans-serif"
@@ -62,7 +62,7 @@
 
                     (li :margin-bottom 2.2rem)
 
-                    (.li-title :font-size 1.2rem)
+                    (.li-title :font-size 2rem)
 
                     (.meta-item :padding-right 0.4rem)))
   :render (with-html

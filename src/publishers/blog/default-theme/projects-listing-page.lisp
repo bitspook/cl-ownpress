@@ -15,7 +15,7 @@
 
       (:header :font-family ,(css-var :title-font-family))
       (.title :font-size 2.5rem)
-      (.description :font-size 1.4rem)
+      (.description :font-size 1.8rem)
 
       (.projects-list :list-style-type none
                       :margin 4rem 0
@@ -31,11 +31,8 @@
         :margin-bottom 2rem
         :font-family ,(css-var :content-font-family)
 
-        (.project-title :font-size 2rem
-                        :margin 0
+        (.project-title :margin 0
                         :margin-bottom 0.4rem)
-        (.subtitle :font-size 1.2rem
-                   :color ,(css-color :dim-text))
 
         (.languages :width 100%
                     :margin-top 1.4rem
@@ -50,11 +47,13 @@
                        :height 0.8rem
                        :margin 0 0.4rem)))
 
+       ((:or .subtitle footer)
+        :color ,(css-color :dim-text)
+        :font-size 1.4rem)
+
        (article
-        :font-size 1.4rem
         (p :margin 1rem 0))
-       (footer :color ,(css-color :dim-text)
-               :margin-top 1rem)))))
+       (footer :margin-top 1rem)))))
   :render
   (with-html
     (:html

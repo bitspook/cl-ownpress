@@ -19,7 +19,7 @@
                :margin 0
                :margin-bottom 0.4rem)
 
-       (.subtitle :font-size 1.2rem
+       (.subtitle :font-size 1.4rem
                   :color ,(css-color :dim-text)))
 
       ("article.main"

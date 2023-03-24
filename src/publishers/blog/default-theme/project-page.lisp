@@ -15,16 +15,16 @@
       ("header.main"
        :margin 2rem 0
 
-       (.title :font-size 2.5rem
+       (.title :font-size 2.8rem
                :margin 0
                :margin-bottom 0.4rem)
 
-       (.subtitle :font-size 1.2rem
+       (.subtitle :font-size 1.8rem
                   :color ,(css-color :dim-text)))
 
       ("article.main"
        :min-height 40rem
-       :font-size 1.4rem
+       :font-size 1.6rem
 
        (p :margin 1rem 0))
 
@@ -37,7 +37,7 @@
 
       ((:or .btn-github .btn-issues .btn-docs)
        :padding 0 1rem
-       :font-size 1.2rem
+       :font-size 1.6rem
        :color ,(css-color :secondary)
 
        (.icon :background-size contain

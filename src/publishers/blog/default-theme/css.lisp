@@ -89,41 +89,49 @@
     ("*" :margin 0
          :padding 0
          :box-sizing "border-box")
+    (":root" :font-size "10px")
     (body :font-family ,(css-var :content-font-family)
-          :font-size "14px"
+          :font-size 1.6rem
           :background ,(css-color :background)
           :color ,(css-color :primary-text))
     ((:or .title header)
      :font-family ,(css-var :title-font-family))
     (a :text-decoration "underline"
        :color ,(css-color :primary-text))
+
     ((:or h1 h2 h3 h4 h5 h6)
      :font-family ,(css-var :title-font-family)
+     :font-weight normal
      :margin "4rem 0 2rem 0")
+
+    (h1 :font-size 2.2rem
+        :border-bottom 1px solid ,(css-color :separator-light))
+    (h2 :font-size 2.1rem)
+    ((:or h3 h4 h5 h6) :font-size 2rem)
+
     ((:or img figure)
      (figcaption
       :padding "0.4em"
       :padding-top 0
       :border-bottom "2px solid" ,(css-color :secondary)
-      :font-size "0.7em"))
+      :font-size 1.2rem))
 
-    ((:or ol ul) :padding-left 0.8rem)
+    ((:or ol ul) :margin-left 1.6rem)
 
-    (blockquote :padding 0.01em 1em
-                :margin 1em 0
+    (blockquote :padding 0.01rem 1rem
+                :margin 1rem 0
                 :border-left 4px solid ,(css-color :secondary)
-                :font-size 1.2em)
+                :font-size 1.8rem)
     (pre :overflow auto
          :padding 1em
          :font-family monospace
-         :font-size 1.2rem)
+         :font-size 1.4rem)
     (code :font-family monospace
           :color ,(css-color :cta)
-          :font-size 1rem)
+          :font-size 1.4rem)
     (.title :margin 2rem 0
             (h1 :font-family "Roboto" sans-serif
                 :font-weight bold
-                :font-size 1.7em
                 :line-height 1.2
                 :text-transform capitalize))
     (video :width 100%)
@@ -131,7 +139,7 @@
     ((:and tr (:nth-child even))
      :background-color ,(css-color :background-dark2))
     (td :padding .4em .8em)
-    (.src :font-size 1rem
+    (.src :font-size 1.4rem
           :padding 1em
           :border 1px solid ,(css-color :separator-light)
           :border-radius 8px
