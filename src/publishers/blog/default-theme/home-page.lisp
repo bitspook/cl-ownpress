@@ -97,7 +97,6 @@
 
       (.about-me-snippet
        :font-family "Cantarell"
-       :font-size 1.35em
        :line-height 1.5
        :align-items center
        :margin 0.8em 0

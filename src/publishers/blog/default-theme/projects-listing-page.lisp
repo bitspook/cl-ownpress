@@ -37,6 +37,7 @@
         (.languages :width 100%
                     :margin-top 1.4rem
                     :margin-bottom 1rem
+                    :font-size 1.4rem
 
                     (.lang :display inline-flex
                            :align-items center

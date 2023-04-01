@@ -8,11 +8,12 @@
 
              (select
                  :border none
-               :background white
+               :background transparent
                :margin 0 1rem
                :font-size 1.6rem
                :padding 0.4rem 0
-               :border-bottom 2px solid ,(css-color :primary-text)
+               :color ,(css-color :primary-text)
+               :border-bottom 2px solid ,(css-color :separator)
                :min-width 10rem)))
   :render
   (labels ((role-intents (role) (cdr (assoc role spec :test 'equal))))

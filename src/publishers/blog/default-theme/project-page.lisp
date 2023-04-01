@@ -31,6 +31,7 @@
       (.elsewhere-buttons
        :list-style-type none
        :display flex
+       :margin 0
        :margin-top 3rem
 
        (li :margin-right 1.4rem))
