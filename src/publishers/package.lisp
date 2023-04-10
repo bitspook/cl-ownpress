@@ -40,6 +40,7 @@ Following publishers are provided with cl-ownpress:"
   (:documentation "A publisher creates publishable artifacts. For example Html+Css+Js files for a
 website."))
 
+(export-always 'publish)
 (defgeneric publish (publisher &key)
   (:documentation "Instruct the PUBLISHER to create artifacts needed for publishing."))
 
@@ -52,3 +53,8 @@ website."))
 
 (defgeneric global-lass-for (publisher)
   (:documentation "Returned lass blocks are added as global Css for generated Html artifacts."))
+
+(export-always 'artifact-already-exists)
+(define-condition artifact-already-exists (error)
+  ((path :initarg :path :reader artifact-path))
+  (:documentation "Condition indicating that an artifact at the same location already exists."))

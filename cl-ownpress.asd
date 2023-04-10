@@ -88,7 +88,7 @@
   :depends-on (:cl-ownpress :parachute)
   :components ((:module "tests"
                 :components
-                ((:file "main")
-                 (:file "publishers"))))
+                ((:file "package")
+                 (:file "publishers/asset"))))
   :description "Test system for cl-ownpress"
   :perform (test-op (op c) (symbol-call :parachute :test :cl-ownpress/tests)))
