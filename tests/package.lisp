@@ -1,5 +1,6 @@
 (uiop:define-package cl-ownpress/tests
   (:use :cl)
+  (:import-from :spinneret :with-html-string)
   (:mix :parachute :serapeum/bundle))
 (in-package :cl-ownpress/tests)
 

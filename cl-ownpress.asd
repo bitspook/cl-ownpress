@@ -30,6 +30,7 @@
                 ((:file "package")
                  (:file "utils")
                  (:file "db")
+
                  (:module "providers"
                   :serial t
                   :components ((:file "package")
@@ -37,15 +38,20 @@
                                (:file "org-file-provider")
                                (:file "denote-provider")
                                (:file "org-project-provider")))
+
                  (:module "publishers"
                   :serial t
                   :components ((:file "package")
                                (:file "asset")
+                               (:file "html/html")
+                               (:file "html/widget")
                                (:file "blog-post")
                                (:file "blog-post-listing")))
+
                  (:module "publishers/journey"
                   :serial t
                   :components ((:file "package")))
+
                  (:module
                   "publishers/blog/theme"
                   :serial t
@@ -58,6 +64,7 @@
                                (:file "models")
                                (:file "rss")
                                (:file "publish")))
+
                  (:module "publishers/blog/default-theme"
                   :serial t
                   :components ((:file "package")
@@ -89,6 +96,10 @@
   :components ((:module "tests"
                 :components
                 ((:file "package")
-                 (:file "publishers/asset"))))
+                 (:file "publishers/asset")))
+               (:module "src"
+                :components
+                ((:file "publishers/html/html.test")
+                 (:file "publishers/html/widget.test"))))
   :description "Test system for cl-ownpress"
   :perform (test-op (op c) (symbol-call :parachute :test :cl-ownpress/tests)))

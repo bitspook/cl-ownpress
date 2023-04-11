@@ -5,16 +5,11 @@
 (defsection @publishers (:title "Publishers")
   "A publisher publishes content provided by one or more providers.
 
-Publishers are free to publish content in any shape and form. They are supposed
-to create artifacts which can then be published. For example, a publisher might
-create a website, or a pdf file.
+Publishers create artifacts which can then be published. For example, a
+publisher might create a website (a bunch of Html, Css and Js files), or a pdf
+file.
 
 Here is a list of publishers packaged with cl-ownpress.
-
-## Publishers packaged with cl-ownpress
-
-- [clown-blog](/publishers-clown-blog) <br /> Creates a static Html site which can be hosted on platforms
-  like Github pages. Meant for publishing personal blogs.
 
 ## API"
 
@@ -46,13 +41,6 @@ website."))
 
 (defgeneric public-path (publisher &key)
   (:documentation "Provide the public path of artifacts produced by PUBLISHER."))
-
-(defclass html-publisher (publisher)
-  nil
-  (:documentation "Publisher whose primary artifact is Html meant to be published on websites."))
-
-(defgeneric global-lass-for (publisher)
-  (:documentation "Returned lass blocks are added as global Css for generated Html artifacts."))
 
 (export-always 'artifact-already-exists)
 (define-condition artifact-already-exists (error)
