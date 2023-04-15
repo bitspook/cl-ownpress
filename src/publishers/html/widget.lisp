@@ -12,20 +12,20 @@ macro to create a new widget."))
   (:documentation "Provide spinneret DOM for the WIDGET."))
 
 (export-always 'lass-of)
-(defgeneric lass-of (widget)
+(defgeneric lass-of (widget &key)
   (:documentation "Provide a list of lass blocks for WIDGET"))
 
 (defmethod dom-of ((widget widget) &key) nil)
 
-(defmethod lass-of ((widget widget))
+(defmethod lass-of ((widget widget) &key)
   "Last call to `lass-of' a WIDGET provides a list of all the lass blocks that
 belong to children of the WIDGET.
 
 It can be used in the final widget (i.e a widget which makes the entire HTML
 document) to dom-of styles for all the widgets used in it."
-  (concatenate 'list (mapcan (lambda (w) (lass-of w)) (used-child-widgets widget))))
+  nil)
 
-(defun used-child-widgets (dom)
+(defun child-widgets (dom)
   "Walk spinneret DOM to figure out which widgets are used in in it.
 A used widget is determined by a call to `dom-of'."
   (let ((children nil))
@@ -47,7 +47,7 @@ ARGS is the arguments received by `dom-of' function."
      (defmethod dom-of ((widget (eql ,name)) &key ,@args)
        (spinneret:with-html ,@dom))
 
-     (defmethod lass-of ((widget (eql ,name)))
+     (defmethod lass-of ((widget (eql ,name)) &key ,@args)
        ,lass)
 
      ,name))
