@@ -15,7 +15,7 @@
                     (:button title))))
       (true (string=
              "<button>Lol</button>"
-             (with-html-string (dom-of button :title "Lol"))))))
+             (spinneret:with-html-string (dom-of button :title "Lol"))))))
 
   (define-test "creates a default implementation for LASS-OF"
     (let* ((button (defwidget button (title)
@@ -37,7 +37,7 @@
                     (:button title))))
       (true (string=
              "<button>Lol</button>"
-             (with-html-string (dom-of button :title "Lol"))))))
+             (spinneret:with-html-string (dom-of button :title "Lol"))))))
 
   (define-test "returns dom of the nested widgets as well"
     (let* ((*print-pretty* nil)
@@ -47,7 +47,7 @@
                    (:form title (dom-of button :title "Lol")))))
       (true (string=
              "<form><button>Lol</button></form>"
-             (with-html-string (dom-of form))))))
+             (spinneret:with-html-string (dom-of form))))))
 
   (define-test "allow extending the returned dom"
     (let* ((*print-pretty* nil)
@@ -60,7 +60,7 @@
           (:footer "Rofl")))
       (true (string=
              "<h1>Heading</h1><button>Lol</button><footer>Rofl</footer>"
-             (with-html-string (dom-of button :title "Lol")))))))
+             (spinneret:with-html-string (dom-of button :title "Lol")))))))
 
 (define-test "lass-of" :parent "widget"
   (define-test "returns lass of the given widget"

@@ -23,7 +23,8 @@
                "yason"
                "xml-emitter"
                "plump"
-               "40ants-doc")
+               "40ants-doc"
+               "cl-slug")
   :components ((:module "src"
                 :serial nil
                 :components
@@ -95,11 +96,12 @@
   :depends-on (:cl-ownpress :parachute)
   :components ((:module "tests"
                 :components
-                ((:file "package")
-                 (:file "publishers/asset")))
+                ((:file "package")))
                (:module "src"
                 :components
-                ((:file "publishers/html/html.test")
-                 (:file "publishers/html/widget.test"))))
+                ((:file "publishers/asset.test")
+                 (:file "publishers/html/html.test")
+                 (:file "publishers/html/widget.test")
+                 (:file "publishers/blog-post.test"))))
   :description "Test system for cl-ownpress"
   :perform (test-op (op c) (symbol-call :parachute :test :cl-ownpress/tests)))
