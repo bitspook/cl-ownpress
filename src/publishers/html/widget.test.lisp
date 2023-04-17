@@ -17,19 +17,26 @@
              "<button>Lol</button>"
              (spinneret:with-html-string (dom-of button :title "Lol"))))))
 
+  (define-test "assigns all used widgets as WIDGET-CHILDREN"
+    (let* ((body (defwidget layout () nil (:p "Body")))
+           (footer (defwidget footer () nil (:footer "Footer")))
+           (layout (defwidget layout () nil
+                     (:h1 "Heading")
+                     (dom-of body)
+                     (dom-of footer)))
+           (children (widget-children layout)))
+      (true (and (eq (car children) 'footer)
+                 (eq (cadr children) 'body)))))
+
   (define-test "creates a default implementation for LASS-OF"
     (let* ((button (defwidget button (title)
                        `((button :background blue)
-                         (span :background ,(if title 'blue 'red)))
+                         (span :background red))
                      (:button title)))
-           (css1 (lass:write-sheet
+           (css (lass:write-sheet
                   (apply #'lass:compile-sheet (lass-of button))
-                  :pretty nil))
-           (css2 (lass:write-sheet
-                  (apply #'lass:compile-sheet (lass-of button :title "lol"))
                   :pretty nil)))
-      (true (string= "button{background:blue;}span{background:blue;}" css2))
-      (true (string= "button{background:blue;}span{background:red;}" css1)))))
+      (true (string= "button{background:blue;}span{background:red;}" css)))))
 
 (define-test "dom-of" :parent "widget"
   (define-test "returns dom of the given widget"
@@ -68,10 +75,10 @@
                        `((button :background blue)
                          (span :background red))
                      (:button title)))
-           (css1 (lass:write-sheet
+           (css (lass:write-sheet
                   (apply #'lass:compile-sheet (lass-of button))
                   :pretty nil)))
-      (true (string= "button{background:blue;}span{background:red;}" css1))))
+      (true (string= "button{background:blue;}span{background:red;}" css))))
 
   (define-test "allow extending the returned lass"
     (let* ((*print-pretty* nil)
@@ -79,12 +86,12 @@
                        `((button :background blue)
                          (span :background red))
                      (:button title)))
-           (css1 (lass:write-sheet
+           (css (lass:write-sheet
                   (apply #'lass:compile-sheet (lass-of button))
                   :pretty nil))
            (extended-css nil))
 
-      (defmethod lass-of :around ((widget (eql button)) &key)
+      (defmethod lass-of :around ((widget (eql button)))
         (concatenate
          'list '((span :background cyan))
          (call-next-method)))
@@ -94,5 +101,5 @@
              (apply #'lass:compile-sheet (lass-of button))
              :pretty nil))
 
-      (true (string= "button{background:blue;}span{background:red;}" css1))
+      (true (string= "button{background:blue;}span{background:red;}" css))
       (true (string= "span{background:cyan;}button{background:blue;}span{background:red;}" extended-css)))))

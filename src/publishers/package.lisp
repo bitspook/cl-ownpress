@@ -1,5 +1,6 @@
 (defpackage #:clown-publishers
   (:use #:cl #:serapeum/bundle #:clown #:40ants-doc)
+  (:import-from #:spinneret :with-html :with-html-string)
   (:import-from #:slug :slugify))
 (in-package #:clown-publishers)
 

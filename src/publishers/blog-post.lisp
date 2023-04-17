@@ -25,6 +25,22 @@
     :documentation "Directory in which generated HTML files will be stored."))
   (:documentation "Publish a blog post."))
 
+(defun publish-html (html slug dir &optional (clean-urls-p t))
+  "Write HTML to a file for SLUG in DIR. If CLEAN-URLS-P is non-nil, the file is
+named SLUG/index.html, otherwise SLUG.html"
+  (let* ((target-dir (path-join dir (if clean-urls-p (concat slug "/") ""))))
+    (ensure-directories-exist target-dir)
+
+    (str:to-file
+     (path-join target-dir (if clean-urls-p "index.html" (concat slug ".html")))
+     html)))
+
+;; css/styles.css is hard-coded for now. I have a few things in mind to how to
+;; publish styles, which I'll make a decision on once this API is put in
+;; production. A few things I have in mind right now:
+;; 1. Make the css-files unique by their content. i.e append a hash obtained
+;; from css content to the file name.
+;; 2. Make the css-file name somehow configurable
 (defmethod publish ((pub blog-post-publisher)
                     &key post layout (clean-urls-p t))
   "Publish blog POST using LAYOUT widget
@@ -33,14 +49,6 @@ LAYOUT must be a WIDGET which accepts the POST as an argument."
     (let* ((html (spinneret:with-html-string
                    (dom-of layout :post post)))
            (slug (slugify (post-title post)))
-           (target-dir (path-join
-                        (publisher-dest pub) base-dir
-                        (if clean-urls-p (concat slug "/") ""))))
+           (all-child-widgets (child-widgets layout)))
 
-      (ensure-directories-exist target-dir)
-
-      (str:to-file
-       (path-join target-dir
-                  (if clean-urls-p "index.html"
-                      (concat slug ".html")))
-       html))))
+      (publish-html html slug (path-join (publisher-dest pub) base-dir) clean-urls-p))))
