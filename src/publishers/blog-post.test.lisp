@@ -9,6 +9,13 @@
 (define-test "bpp.publish" :parent "blog-post-publisher"
   (define-test "uses LAYOUT to create html file for given BLOG-POST in BASE-DIR"
     (cleanup)
+    (defwidget layout (post)
+        `((p :color ,(if post 'red 'blue)))
+      (:h1 (post-title post))
+      (:p (post-description post))
+      (:div
+       (:raw (post-body post))))
+
     (let* ((ass (make-instance
                  'cpub:asset-publisher
                  :dest *test-dir*))
@@ -21,14 +28,8 @@
                   'cpub:blog-post
                   :title "Test"
                   :body "<h1>Testing test.</h1>"
-                  :description "Testing."))
-           (layout (defwidget layout (post)
-                       `((p :color ,(if post 'red 'blue)))
-                     (:h1 (post-title post))
-                     (:p (post-description post))
-                     (:div
-                      (:raw (post-body post))))))
-      (publish pub :post post :layout layout)
+                  :description "Testing.")))
+      (publish pub :post post :layout 'layout)
       (true
        (uiop:file-exists-p
         (path-join *test-dir* "blog/" "test/index.html")))))
@@ -36,6 +37,13 @@
   (define-test "publishes blog posts as <slug>.html files when :CLEAN-URLS-P is nil
 "
     (cleanup)
+    (defwidget layout (post)
+        `((p :color ,(if post 'red 'blue)))
+      (:h1 (post-title post))
+      (:p (post-description post))
+      (:div
+       (:raw (post-body post))))
+
     (let* ((ass (make-instance
                  'cpub:asset-publisher
                  :dest *test-dir*))
@@ -48,14 +56,8 @@
                   'cpub:blog-post
                   :title "Test"
                   :body "<h1>Testing test.</h1>"
-                  :description "Testing."))
-           (layout (defwidget layout (post)
-                       `((p :color ,(if post 'red 'blue)))
-                     (:h1 (post-title post))
-                     (:p (post-description post))
-                     (:div
-                      (:raw (post-body post))))))
-      (publish pub :post post :layout layout :clean-urls-p nil)
+                  :description "Testing.")))
+      (publish pub :post post :layout 'layout :clean-urls-p nil)
       (true
        (uiop:file-exists-p
         (path-join *test-dir* "blog/" "test.html")))))
@@ -69,7 +71,7 @@
                        '((footer :color red))
                      (:footer "Footer")))
            (layout (defwidget layout (post)
-                       `((p :color ,(if post 'red 'blue)))
+                       `((p :color 'red))
                      (:h1 (post-title post))
                      (:p (post-description post))
                      (:div
@@ -78,7 +80,11 @@
       (publish pub :post post :layout layout :clean-urls-p nil)
       (true
        (uiop:file-exists-p
-        (path-join *test-dir* "css/" "styles.css")))))
+        (path-join *test-dir* "css/" "styles.css")))
+      (true
+       (string=
+        (str:from-file (path-join *test-dir* "css/" "styles.css"))
+        "footer{color:red;}p{color:red;}"))))
 
   (define-test "provides ASSET-PUBLISHER to LAYOUT so it can link to published css")
 

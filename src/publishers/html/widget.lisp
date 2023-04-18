@@ -1,68 +1,64 @@
 (in-package :clown-publishers)
 
 (export-always 'widget)
-(export-always 'widget-children)
+(export-always 'set-widget-children)
 (defclass widget ()
-  ((children :initarg :children
-             :initform nil
-             :accessor widget-children
-             ;; TODO: Figure out how to find children of a widget after it is
-             ;; created (i.e from outside defwidget macro). I tried, but my CL
-             ;; skills aren't good enough to figure it out yet. So I am settling
-             ;; for this API for now.
-             :documentation "List of widgets used in the DOM-OF this widget. This list is automatically
-created when using DEFWIDGET to create a widget. But when a WIDGET's dom is modified,
-this list need to be manually modified, or other methods should be used to compensate.
-For example when using `defmethod :around' to add extra html to DOM-OF a WIDGET, either
- add new widgets (if any) to this list, or also extend LASS-OF the WIDGET."))
+  nil
   (:documentation "A widget produces fragments of a web page. You can think of them as Web components.
 A widget is made up of spinneret Dom forms, and lass Css forms. Use `defwidget'
 macro to create a new widget."))
 
 (export-always 'dom-of)
-(defgeneric dom-of (widget &key)
+(defgeneric dom-of (widget)
   (:documentation "Provide spinneret DOM for the WIDGET."))
+(defmethod dom-of ((widget widget)) nil)
 
 (export-always 'lass-of)
 (defgeneric lass-of (widget)
   (:documentation "Provide a list of lass blocks for WIDGET"))
-
-(defmethod dom-of ((widget widget) &key) nil)
-
-(defmethod lass-of ((widget widget))
-  "Last call to `lass-of' a WIDGET provides a list of all the lass blocks that
-belong to children of the WIDGET.
-
-It can be used in the final widget (i.e a widget which makes the entire HTML
-document) to dom-of styles for all the widgets used in it."
-  nil)
-
-(export-always 'children-of)
-(defun children-of (dom)
-  "Walk spinneret DOM to figure out which widgets are used in in it.
-A used widget is determined by a call to `dom-of'."
-  (let ((children nil))
-    (walk-tree
-     (lambda (cell)
-       (when (and (listp cell)
-                  (eq (car cell) 'dom-of))
-         (let ((child (cadr cell)))
-           (when (not (find child children))
-             (push child children)))))
-     dom)
-    children))
+(defmethod lass-of ((widget widget)) nil)
 
 (export-always 'defwidget)
 (defmacro defwidget (name args lass  &body dom)
   "Create a widget (instance of `widget') named NAME.
 ARGS is the arguments received by `dom-of' function."
-  `(let ((,name (make-instance
-                 'widget
-                 :children (children-of ',dom))))
-     (defmethod dom-of ((widget (eql ,name)) &key ,@args)
-       (spinneret:with-html ,@dom))
+  `(progn
+     (defclass ,name (widget)
+       ,(mapcar
+         (lambda (arg) `(,arg :initarg ,(make-keyword arg)))
+         args))
 
-     (defmethod lass-of ((widget (eql ,name)))
-       ,lass)
+     (defmethod dom-of ((widget ,name))
+       (with-slots ,args widget
+         (spinneret:with-html ,@dom)))
 
-     ,name))
+     (defmethod lass-of ((widget ,name))
+       (with-slots ,args widget
+         ,lass))
+
+     ',name))
+
+;; Exporing *render-stack* but not defining it here so users are forced to
+;; define it in lexical-scope when using RENDER.
+(export-always '*render-stack*)
+(export-always 'render)
+;; This is a good place for extension. I'd eventually like to have the ability
+;; to override dom/css/js of any individual widget rendered in an HTML page. To
+;; achieve that, we can add Emacs style hooks which are executed before/after a
+;; widget is rendered/instantiated, so dom/css of not only the class of a
+;; widget, but also that of a particular instance can be manipulated by the end
+;; user.
+(defmacro render (widget &rest args)
+  "Instantiate WIDGET with ARGS, add it to *RENDER-STACK* and return its dom.
+
+Recommended API for:
+1. Obtaining the dom of a widget for generating html
+2. Adding child widget(s)
+
+It adds the instance to *RENDER-STACK*, which can then be used to determine what
+was rendered. This can be useful e.g to determine which widgets' css should be
+generated. Make sure to wrap calls to RENDER in a lexical scope which sets
+*RENDER-STACK*."
+  `(let ((instance (make-instance ,widget ,@args)))
+     (push instance *render-stack*)
+     (dom-of instance)))
