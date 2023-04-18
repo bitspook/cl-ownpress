@@ -64,20 +64,25 @@
 
   (define-test "publishes css used in LAYOUT using asset publisher to css/styles.css"
     (cleanup)
-    (let* ((ass (make-instance 'cpub:asset-publisher :dest *test-dir*))
+    (defwidget footer ()
+        '((footer :color red))
+      (:footer "Footer"))
+
+    (defwidget layout (post)
+        `((p :color red))
+      (:h1 (post-title post))
+      (:p (post-description post))
+      (:div
+       (:raw (post-body post)))
+      (render 'footer)
+      ;; Render footer twice to verify no duplicate CSS is added
+      (render 'footer))
+
+    (let* ((lass::*pretty* nil)
+           (ass (make-instance 'cpub:asset-publisher :dest *test-dir*))
            (pub (make-instance 'cpub:blog-post-publisher :dest *test-dir* :asset-publisher ass :base-dir #p"blog/"))
-           (post (make-instance 'cpub:blog-post :title "Test" :body "<h1>Testing test.</h1>" :description "Testing."))
-           (footer (defwidget footer ()
-                       '((footer :color red))
-                     (:footer "Footer")))
-           (layout (defwidget layout (post)
-                       `((p :color 'red))
-                     (:h1 (post-title post))
-                     (:p (post-description post))
-                     (:div
-                      (:raw (post-body post)))
-                     (dom-of footer))))
-      (publish pub :post post :layout layout :clean-urls-p nil)
+           (post (make-instance 'cpub:blog-post :title "Test" :body "<h1>Testing test.</h1>" :description "Testing.")))
+      (publish pub :post post :layout 'layout :clean-urls-p nil)
       (true
        (uiop:file-exists-p
         (path-join *test-dir* "css/" "styles.css")))

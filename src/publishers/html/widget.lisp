@@ -38,8 +38,8 @@ ARGS is the arguments received by `dom-of' function."
 
      ',name))
 
-;; Exporing *render-stack* but not defining it here so users are forced to
-;; define it in lexical-scope when using RENDER.
+(defparameter *render-stack* nil)
+
 (export-always '*render-stack*)
 (export-always 'render)
 ;; This is a good place for extension. I'd eventually like to have the ability

@@ -63,9 +63,10 @@
     (defwidget button (title) nil
       (:button title))
 
-    (let* ((*print-pretty* nil)
-           (btn (make-instance 'button :title "Lol")))
-      (defmethod dom-of :around ((widget (eql btn)) &key)
+    (defparameter btn (make-instance 'button :title "Lol"))
+
+    (let* ((*print-pretty* nil))
+      (defmethod dom-of :around ((widget (eql btn)))
         (spinneret:with-html
           (:h1 "Heading")
           (call-next-method)
@@ -123,9 +124,9 @@
       (render 'navbar)
       (:p "I am a blog post"))
 
-    (let* ((cpub::*render-stack* nil)
+    (let* ((cpub:*render-stack* nil)
            (*print-pretty* nil)
            (html (with-html-string (render 'post))))
       (true (string= "<nav><button>Click me</button></nav><p>I am a blog post" html))
-      (true (eq 3 (length cpub::*render-stack*)))
-      (true (eq 'button (class-name-of (car cpub::*render-stack*)))))))
+      (true (eq 3 (length cpub:*render-stack*)))
+      (true (eq 'button (class-name-of (car cpub:*render-stack*)))))))

@@ -35,6 +35,29 @@ named SLUG/index.html, otherwise SLUG.html"
      (path-join target-dir (if clean-urls-p "index.html" (concat slug ".html")))
      html)))
 
+(defun publish-render-stack-css (path)
+  "Publish all the css used by *RENDER-STACK* to a file at PATH.
+Duplicate CSS is omitted at widget level. If a widget has 3 instances w1, w2,
+and w3, from which w3's css is customized; w1 and w2 will contribute one css
+fragment, and w3 will contribute another; regardless of how small the change in
+CSS w3 has."
+  (ensure-directories-exist (directory-namestring path))
+
+  (let ((css (mapcar
+              ;; We create CSS strings per-widget, so that we can then do a
+              ;; simple STRING= to remove duplicates. This allow us to keep
+              ;; user's customization done at widget instance level, but still
+              ;; remove duplicates.
+              (op (lass:write-sheet
+                   (apply #'lass:compile-sheet (lass-of _))))
+              *render-stack*)))
+    (str:to-file
+     path
+     (str:join
+      (if lass:*pretty* "\n" "")
+      ;; Remove duplicate CSS.
+      (nub css :test #'string=)))))
+
 ;; css/styles.css is hard-coded for now. I have a few things in mind to how to
 ;; publish styles, which I'll make a decision on once this API is put in
 ;; production. A few things I have in mind right now:
@@ -46,9 +69,15 @@ named SLUG/index.html, otherwise SLUG.html"
   "Publish blog POST using LAYOUT widget
 LAYOUT must be a WIDGET which accepts the POST as an argument."
   (with-slots (base-dir) pub
-    (let* ((html (spinneret:with-html-string
-                   (dom-of layout :post post)))
+    (let* ((*render-stack* nil)
+           (dest (publisher-dest pub))
+           (html (spinneret:with-html-string
+                   (render layout :post post)))
            (slug (slugify (post-title post)))
-           (all-child-widgets (child-widgets layout)))
+           (css-filepath (path-join dest "css/" "styles.css")))
 
-      (publish-html html slug (path-join (publisher-dest pub) base-dir) clean-urls-p))))
+      (publish-html
+       html slug
+       (path-join dest base-dir) clean-urls-p)
+
+      (publish-render-stack-css css-filepath))))
