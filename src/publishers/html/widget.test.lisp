@@ -20,7 +20,7 @@
              "<button>Lol</button>"
              (spinneret:with-html-string (dom-of btn))))))
 
-  (define-test "creates a default implementation for LASS-OF"
+  (define-test "creates a default implementation for LASS-OF and CSS-OF"
     (defwidget button (title)
         `((button :display ,(if title 'flex 'none))
           (span :background red))
@@ -28,8 +28,9 @@
 
     (let* ((btn1 (make-instance 'button :title "Lol"))
            (btn2 (make-instance 'button :title nil))
-           (css1 (lass:write-sheet (apply #'lass:compile-sheet (lass-of btn1)) :pretty nil))
-           (css2 (lass:write-sheet (apply #'lass:compile-sheet (lass-of btn2)) :pretty nil)))
+           (*print-pretty* nil)
+           (css1 (css-of btn1))
+           (css2 (css-of btn2)))
       (true (string= "button{display:flex;}span{background:red;}" css1))
       (true (string= "button{display:none;}span{background:red;}" css2)))))
 
@@ -63,9 +64,8 @@
     (defwidget button (title) nil
       (:button title))
 
-    (defparameter btn (make-instance 'button :title "Lol"))
-
-    (let* ((*print-pretty* nil))
+    (let* ((*print-pretty* nil)
+           (btn (make-instance 'button :title "Lol")))
       (defmethod dom-of :around ((widget (eql btn)))
         (spinneret:with-html
           (:h1 "Heading")

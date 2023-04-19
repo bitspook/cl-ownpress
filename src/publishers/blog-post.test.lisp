@@ -78,7 +78,7 @@
       ;; Render footer twice to verify no duplicate CSS is added
       (render 'footer))
 
-    (let* ((lass::*pretty* nil)
+    (let* ((*print-pretty* nil)
            (ass (make-instance 'cpub:asset-publisher :dest *test-dir*))
            (pub (make-instance 'cpub:blog-post-publisher :dest *test-dir* :asset-publisher ass :base-dir #p"blog/"))
            (post (make-instance 'cpub:blog-post :title "Test" :body "<h1>Testing test.</h1>" :description "Testing.")))

@@ -18,6 +18,14 @@ macro to create a new widget."))
   (:documentation "Provide a list of lass blocks for WIDGET"))
 (defmethod lass-of ((widget widget)) nil)
 
+(export-always 'css-of)
+(defgeneric css-of (widget)
+  (:documentation "Return css string for WIDGET. Uses LASS-OF internally.")
+  (:method ((widget widget))
+    (let ((lass:*pretty* *print-pretty*))
+      (lass:write-sheet
+       (apply #'lass:compile-sheet (lass-of widget))))))
+
 (export-always 'defwidget)
 (defmacro defwidget (name args lass  &body dom)
   "Create a widget (instance of `widget') named NAME.

@@ -43,18 +43,15 @@ fragment, and w3 will contribute another; regardless of how small the change in
 CSS w3 has."
   (ensure-directories-exist (directory-namestring path))
 
-  (let ((css (mapcar
-              ;; We create CSS strings per-widget, so that we can then do a
-              ;; simple STRING= to remove duplicates. This allow us to keep
-              ;; user's customization done at widget instance level, but still
-              ;; remove duplicates.
-              (op (lass:write-sheet
-                   (apply #'lass:compile-sheet (lass-of _))))
-              *render-stack*)))
+  ;; We create CSS strings per-widget, so that we can then do a
+  ;; simple STRING= to remove duplicates. This allow us to keep
+  ;; user's customization done at widget instance level, but still
+  ;; remove duplicates.
+  (let ((css (mapcar #'css-of *render-stack*)))
     (str:to-file
      path
      (str:join
-      (if lass:*pretty* "\n" "")
+      (if *print-pretty* #\NewLine "")
       ;; Remove duplicate CSS.
       (nub css :test #'string=)))))
 
