@@ -29,7 +29,7 @@ macro to create a new widget."))
 (export-always 'defwidget)
 (defmacro defwidget (name args lass  &body dom)
   "Create a widget (instance of `widget') named NAME.
-ARGS is the arguments received by `dom-of' function."
+ARGS is the arguments received by `dom-of' and `lass-of' functions."
   `(progn
      (defclass ,name (widget)
        ,(mapcar
@@ -46,7 +46,8 @@ ARGS is the arguments received by `dom-of' function."
 
      ',name))
 
-(defparameter *render-stack* nil)
+(defparameter *render-stack* nil
+  "A list to keep track of widgets that are getting rendered. This is used/useful to determine which widget's CSS should be included in the final artifact.")
 
 (export-always '*render-stack*)
 (export-always 'render)
@@ -59,7 +60,7 @@ ARGS is the arguments received by `dom-of' function."
 (defmacro render (widget &rest args)
   "Instantiate WIDGET with ARGS, add it to *RENDER-STACK* and return its dom.
 
-Recommended API for:
+This is recommended API for:
 1. Obtaining the dom of a widget for generating html
 2. Adding child widget(s)
 
@@ -70,3 +71,22 @@ generated. Make sure to wrap calls to RENDER in a lexical scope which sets
   `(let ((instance (make-instance ,widget ,@args)))
      (push instance *render-stack*)
      (dom-of instance)))
+
+(export-always 'rendered-css)
+(defun rendered-css ()
+  "Return CSS for all the widgets rendered so far.
+Rendered widgets are determined from *render-stack*."
+  (let ((lass:*pretty* *print-pretty*)
+        ;; This part will get tricky when we add the ability to change css of each individual
+        ;; instance.
+        (unique-widgets
+          (remove-duplicates
+           *render-stack*
+           :test (lambda (a b)
+                   (eql (class-name-of a)
+                        (class-name-of b))))))
+    (mapconcat
+     (lambda (widget)
+       (apply #'lass:compile-and-write (lass-of widget)))
+     unique-widgets
+     (if *print-pretty* #\NewLine ""))))

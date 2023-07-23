@@ -130,3 +130,44 @@
       (true (string= "<nav><button>Click me</button></nav><p>I am a blog post" html))
       (true (eq 3 (length cpub:*render-stack*)))
       (true (eq 'button (class-name-of (car cpub:*render-stack*)))))))
+
+(define-test "rendered-css" :parent "widget"
+  (define-test "return CSS for *all* rendered WIDGETs (parent and children)"
+    (defwidget button (title) '((button :background "blue")) (:button title))
+
+    (defwidget navbar ()
+        '((nav :background "cyan"))
+      (:nav (render 'button :title "Click me")))
+
+    (defwidget post ()
+        '((p :background "parrot"))
+      (render 'navbar)
+      (:p "I am a blog post"))
+
+    (let* ((cpub:*render-stack* nil)
+           (*print-pretty* nil)
+           (html (with-html-string (render 'post)))
+           (css (rendered-css)))
+      (true (string= "<nav><button>Click me</button></nav><p>I am a blog post" html))
+      (true (string= "button{background:blue;}nav{background:cyan;}p{background:parrot;}" css))))
+
+  (define-test "does not add duplicate CSS if a widget is rendered more than once"
+    (defwidget button (title) '((button :background "blue")) (:button title))
+
+    (defwidget navbar ()
+        '((nav :background "cyan"))
+      (:nav (render 'button :title "Click me")
+            (render 'button :title "Click me again")
+            (render 'button :title "Click me once more")))
+
+    (defwidget post ()
+        '((p :background "parrot"))
+      (render 'navbar)
+      (:p "I am a blog post"))
+
+    (let* ((cpub:*render-stack* nil)
+           (*print-pretty* nil)
+           (html (with-html-string (render 'post)))
+           (css (rendered-css)))
+      (true (string= "<nav><button>Click me</button><button>Click me again</button><button>Click me once more</button></nav><p>I am a blog post" html))
+      (true (string= "button{background:blue;}nav{background:cyan;}p{background:parrot;}" css)))))
