@@ -23,7 +23,8 @@
                "xml-emitter"
                "plump"
                "40ants-doc"
-               "cl-slug")
+               "cl-slug"
+               "md5")
   :components ((:module "src"
                 :serial nil
                 :components

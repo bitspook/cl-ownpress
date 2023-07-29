@@ -5,8 +5,8 @@
 (defclass widget ()
   nil
   (:documentation "A widget produces fragments of a web page. You can think of them as Web components.
-A widget is made up of spinneret Dom forms, and lass Css forms. Use `defwidget'
-macro to create a new widget."))
+A widget is made up of spinneret Dom forms and lass Css forms. Use `defwidget' macro to create a new
+widget."))
 
 (export-always 'dom-of)
 (defgeneric dom-of (widget)
@@ -47,7 +47,8 @@ ARGS is the arguments received by `dom-of' and `lass-of' functions."
      ',name))
 
 (defparameter *render-stack* nil
-  "A list to keep track of widgets that are getting rendered. This is used/useful to determine which widget's CSS should be included in the final artifact.")
+  "A list to keep track of widgets that are getting rendered. This is used/useful to determine which
+widget's CSS should be included in the final artifact.")
 
 (export-always '*render-stack*)
 (export-always 'render)

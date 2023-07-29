@@ -15,7 +15,7 @@
   (uiop:delete-directory-tree *test-src-dir* :validate t :if-does-not-exist :ignore))
 
 (define-test "asset-publisher" :parent "Clown publishers"
-  (define-test .publish
+  (define-test "publish"
     (define-test "when CONTENT is a string or stream"
       (define-test "publish CONTENT as a file at PATH"
         (setup)
@@ -81,4 +81,43 @@
             (uiop:with-temporary-file (:pathname temp-file :directory existing-dir)
               (declare (ignore temp-file))
               (fail (cpub:publish *ass* :path "l1/" :content existing-dir)
-                  'cpub:artifact-already-exists))))))))
+                  'cpub:artifact-already-exists)))))
+
+      (define-test "when HASH-ARTIFACT-NAME-P is non-nil"
+        (define-test "throw error if  CONTENT is a path to a directory"
+          (setup)
+          (let ((content-dir (path-join *test-dir* "some-dir/")))
+            (ensure-directories-exist content-dir)
+            (handler-case (cpub:publish *ass* :path "l1" :content content-dir :hash-artifact-name-p t)
+              (error (e)
+                (true (string=
+                       (format nil "~a" e)
+                       "HASH-ARTIFACT-NAME-P can not be used to publish a directory"))))))
+
+        (define-test "include content hash of artifact in published artifact's name"
+          (define-test "when CONTENT is a string"
+            (setup)
+            (let* ((src-filename "css/lol.css")
+                   (content "body{background:red}")
+                   (expected-filename (cpub::append-content-hash
+                                       src-filename
+                                       (md5:md5sum-string content))))
+              (cpub:publish *ass* :path src-filename :content content
+                                  :hash-artifact-name-p t)
+              (true (uiop:file-exists-p (path-join *test-dir* expected-filename)))))
+
+          (define-test "when CONTENT is pathname to a file"
+            (setup)
+            (let* ((src-filename #p"lol.css")
+                   (content "body{background:red}")
+                   (expected-filename (cpub::append-content-hash
+                                       (namestring src-filename)
+                                       (md5:md5sum-string content))))
+              (ensure-directories-exist *test-src-dir*)
+              (str:to-file (path-join *test-src-dir* src-filename) content)
+
+              (cpub:publish *ass* :path (path-join *test-dir* src-filename)
+                                  :content (path-join *test-src-dir* src-filename)
+                                  :hash-artifact-name-p t)
+
+              (true (uiop:file-exists-p (path-join *test-dir* expected-filename))))))))))
