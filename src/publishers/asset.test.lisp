@@ -120,4 +120,17 @@
                                   :content (path-join *test-src-dir* src-filename)
                                   :hash-artifact-name-p t)
 
-              (true (uiop:file-exists-p (path-join *test-dir* expected-filename))))))))))
+              (true (uiop:file-exists-p (path-join *test-dir* expected-filename))))))))
+
+    (define-test "return PATH (relative to DEST) of published artifact"
+      (setup)
+      (let* ((src-filename "css/lol.css")
+             (content "body{background:red}")
+             (expected-filename (cpub::append-content-hash
+                                 src-filename
+                                 (md5:md5sum-string content)))
+             (returned-filename (cpub:publish *ass* :path src-filename :content content
+                                                    :hash-artifact-name-p t)))
+
+        (true (equal (namestring expected-filename)
+                     (namestring returned-filename)))))))

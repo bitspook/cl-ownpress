@@ -24,6 +24,9 @@ on Windows maybe."
          (appendable-hash (str:substring 0 hash-length hash)))
     (str:concat name "-" appendable-hash "." ext)))
 
+;; TODO HASH-ARTIFACT-NAME-P should be a slot of asset-publisher. This means when publishing a
+;; directory, we need to walk the entire directory-tree, and publish each file with its content-hash
+;; appended to its name
 (defmethod publish ((pub asset-publisher) &key path content hash-artifact-name-p)
   "Publish CONTENT as a file at PATH. PATH is a suggestion for where the new file should be created,
 path of the created artifact might differ, for example, asset-publisher might decide to change the
@@ -34,7 +37,8 @@ name of created-artifact in case of a conflict.
   is appended with hash of the content of the artifact
 
 Returns the path of created artifact"
-  (let ((dest (path-join (publisher-dest pub) path)))
+  (let* ((pub-dest (namestring (publisher-dest pub)))
+         (dest (path-join pub-dest path)))
     (when (or (uiop:file-exists-p dest)
               (uiop:directory-exists-p dest))
       (error 'artifact-already-exists :path dest))
@@ -46,16 +50,20 @@ Returns the path of created artifact"
         (when hash-artifact-name-p
           (error "HASH-ARTIFACT-NAME-P can not be used to publish a directory"))
 
-        (return-from publish (copy-dirs content dest)))
+        (return-from publish
+          (progn
+            (copy-dirs content dest)
+            (str:replace-first pub-dest "" (namestring dest)))))
 
       (return-from publish
-        (uiop:copy-file
-         content
-         (if hash-artifact-name-p
-             (append-content-hash (namestring dest) (md5sum-file content))
-             dest))))
+        (let ((dest (if hash-artifact-name-p
+                        (append-content-hash (namestring dest) (md5sum-file content))
+                        dest)))
+          (uiop:copy-file content dest)
+          (str:replace-first pub-dest "" (namestring dest)))))
 
-    (str:to-file (if hash-artifact-name-p
-                     (append-content-hash (namestring dest) (md5sum-string content))
-                     dest)
-                 content)))
+    (let ((dest (if hash-artifact-name-p
+                    (append-content-hash (namestring dest) (md5sum-string content))
+                    dest)))
+      (str:to-file dest content)
+      (str:replace-first pub-dest "" (namestring dest)))))
