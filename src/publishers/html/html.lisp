@@ -17,7 +17,14 @@
           :documentation "Title of the Html page")))
 
 (defmethod publish ((pub html-publisher) &key page-builder root-widget path)
-  "Publish ROOT-WIDGET at PATH using PAGE-RENDERER."
+  "Publish ROOT-WIDGET at PATH using PAGE-BUILDER.
+PAGE-BUILDER gets `css-file' and `html' as keyword arguments. `css-file' is path to the created css
+file. `html' is html string of rendered widgets that should go in `<body>` of the page.
+
+PAGE-BUILDER is a quick-fix for the chicken-and-egg problem of rendering a `widget' to conclude
+what css to render, and needing the rendered css to create css-file with content-hash which should
+then be linked in final html page. I wish we could produce the final HTML from `root-widget' itself
+and not need a `page-builder'."
   (let* ((*render-stack* nil)
          (ass (slot-value pub 'asset-pub)))
 
