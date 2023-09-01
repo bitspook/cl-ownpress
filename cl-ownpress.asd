@@ -90,6 +90,14 @@
   :description "Personal publishing platform"
   :in-order-to ((test-op (test-op "cl-ownpress/tests"))))
 
+(defsystem "cl-ownblog"
+  :author "Charanjit Singh"
+  :license "AGPL-3.0-only"
+  :depends-on (:cl-ownpress)
+  :components ((:module "src/blog"
+                :components ((:file "package"))))
+  :description "A blog implemented using cl-ownpress")
+
 (defsystem "cl-ownpress/tests"
   :author "Charanjit Singh"
   :license "AGPL-3.0-only"
