@@ -1,18 +1,9 @@
 (defpackage clown-providers
-  (:use :cl :serapeum/bundle :40ants-doc)
+  (:use :cl :serapeum/bundle)
   (:export
    provider invoke-provider categorize identify slugify
    org-file-provider denote-provider org-project-provider))
 (in-package :clown-providers)
-
-(defsection @providers (:title "clown-providers")
-  "A provider provides content to be published to a [publisher](/publishers).
-
-Providers can be composed together, to create new providers.
-
-## API
-"
-  (clown-providers package))
 
 (defmacro insert-into (table values &key conflict-cols)
   "Utility to cut some boilerplate to insert a set of values into a table.

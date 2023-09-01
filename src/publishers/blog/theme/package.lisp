@@ -1,6 +1,6 @@
 (defpackage :clown-blog.theme
   (:nicknames :clown-theme)
-  (:use :cl :serapeum/bundle :40ants-doc)
+  (:use :cl :serapeum/bundle)
   (:export defwidget styles-of render compile-and-write-lass-blocks
            with-html-string *debug-transpiles*)
   ;; theme class
@@ -8,19 +8,6 @@
    theme theme-home-template theme-listing-template theme-post-template
    theme-about-me-template theme-project-template theme-projects-listing-template theme-assets-dir))
 (in-package :clown-theme)
-
-(defsection @blog-themes (:title "Blog Theme")
-  "A blog theme decides what shape and form Html for a blog is produced."
-
-  "A theme is represented by:"
-  (theme class)
-
-  "## API"
-  (*debug-transpiles* variable)
-
-  "## Utilities"
-  (compile-and-write-lass-blocks function)
-  (with-html-string macro))
 
 (defvar *debug-transpiles* t
   "Transpiling of HTML/JS/CSS should be done in debug mode i.e without
