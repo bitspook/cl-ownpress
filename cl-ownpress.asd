@@ -41,8 +41,8 @@
                   :serial t
                   :components ((:file "package")
                                (:file "asset")
-                               (:file "html/html")
                                (:file "html/widget")
+                               (:file "html/html")
                                (:file "blog-post")
                                (:file "blog-post-listing")))
 
@@ -55,6 +55,7 @@
                   :serial t
                   :components ((:file "package")
                                (:file "widget")))
+
                  (:module
                   "publishers/blog"
                   :serial t

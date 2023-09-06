@@ -49,16 +49,16 @@
     (defwidget button (title) nil
       (:button title))
 
-    (defparameter btn (make-instance 'button :title "Lol"))
+    (let ((btn (make-instance 'button :title "Lol")))
 
-    (defwidget form () nil
-      (:form (dom-of btn)))
+      (defwidget form () nil
+        (:form (dom-of btn)))
 
-    (let* ((*print-pretty* nil)
-           (frm (make-instance 'form)))
-      (true (string=
-             "<form><button>Lol</button></form>"
-             (spinneret:with-html-string (dom-of frm))))))
+      (let* ((*print-pretty* nil)
+             (frm (make-instance 'form)))
+        (true (string=
+               "<form><button>Lol</button></form>"
+               (spinneret:with-html-string (dom-of frm)))))))
 
   (define-test "allow extending the returned dom"
     (defwidget button (title) nil
@@ -127,7 +127,7 @@
     (let* ((cpub:*render-stack* nil)
            (*print-pretty* nil)
            (html (with-html-string (render 'post))))
-      (true (string= "<nav><button>Click </button></nav><p>I am a blog post" html))
+      (true (string= "<nav><button>Click me</button></nav><p>I am a blog post" html))
       (true (eq 3 (length cpub:*render-stack*)))
       (true (eq 'button (class-name-of (car cpub:*render-stack*))))))
 
@@ -165,7 +165,7 @@
            (*print-pretty* nil)
            (html (with-html-string (render 'post)))
            (css (rendered-css)))
-      (true (string= "<nav><button>Click </button></nav><p>I am a blog post" html))
+      (true (string= "<nav><button>Click me</button></nav><p>I am a blog post" html))
       (true (string= "button{background:blue;}nav{background:cyan;}p{background:parrot;}" css))))
 
   (define-test "does not add duplicate CSS if a widget is rendered more than once"

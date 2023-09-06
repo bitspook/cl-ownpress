@@ -25,8 +25,8 @@ PAGE-BUILDER is a quick-fix for the chicken-and-egg problem of rendering a `widg
 what css to render, and needing the rendered css to create css-file with content-hash which should
 then be linked in final html page. I wish we could produce the final HTML from `root-widget' itself
 and not need a `page-builder'."
-  (let* ((*render-stack* nil)
-         (ass (slot-value pub 'asset-pub)))
+  (let ((*render-stack* nil)
+        (ass (slot-value pub 'asset-pub)))
 
     (push root-widget *render-stack*)
     (let* ((html (with-html-string (dom-of root-widget)))
