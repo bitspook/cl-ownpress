@@ -2,8 +2,6 @@
 
 (use-package :clown-publishers)
 
-(define-test "Clown publishers")
-
 (defparameter *ass* (make-instance 'cpub:asset-publisher
                                    :dest *test-dir*))
 
@@ -14,9 +12,9 @@
   (uiop:delete-directory-tree *test-dir* :validate t :if-does-not-exist :ignore)
   (uiop:delete-directory-tree *test-src-dir* :validate t :if-does-not-exist :ignore))
 
-(define-test "asset-publisher" :parent "Clown publishers"
-  (define-test "publish"
-    (define-test "when CONTENT is a string or stream"
+(define-test "asset-publisher"
+  (define-test "asset-publisher.publish"
+    (define-test "when CONTENT is a string"
       (define-test "publish CONTENT as a file at PATH"
         (setup)
         (cpub:publish *ass* :content "Test" :path "css/styles.scss")

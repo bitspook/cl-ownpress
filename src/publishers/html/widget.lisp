@@ -46,7 +46,7 @@ ARGS is the arguments received by `dom-of' and `lass-of' functions."
 
      ',name))
 
-(defparameter *render-stack* nil
+(defvar *render-stack* nil
   "A list to keep track of widgets that are getting rendered. This is used/useful to determine which
 widget's CSS should be included in the final artifact.")
 

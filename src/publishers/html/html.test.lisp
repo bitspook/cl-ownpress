@@ -26,7 +26,7 @@
 (defun identity-html-builder (&key css-file html)
   (spinneret:with-html (:raw html)))
 
-(define-test "publish" :parent "html-publisher"
+(define-test "html-publisher.publish" :parent "html-publisher"
   (define-test "creates a css file in `dest' named styles-<content-hash>.css"
     (defwidget btn (title)
         '((.button :color red))
@@ -119,14 +119,14 @@
                  :root-widget (make-instance 'root)
                  :path "pages/page.html")
 
-        (true (uiop:file-exists-p (path-join *test-dir* expected-css-file)))
         (true (uiop:file-exists-p (path-join *test-dir* "pages/page.html")))
-        (true (str:from-file (path-join *test-dir* expected-css-file))
-              ".button{color:red;}.nav{color:blue;}body{background:magenta;}")
         (true (str:from-file (path-join *test-dir* "pages/page.html"))
               (format nil "<html lang=en><head><meta charset=UTF-8>~
                            <title>Test page</title>~
-                           <link href=styles-9F61EA.css>~
+                           <link href=~a>~
                            </head><body>~
                            <div><nav><button>Rofl</button></nav>~
-                           </div></body></html>"))))))
+                           </div></body></html>" expected-css-file))
+        (true (uiop:file-exists-p (path-join *test-dir* expected-css-file)))
+        (true (str:from-file (path-join *test-dir* expected-css-file))
+              ".button{color:red;}.nav{color:blue;}body{background:magenta;}")))))

@@ -29,7 +29,6 @@ and not need a `page-builder'."
          (ass (slot-value pub 'asset-pub)))
 
     (push root-widget *render-stack*)
-
     (let* ((html (with-html-string (dom-of root-widget)))
            (css-file (publish ass :path #p"styles.css"
                               :content (rendered-css)
