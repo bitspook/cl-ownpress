@@ -42,9 +42,7 @@
                   :components ((:file "package")
                                (:file "asset")
                                (:file "html/widget")
-                               (:file "html/html")
-                               (:file "blog-post")
-                               (:file "blog-post-listing")))
+                               (:file "html/html")))
 
                  (:module "publishers/journey"
                   :serial t
@@ -99,7 +97,6 @@
                 :components
                 ((:file "publishers/asset.test")
                  (:file "publishers/html/html.test")
-                 (:file "publishers/html/widget.test")
-                 (:file "publishers/blog-post.test"))))
+                 (:file "publishers/html/widget.test"))))
   :description "Test system for cl-ownpress"
   :perform (test-op (op c) (symbol-call :parachute :test :cl-ownpress/tests)))

@@ -10,12 +10,6 @@
 (Although it is named `html-publisher', it publishes both Html and Css files. It's called
 `html-publisher' because HTML is the primary artifact.)"))
 
-(export-always 'html-page)
-(defclass html-page ()
-  ((title :initarg :title
-          :accessor :html-page-title
-          :documentation "Title of the Html page")))
-
 (defmethod publish ((pub html-publisher) &key page-builder root-widget path)
   "Publish ROOT-WIDGET at PATH using PAGE-BUILDER.
 PAGE-BUILDER gets `css-file' and `html' as keyword arguments. `css-file' is path to the created css
