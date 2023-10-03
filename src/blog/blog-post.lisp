@@ -13,6 +13,10 @@
   ((title :initarg :title
           :initform (error "Post `title` is required")
           :accessor post-title)
+   (slug :initarg :slug
+         :accessor post-slug
+         :initform nil
+         :documentation "Url-fragment for this blob post. Defaults to `(slugify title)`")
    (description :initarg :description
                 :initform (error "Post `description` is required")
                 :accessor post-description)
@@ -31,6 +35,12 @@
    (author :initarg :author
            :initform (error "Post `author` is required")
            :accessor post-author)))
+
+(defmethod initialize-instance :after ((post blog-post) &rest initargs &key)
+  "Set default value for post-slug."
+  (declare (ignorable initargs))
+  (when (not (post-slug post))
+    (setf (post-slug post) (slugify (post-title post)))))
 
 (export-always 'blog-post-publisher)
 (defclass blog-post-publisher (html-publisher)
@@ -54,9 +64,8 @@
                     &key post layout)
   "Publish blog POST using LAYOUT widget
 LAYOUT must be a WIDGET which accepts the POST as an argument."
-  (with-slots (title) post
-    (let* ((slug (slugify title))
-           (html-path (path-join (str:concat slug "/") "index.html")))
+  (with-slots (title slug) post
+    (let* ((html-path (path-join (str:concat slug "/") "index.html")))
       (call-next-method pub
                         :page-builder (blog-post-page-builder post)
                         :root-widget layout

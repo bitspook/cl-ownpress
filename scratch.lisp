@@ -8,6 +8,7 @@
                               :handles '(("Mastodon" "bitspook" "https://infosec.exchange/@bitspook"))))
        (post (make-instance 'blog-post
                             :title "Test Title"
+                            :slug "best-title"
                             :description "Just trying to publish a dummy post"
                             :created-at (local-time:today)
                             :updated-at "2023-09-11"
