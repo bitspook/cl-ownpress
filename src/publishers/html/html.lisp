@@ -33,3 +33,43 @@ and not need a `page-builder'."
       ;; only for css/js. Do this when asset-publisher has been updated to configure hash-in-name
       ;; setting at instance level instead of function call level.
       (publish ass :path path :content html))))
+
+(export-always '*lass-tags*)
+(defparameter *lass-tags*
+  '((:sm "(max-width: 640px)" media-query)
+    (:md "(max-width: 768px)" media-query)
+    (:lg "(max-width: 1024px)" media-query)
+    (:xl "(max-width: 1280px)" media-query)
+    (:2xl "(max-width: 1536px)" media-query)
+    (:dark ".dark" selector))
+  "mobile-first tags can be used to define breakpoints and other media queries to ergonomically add
+specialized lass using MOBILE-FIRST-LASS.")
+
+(defun apply-lass-tags (tag-labels styles)
+  "Apply TAG-LABELS *LASS-TAGS* with STYLES to create final Lass."
+  (let* ((tags (mapcar (op (assoc _ *mobile-first-tags*)) tag-labels))
+         (m-queries
+           (str:join
+            " or "
+            (mapcar
+             #'second
+             (remove-if-not (op (eq (third _) 'media-query)) tags))))
+         (selectors (str:join " " (mapcar #'second (remove-if-not (op (eq (third _) 'selector)) tags))))
+         (l2-lass (if (str:emptyp selectors) styles
+                      `((,selectors ,@styles))))
+         (l1-lass (if (str:emptyp m-queries) l2-lass
+                      `((:media ,m-queries ,@l2-lass)))))
+    (car l1-lass)))
+
+(export-always 'tagged-lass)
+(defun tagged-lass (&rest styles)
+  "Ergonomically add Lass for different cases based on *LASS-TAGS*."
+  (let ((lass nil)
+        (tag-labels nil))
+    (loop :for style :in styles
+          :do (if (keywordp style)
+                  (push style tag-labels)
+                  (progn
+                    (push (apply-lass-tags tag-labels style) lass)
+                    (setf tag-labels nil))))
+    (concatenate 'list lass)))
