@@ -81,11 +81,12 @@ Rendered widgets are determined from *render-stack*."
         ;; This part will get tricky when we add the ability to change css of each individual
         ;; instance.
         (unique-widgets
-          (remove-duplicates
-           *render-stack*
-           :test (lambda (a b)
-                   (eql (class-name-of a)
-                        (class-name-of b))))))
+          (nreverse
+           (remove-duplicates
+            *render-stack*
+            :test (lambda (a b)
+                    (eql (class-name-of a)
+                         (class-name-of b)))))))
     (mapconcat
      (lambda (widget)
        (apply #'lass:compile-and-write (lass-of widget)))
