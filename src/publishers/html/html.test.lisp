@@ -130,3 +130,44 @@
         (true (uiop:file-exists-p (path-join *test-dir* expected-css-file)))
         (true (str:from-file (path-join *test-dir* expected-css-file))
               ".button{color:red;}.nav{color:blue;}body{background:magenta;}")))))
+
+(define-test "tagged-lass" :parent "html-publisher"
+  (define-test "returns top-level lass-forms as-is"
+      (let ((lass:*pretty* nil))
+        (true
+         (equal
+          (let ((lass:*pretty* nil))
+            (apply #'lass:compile-and-write
+                   (tagged-lass
+                    '((body :background blue)
+                      (p :margin 10px)))))
+          "body{background:blue;}p{margin:10px;}"))))
+
+  (define-test "returns lass-forms immediately following a tag with specifier applied"
+      (let ((lass:*pretty* nil))
+        (true
+         (equal
+          (let ((lass:*pretty* nil)
+                (*lass-tags* '((:md "(min-width: 0px)" :media-query))))
+            (apply #'lass:compile-and-write
+                   (tagged-lass
+                    '((body :background blue)
+                      (p :margin 10px))
+                    :md '((body :background red)
+                          (p :margin 0)))))
+          "@media (min-width: 0px){body{background:red;}p{margin:0;}}body{background:blue;}p{margin:10px;}"))))
+
+  (define-test "returns lass-forms immediately following a multiple-tags with specifier applied"
+      (true
+       (equal
+        (let ((lass:*pretty* nil)
+              (*lass-tags* '((:md "(min-width: 0px)" :media-query)
+                             (:sm "(min-width: 10px)" :media-query))))
+          (apply #'lass:compile-and-write
+                 (tagged-lass
+                  '((body :background blue)
+                    (p :margin 10px))
+
+                  :md :sm '((body :background red)
+                            (p :margin 0)))))
+        "@media (min-width: 10px) or (min-width: 0px){body{background:red;}p{margin:0;}}body{background:blue;}p{margin:10px;}"))))
