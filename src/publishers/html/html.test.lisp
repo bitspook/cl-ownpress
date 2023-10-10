@@ -38,7 +38,7 @@
             (render 'btn :title "Roflmao")))
 
     (let* ((src-filename "styles.css")
-           (content ".button{color:red;}.nav{color:blue;}")
+           (content ".nav{color:blue;}.button{color:red;}")
            (expected-filename (cpub::append-content-hash
                                src-filename
                                (md5:md5sum-string content)))
@@ -51,7 +51,7 @@
 
       (true (uiop:file-exists-p (path-join *test-dir* expected-filename)))
       (true (str:from-file (path-join *test-dir* expected-filename))
-            ".button{color:red;}.nav{color:blue;}")))
+            ".nav{color:blue;}.button{color:red;}")))
 
   (define-test "creates html file at given PATH relative to DEST"
     ;; Simple widget
@@ -99,7 +99,7 @@
         (:div (render 'nav)))
 
       (let* ((src-filename "styles.css")
-             (content ".button{color:red;}.nav{color:blue;}body{background:magenta;}")
+             (content "body{background:magenta;}.nav{color:blue;}.button{color:red;}")
              (expected-css-file (cpub::append-content-hash
                                  src-filename
                                  (md5:md5sum-string content)))
@@ -129,7 +129,7 @@
                            </div></body></html>" expected-css-file))
         (true (uiop:file-exists-p (path-join *test-dir* expected-css-file)))
         (true (str:from-file (path-join *test-dir* expected-css-file))
-              ".button{color:red;}.nav{color:blue;}body{background:magenta;}")))))
+              "body{background:magenta;}.nav{color:blue;}.button{color:red;}")))))
 
 (define-test "tagged-lass" :parent "html-publisher"
   (define-test "returns top-level lass-forms as-is"

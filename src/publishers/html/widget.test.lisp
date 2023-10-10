@@ -166,7 +166,7 @@
            (html (with-html-string (render 'post)))
            (css (rendered-css)))
       (true (string= "<nav><button>Click me</button></nav><p>I am a blog post" html))
-      (true (string= "button{background:blue;}nav{background:cyan;}p{background:parrot;}" css))))
+      (true (string= "p{background:parrot;}nav{background:cyan;}button{background:blue;}" css))))
 
   (define-test "does not add duplicate CSS if a widget is rendered more than once"
     (defwidget button (title) '((button :background "blue")) (:button title))
@@ -187,4 +187,4 @@
            (html (with-html-string (render 'post)))
            (css (rendered-css)))
       (true (string= "<nav><button>Click me</button><button>Click me again</button><button>Click me once more</button></nav><p>I am a blog post" html))
-      (true (string= "button{background:blue;}nav{background:cyan;}p{background:parrot;}" css)))))
+      (true (string= "p{background:parrot;}nav{background:cyan;}button{background:blue;}" css)))))
