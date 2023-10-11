@@ -4,6 +4,8 @@
   :depends-on (:cl-ownpress)
   :components ((:module "src/blog"
                 :components ((:file "package")
+                             (:file "modern-normalize")
+                             (:file "pollen")
                              (:file "blog-post")
                              (:module "widgets"
                               :components ((:file "navbar")
