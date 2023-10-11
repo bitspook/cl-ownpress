@@ -71,7 +71,7 @@ specialized lass using MOBILE-FIRST-LASS.")
                   (push style tag-labels)
                   (progn
                     (if tag-labels
-                        (push (apply-lass-tags tag-labels style) lass)
+                        (push (apply-lass-tags tag-labels style) (cdr (last lass)))
                         (setf lass (concatenate 'list lass style)))
                     (setf tag-labels nil))))
     (concatenate 'list lass)))

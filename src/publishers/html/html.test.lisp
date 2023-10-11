@@ -155,7 +155,7 @@
                       (p :margin 10px))
                     :md '((body :background red)
                           (p :margin 0)))))
-          "@media (min-width: 0px){body{background:red;}p{margin:0;}}body{background:blue;}p{margin:10px;}"))))
+          "body{background:blue;}p{margin:10px;}@media (min-width: 0px){body{background:red;}p{margin:0;}}"))))
 
   (define-test "returns lass-forms immediately following a multiple-tags with specifier applied"
       (true
@@ -170,4 +170,4 @@
 
                   :md :sm '((body :background red)
                             (p :margin 0)))))
-        "@media (min-width: 10px) or (min-width: 0px){body{background:red;}p{margin:0;}}body{background:blue;}p{margin:10px;}"))))
+        "body{background:blue;}p{margin:10px;}@media (min-width: 10px) or (min-width: 0px){body{background:red;}p{margin:0;}}"))))
