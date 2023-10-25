@@ -9,10 +9,12 @@
        :padding (var --size-4)
        :margin (var --scale-2) 0
 
-       (h1 :font-size (var --scale-5)
+       (h1 :font-family (var --font-title)
+           :font-size (var --scale-6)
            :margin-bottom (var --scale-0))
 
-       (.meta :color (var --color-grey-500))
+       (.meta :color (var --color-grey-500)
+              :font-size (var --scale-0))
 
        (.meta-item :display inline)
 
@@ -23,10 +25,11 @@
 
               (.tag
                :display inline-block
-               :padding-right (var --size-3)
-               :font-size (var --scale-1)))))
+               :padding-right (var --size-3)))))
 
-     (.post-body :padding (var --size-4)))))
+     (.post-body :padding 0 (var --size-4)
+                 :font-size (var --scale-1)
+                 :line-height (var --line-md)))))
 
 (defwidget blog-post-w (post)
     (bp-lass)
