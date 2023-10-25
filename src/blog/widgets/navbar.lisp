@@ -1,49 +1,48 @@
 (in-package #:cl-ownblog)
 
-(defwidget navbar-w () nil
+(defparameter navbar-lass
+  (tagged-lass
+   `((.top-nav
+      :min-height (var --size-16)
+      :display flex
+      :padding (var --size-2)
+      :flex-direction column
+      :position relative
+      :justify-content space-between
+
+      (.brand
+       :width (var --size-16)
+       :height (var --size-16)
+       :align-self center
+       :flex-grow 1
+
+       (img :width (var --size-16)))
+
+      (ul.nav
+       :list-style-type none
+       :padding 0
+       :display flex
+       :flex-wrap wrap
+       :justify-content center
+       :align-items center
+
+       (li :padding 0 (var --size-4) (var --size-4)))))
+
+   :sm  `((.top-nav
+           :padding-right 1em
+           :flex-direction row
+
+           (a :font-size 1em)
+
+           (ul.nav (li :padding 0 (var --size-4)))))))
+
+(defwidget navbar-w (links) navbar-lass
   (:nav :class "top-nav"
         (:div :class "brand"
               (:a :href "/"
                   (:img :class "brand-avatar"
-                        :src "/images/avatar.png"
+                        :src "/images/spooky-avatar.png"
                         :alt "Brand")))
-        (:div
-         (:ul (:li (:a :href "/blog" "Blog"))
-              (:li (:a :href "/poems" "Poems"))
-              (:li (:a :href "/projects" "Projects"))))))
-
-(defmethod lass-of ((w navbar-w))
-  (tagged-lass
-   `((.top-nav
-      :height 90px
-      :display flex
-      :position relative
-      :justify-content space-between
-
-      (ul :list-style-type none
-          :display flex
-          :align-items center
-          :padding 2em 0)
-
-      (li :flex-grow 1
-          :padding-right 2em
-
-          (a :text-decoration underline
-             :font-family Roboto sans-serif
-             :color "#000")
-
-          ("a:hover" :color "#444"))
-
-      ("li:last-child" :padding 0)
-
-      (.brand :width 60px
-              :height 60px
-              :align-self center
-              :flex-grow 1)
-
-      (.brand-avatar :height 100%)))
-
-   :sm `((.top-nav :padding-right 1em
-                   (a :font-size 1.4em)))
-
-   :dark `((.top-nav (ul (li (a :color red)))))))
+        (:ul :class "nav"
+             (loop :for link :in links
+                   :do (:li (:a :href (second link) (first link)))))))

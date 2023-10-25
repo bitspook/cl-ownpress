@@ -57,7 +57,9 @@
         (spinneret:with-html
           (:html
            (:head (:title title)
-                  (:link :rel "stylesheet" :href (str:concat "/" css-file)))
+                  (:meta :name "viewport" :content "width=device-width, initial-scale=1")
+                  (:link :rel "stylesheet" :href (str:concat "/" css-file))
+                  (:script :src "/js/app.js"))
            (:body (:raw html)))))))
 
 (defmethod publish ((pub blog-post-publisher)

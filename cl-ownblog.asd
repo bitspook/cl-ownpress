@@ -6,6 +6,7 @@
                 :components ((:file "package")
                              (:file "modern-normalize")
                              (:file "pollen")
+                             (:file "global-lass")
                              (:file "blog-post")
                              (:module "widgets"
                               :components ((:file "navbar")
