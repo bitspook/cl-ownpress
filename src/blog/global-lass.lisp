@@ -99,10 +99,22 @@
 
      ((:or code kbd samp pre)
       :font-size (var --scale-0)
+      :padding (var --size-1)
       :font-family (var --font-mono)
       :background-color (var --color-grey-200)
       :border 1px solid (var --color-grey-300)
       :border-radius (var --radius-xs)))
 
    :dark `((body :color (var --color-grey-300)
-                 :background (var --color-grey-900)))))
+                 :background (var --color-grey-900))
+
+           (a :color (var --color-grey-300))
+
+           ((:or code kbd samp pre)
+            :background-color (var --color-grey-800)
+            :border 1px solid (var --color-grey-900)
+            :border-radius (var --radius-xs))
+
+           ((:or input textarea)
+            :background-color (var --color-grey-700)
+            :color inherit))))

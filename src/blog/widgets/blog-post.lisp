@@ -29,7 +29,10 @@
 
      (.post-body :padding 0 (var --size-4)
                  :font-size (var --scale-1)
-                 :line-height (var --line-md)))))
+                 :line-height (var --line-md)))
+
+   :lg `((.content :max-width (var --width-lg)
+                   :margin 0 auto))))
 
 (defwidget blog-post-w (post)
     (bp-lass)
