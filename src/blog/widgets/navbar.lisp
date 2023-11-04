@@ -41,7 +41,7 @@
         (:div :class "brand"
               (:a :href "/"
                   (:img :class "brand-avatar"
-                        :src "/images/spooky-avatar.png"
+                        :src "/images/avatar.png"
                         :alt "Brand")))
         (:ul :class "nav"
              (loop :for link :in links

@@ -4,6 +4,7 @@
 
 (defun build-test-blog ()
   (let* ((www #p"/tmp/www/")
+         (static (asdf:system-relative-pathname :cl-ownblog "src/blog/static/"))
          (author (make-instance 'persona
                                 :name "Charanjit Singh"
                                 :handles '(("Mastodon" "bitspook" "https://infosec.exchange/@bitspook"))))
@@ -15,7 +16,7 @@
                               :updated-at (local-time:today)
                               :author author
                               :tags '("test" "post" "is" "still" "just" "a" "post")
-                              :body (str:from-file "~/Downloads/test.html")))
+                              :body (str:from-file (path-join static "test.html"))))
          (root-w (make-instance 'blog-post-w :post post))
          (asset-pub (make-instance 'asset-publisher
                                    :dest www))
@@ -24,8 +25,10 @@
                                   :dest www)))
 
     (uiop:delete-directory-tree www :validate t :if-does-not-exist :ignore)
-    (publish asset-pub :content #p"~/Documents/work/bitspook.github.io/static/")
+    (publish asset-pub :content static)
     (publish post-pub :post post :layout root-w)))
+
+(build-test-blog)
 
 ;; quick hack to auto-build
 ;; elisp
