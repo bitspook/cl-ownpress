@@ -1,10 +1,9 @@
 * Cl-ownpress 
 
 #+begin_quote
-⚠️ Published documentation might be lying. I am in middle of re-doing the
-architecture (including the public API) of cl-ownpress, and am doing docs-first
-test-driven development. Once I am happy with it, I will create a 1.0 release
-and do future releases in release branches.
+⚠️ Published documentation might be lying. I am in middle of re-doing the architecture (including the
+public API) of cl-ownpress, and am doing docs-first test-driven development. Once I am happy with
+it, I will create a 1.0 release and do future releases in release branches.
 #+end_quote
 
 #+begin_quote
@@ -14,9 +13,9 @@ and do future releases in release branches.
 Practically, cl-ownpress is a static site generator.
 
 Theoretically, its primary objective is to
+
 #+begin_quote
-Give hackers the ability to publish their content while maintaining its
-ownership.
+Give hackers the ability to publish their content while maintaining its ownership.
 #+end_quote
 
 ** Goals
@@ -32,24 +31,21 @@ ownership.
 
 3. Just-works user experience
 
-   Although cl-ownpress primarily targets software hackers, that does not mean
-   it gets to ignore user-experience. Only using the software (i.e without any
-   desire to hack it further) should achieve the "just works" standard.
+   Although cl-ownpress primarily targets software hackers, that does not mean it gets to ignore
+   user-experience. Only using the software (i.e without any desire to hack it further) should
+   achieve the "just works" standard.
 
 4. Content ownership
 
-   As users of the internet, we publish a lot of content on the web. It almost
-   always end up on a walled platform, at the mercy of someone-not-you's whims.
-   Cl-ownpress should make effort to bring ownership of user's published content
-   back to user.
+   As users of the internet, we publish a lot of content on the web. It almost always end up in a
+   walled platform, at the mercy of someone-not-you's whims. Cl-ownpress should bring ownership of
+   user's published content back to user.
 
 ** Current state
 
-I am using cl-ownpress to create [[https://bitspook.in/][my personal website]]. You can follow [[https://infosec.exchange/@bitspook/109353596205512997][this thread on infosec.exchange]]
-if you're interested in see me build it publicly.
+I am using cl-ownpress to create [[https://bitspook.in/][my personal website]].
 
-Right now cl-ownpress is
-moving forward to allow me achieve my desired publishing workflow.
+Right now cl-ownpress is moving forward to allow me achieve my desired publishing workflow.
 
 - Publish with full power of Emacs
   
@@ -95,11 +91,10 @@ moving forward to allow me achieve my desired publishing workflow.
   *Status*: TODO
   #+end_quote
 
-- Publish my tweets
+- Publish my toots
 
-  Tweeting is convenient, I want my tweets published as micro-posts on my blog
-  until I can turn it around and build a mobile app to publish my micro-blog
-  posts on mastodon/twitter instead.
+  Tooting is convenient, I want my tweets published as micro-posts on my blog until I can turn it
+  around and start publishing my micro-blog posts on mastodon instead.
 
   #+begin_quote
   *Status*: TODO
@@ -107,12 +102,11 @@ moving forward to allow me achieve my desired publishing workflow.
 
 - Publish discussions from other platforms
 
-  Often, a lot of value can be found in the discussions that a piece of content
-  births on platforms like Hacker News and Reddit. I want these tracked and
-  presented with the published content itself.
+  Often, a lot of value can be found in the discussions that a piece of content births on platforms
+  like Hacker News and Reddit. I want these tracked and presented with the published content itself.
 
-  I am still debating whether the discussions themselves should also be
-  retrieved and published along with the content.
+  I am still debating whether the discussions themselves should also be retrieved and published
+  along with the content.
 
   #+begin_quote
   *Status*: TODO
@@ -120,44 +114,58 @@ moving forward to allow me achieve my desired publishing workflow.
 
 - Publish my personal growth
 
-  This is one of the trickiest, and most unclear things I want to achieve on my
-  personal site. I am letting it stay in the back of my head and brew for now.
+  This is one of the trickiest, and most unclear things I want to achieve on my personal site. I am
+  letting it stay in the back of my head and brew for now.
 
   #+begin_quote
   *Status*: TODO
   #+end_quote
 
-
 * Software Architecture
 
-Clownpress itself is not much more than a collection of utilities. It provides
-some convenient constructs to achieve its goals, but bulk of the work is done by
-its various components.
+Cl-ownpress enables building [[https://en.wikipedia.org/wiki/Extract,_transform,_load][ETL]] pipeline meant for publishing content. It enable a very simple
+use-case:
 
-1. Provider
+1. Extract data from multiple sources. e.g. from a [[https://protesilaos.com/emacs/denote][Denote]] direcotry
+2. Transform, enhance and collect it e.g collect e.g enhance collected notes with more information
+   to create instances of =blog-post=
+3. Use it to publish artifacts e.g convert =blog-post='s to HTML+CSS+JS+Image files
 
-   A provider provides content. It reaches the source, collect, sanitize and
-   stores the content hacker wants ownership on. For example =*fs-provider*=
-   allows the ability to provide blog posts saved as text files on hacker's
-   file-system.
+Core concepts
 
-2. Publisher
+1. =Provider=
 
-   A publisher converts saved content into publishable assets. To publish
-   something has a very vague meaning, and that is intentional. e.g a publisher
-   might create a complete blog website ready to be shared online.
+   A provider provides content. It reaches the source, collect, sanitize and stores the content in a
+   way which loses as little information from the source as possible. =Provider=-s are specialized
+   for the source, not the destination. For example, A =DenoteNote= should represents a note, not a
+   blog post which can be created using it.
 
-** Why sqlite?
+2. =Publishable=
 
-- For momentum. Things sqlite is being used for right now can very well be done
-  without it, but it'll take work.
-- For prototyping. I have some ideas I want to explore, and sqlite requires
-  minimum amount of work to do that.
-- To maintain a snapshot of content to be published, since the source of content
-  might not be available all the time, or is costly to retrieve. (This could
-  also be done by creating new files on filesystem though, I am still debating
-  whether that should be the way to go)
-  
-Once I have a good hold on the scope of the project, we'll revisit the decision
-of having a database file, or operate only on files in filesystem to build a
-form of in-memory database every time.
+   Anything that inherits from =Publishable= class is meant to be published. A =Publishable=
+   satisfies certain constraints:
+
+   1. =uri=
+
+      Every =Publishable= has a universal resource identifier, where universe is the current
+      publishing session. It is called a =URI= instead of ID or UUID because:
+      
+      1. It should human readable
+      2. It should be a UNIX path
+
+      =uri= deterministically decides where a =Publishable= shall be published to. 
+
+   A =Publishable= can be converted from data provided by a =Provider=, or a =Provider= might choose
+   to directly produce =Publishable=-s.
+
+3. =Publisher=
+
+   A publisher publishes the =Publishable=-s to produce final results. It might be a HTML page, a
+   ledger file, or a complete website.
+
+   Data provided by a single provider might produce multiple =Publishable=-s, which get published by
+   multiple =Publisher=-s.
+
+   
+   
+
