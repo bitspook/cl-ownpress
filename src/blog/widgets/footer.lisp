@@ -1,4 +1,4 @@
-(in-package #:cl-ownblog)
+(in-package #:in.bitspook.cl-ownblog)
 
 (defwidget footer-w (post) nil
   (with-slots (author) post

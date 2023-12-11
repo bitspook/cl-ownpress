@@ -1,4 +1,4 @@
-(in-package #:cl-ownblog)
+(in-package #:in.bitspook.cl-ownblog)
 
 ;; https://github.com/sindresorhus/modern-normalize
 (defparameter normalize-lass

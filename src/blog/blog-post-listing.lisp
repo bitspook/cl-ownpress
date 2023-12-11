@@ -1,4 +1,4 @@
-(in-package #:clown-publishers)
+(in-package #:in.bitspook.cl-ownblog)
 
 (defclass blog-post-listing-publisher (html-publisher)
   ((asset-publisher :initform (error "Not implemented"))

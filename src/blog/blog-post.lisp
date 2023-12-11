@@ -1,4 +1,4 @@
-(in-package #:cl-ownblog)
+(in-package #:in.bitspook.cl-ownblog)
 
 (export-always 'persona)
 (defclass persona ()

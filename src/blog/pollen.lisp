@@ -1,4 +1,4 @@
-(in-package #:cl-ownblog)
+(in-package #:in.bitspook.cl-ownblog)
 
 (defparameter pollen-vars
   '(:--scale-0 1rem

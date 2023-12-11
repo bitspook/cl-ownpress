@@ -1,4 +1,4 @@
-(in-package :clown)
+(in-package #:in.bitspook.cl-ownpress)
 
 (defun join-paths (&rest frags)
   "Join FRAGS together with `/` ensuring to add `/` b/w FRAGS only if necessary."
@@ -19,7 +19,7 @@
            f))))
 
 (defun system-local (path)
-  (namestring (asdf:system-relative-pathname "cl-ownpress" path)))
+  (namestring (asdf:system-relative-pathname "in.bitspook.cl-ownpress" path)))
 
 (defun recursive-directory-files (start-dir)
   (let ((files (uiop:directory-files start-dir))
