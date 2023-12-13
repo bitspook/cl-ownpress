@@ -13,3 +13,7 @@
 (defmethod identify ((obj identifiable))
   "Default implementation for IDENTIFIABLE objects. Returns value of ID slot."
   (slot-value obj 'id))
+
+(export-always 'provide-all)
+(defgeneric provide-all (obj &rest args)
+  (:documentation "Every provider should have a PROVIDE-ALL."))

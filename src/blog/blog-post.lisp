@@ -42,6 +42,20 @@
   (when (not (post-slug post))
     (setf (post-slug post) (slugify (post-title post)))))
 
+(defmethod from ((obj denote-file) (to (eql 'blog-post)))
+  (with-accessors ((id denote-file-id)
+                   (metadata denote-file-metadata)
+                   (body denote-file-body-html))
+      obj
+    (make 'blog-post
+          :title (@ metadata "title")
+          :tags (@ metadata "tags")
+          :created-at (local-time:parse-timestring (@ metadata "date") :date-time-separator #\Space)
+          :updated-at (local-time:parse-timestring (@ metadata "date") :date-time-separator #\Space)
+          :body body
+          :description ""
+          :author (make 'persona :name "Unknown"))))
+
 (export-always 'blog-post-publisher)
 (defclass blog-post-publisher (html-publisher)
   ((asset-pub
