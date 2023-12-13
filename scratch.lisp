@@ -31,5 +31,5 @@
 ;; quick hack to auto-build
 ;; elisp
 ;; (defun build-blog (successp notes buffer loadp)
-;;   (sly-eval '(cl-ownblog::build-test-blog) "cl-ownblog"))
+;;   (sly-eval '(in.bitspook.cl-ownblog::build-test-blog) "cl-ownblog"))
 ;; (add-hook 'sly-compilation-finished-hook #'build-blog)
