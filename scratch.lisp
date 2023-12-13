@@ -2,10 +2,9 @@
 
 (in-package :in.bitspook.cl-ownblog)
 
-(defparameter *notes* nil)
-
-(let ((notes-provider (make-instance 'denote-provider)))
-  (setf *notes* (provide-all notes-provider)))
+(defparameter *notes*
+  (let ((notes-provider (make-instance 'denote-provider)))
+    (provide-all notes-provider)))
 
 (defun build-test-blog ()
   (let* ((www #p"/tmp/www/")
@@ -17,7 +16,7 @@
                                    :dest www))
          (post-pub (make-instance 'blog-post-publisher
                                   :asset-pub asset-pub
-                                  :dest www)))
+                                  :dest (path-join www "blog/"))))
 
     (uiop:delete-directory-tree www :validate t :if-does-not-exist :ignore)
     (publish asset-pub :content static)
