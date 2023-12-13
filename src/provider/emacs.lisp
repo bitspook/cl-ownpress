@@ -1,5 +1,7 @@
 (in-package #:in.bitspook.cl-ownpress/provider)
 
+(export-always 'emacs-provider)
+(export-always 'script)
 (defclass emacs-provider ()
   ((script :initarg :script
            :initform (error ":script is required")
@@ -20,7 +22,7 @@ emitted from Emacs script, until message of type :done is emitted."
         (:case event (push msg events))
         (:finally done (declare (ignore msg)) t)
         (uiop:run-program (format nil "emacsclient -e '(load \"~a\")' ~
-                                       '(main (list ~{\"~a\" ~}))'"
+                                       '(main ~{\"~a\" ~})'"
                                   script script-args)
                           :output *standard-output*
                           :error-output *standard-output*)))

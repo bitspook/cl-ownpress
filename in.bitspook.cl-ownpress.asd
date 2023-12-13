@@ -27,8 +27,7 @@
                   :serial t
                   :components ((:file "package")
                                (:file "rpc-server")
-                               (:file "emacs")
-                               (:file "denote")))
+                               (:file "emacs")))
 
                  (:module "publisher"
                   :serial t
