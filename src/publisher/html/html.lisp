@@ -27,12 +27,10 @@ and not need a `page-builder'."
            (css-file (publish ass :path #p"styles.css"
                               :content (rendered-css)
                               :hash-artifact-name-p t))
-           (html (with-html-string (funcall page-builder :css-file css-file :html html))))
+           (html (with-html-string (funcall page-builder :css-file css-file :html html)))
+           (html-file-publisher (make 'asset-publisher :dest (publisher-dest pub))))
 
-      ;; TODO Create a new instance of asset-publisher for publishing the Html file. Use `asset-pub'
-      ;; only for css/js. Do this when asset-publisher has been updated to configure hash-in-name
-      ;; setting at instance level instead of function call level.
-      (publish ass :path path :content html))))
+      (publish html-file-publisher :path path :content html))))
 
 (export-always '*lass-tags*)
 (defparameter *lass-tags*

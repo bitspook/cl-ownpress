@@ -1,10 +1,10 @@
-(uiop:define-package cl-ownpress/tests
-  (:use :cl)
+(uiop:define-package in.bitspook.cl-ownpress/tests
+  (:use :cl :in.bitspook.cl-ownpress/publisher)
   (:import-from :spinneret :with-html-string)
   (:mix :parachute :serapeum/bundle))
-(in-package :cl-ownpress/tests)
+(in-package #:in.bitspook.cl-ownpress/tests)
 
-(sb-ext:add-package-local-nickname :cpub :clown-publishers)
+(sb-ext:add-package-local-nickname :cpub :in.bitspook.cl-ownpress/publisher)
 
 (defparameter *test-dir* #p"/tmp/cl-ownpress-tests/")
 

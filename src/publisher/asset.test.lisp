@@ -1,7 +1,5 @@
 (in-package #:in.bitspook.cl-ownpress/tests)
 
-(use-package #:in.bitspook.cl-ownpress/publisher)
-
 (defparameter *ass* (make-instance 'cpub:asset-publisher
                                    :dest *test-dir*))
 

@@ -1,7 +1,5 @@
 (in-package #:in.bitspook.cl-ownpress/tests)
 
-(use-package :clown-publishers)
-
 (define-test "html-publisher")
 
 (defparameter *ass*
@@ -28,21 +26,22 @@
 
 (define-test "html-publisher.publish" :parent "html-publisher"
   (define-test "creates a css file in `dest' named styles-<content-hash>.css"
-    (defwidget btn (title)
-        '((.button :color red))
-      (:button title))
-    (defwidget nav ()
-        '((.nav :color blue))
-      (:nav (render 'btn :title "Rofl")
-            (render 'btn :title "Lmao")
-            (render 'btn :title "Roflmao")))
-
     (let* ((src-filename "styles.css")
            (content ".nav{color:blue;}.button{color:red;}")
            (expected-filename (cpub::append-content-hash
                                src-filename
                                (md5:md5sum-string content)))
            (*print-pretty* nil))
+      (defwidget btn (title)
+          '((.button :color red))
+        (:button title))
+      (defwidget nav ()
+          '((.nav :color blue))
+        (:nav (render 'btn :title "Rofl")
+              (render 'btn :title "Lmao")
+              (render 'btn :title "Roflmao")))
+
+
       (setup)
       (publish *pub*
                :page-builder #'identity-html-builder
@@ -60,14 +59,19 @@
 
       (setup)
 
-      (publish
-       *pub*
-       :page-builder #'identity-html-builder
-       :path #p"simple-widgets/simple-button.html"
-       :root-widget (make-instance 'btn :title "Lol"))
+      (let ((*pub* (make-instance
+                    'cpub:html-publisher
+                    :asset-pub *ass*
+                    :dest (path-join *test-dir* "blog/"))))
 
-      (true (uiop:file-exists-p (path-join *test-dir* "simple-widgets/simple-button.html")))
-      (true (str:from-file (path-join *test-dir* "simple-widgets/simple-button.html")) "<button>Lol</button>"))
+        (publish
+         *pub*
+         :page-builder #'identity-html-builder
+         :path #p"simple-widgets/simple-button.html"
+         :root-widget (make-instance 'btn :title "Lol"))
+
+        (true (uiop:file-exists-p (path-join *test-dir* "blog/simple-widgets/simple-button.html")))
+        (true (str:from-file (path-join *test-dir* "blog/simple-widgets/simple-button.html")) "<button>Lol</button>")))
 
     ;; A bit more complex widget
     (progn

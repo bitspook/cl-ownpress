@@ -1,7 +1,5 @@
 (defpackage in.bitspook.cl-ownpress/provider
-  (:use #:cl #:serapeum/bundle #:in.bitspook.cl-ownpress)
-  (:export
-   org-file-provider denote-provider org-project-provider))
+  (:use #:cl #:serapeum/bundle #:in.bitspook.cl-ownpress))
 (in-package #:in.bitspook.cl-ownpress/provider)
 
 (defclass identifiable () ()

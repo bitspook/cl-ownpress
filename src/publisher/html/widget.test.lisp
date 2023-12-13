@@ -1,7 +1,5 @@
 (in-package #:in.bitspook.cl-ownpress/tests)
 
-(use-package :clown-publishers)
-
 (define-test "widget")
 
 (define-test "defwidget" :parent "widget"

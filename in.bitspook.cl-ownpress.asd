@@ -27,7 +27,8 @@
                   :serial t
                   :components ((:file "package")
                                (:file "rpc-server")
-                               (:file "emacs")))
+                               (:file "emacs")
+                               (:file "denote")))
 
                  (:module "publisher"
                   :serial t
@@ -36,7 +37,7 @@
                                (:file "html/widget")
                                (:file "html/html"))))))
   :description "Personal publishing platform"
-  :in-order-to ((test-op (test-op "cl-ownpress/tests"))))
+  :in-order-to ((test-op (test-op "in.bitspook.cl-ownpress/tests"))))
 
 (defsystem "in.bitspook.cl-ownpress/tests"
   :author "Charanjit Singh"
@@ -47,8 +48,8 @@
                 ((:file "package")))
                (:module "src"
                 :components
-                ((:file "publishers/asset.test")
-                 (:file "publishers/html/html.test")
-                 (:file "publishers/html/widget.test"))))
+                ((:file "publisher/asset.test")
+                 (:file "publisher/html/html.test")
+                 (:file "publisher/html/widget.test"))))
   :description "Test system for cl-ownpress"
-  :perform (test-op (op c) (symbol-call :parachute :test :cl-ownpress/tests)))
+  :perform (test-op (op c) (symbol-call :parachute :test :in.bitspook.cl-ownpress/tests)))
