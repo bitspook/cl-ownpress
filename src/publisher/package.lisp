@@ -12,8 +12,8 @@
          :initform (error "dest is required")
          :initarg :dest
          :accessor publisher-dest))
-  (:documentation "A publisher creates publishable artifacts. For example Html+Css+Js+Rss files for a
-website."))
+  (:documentation "A publisher creates publishable artifacts. A publisher consumes `publishable'-s to produce final
+results. It might be a HTML page, a ledger file, or a complete website."))
 
 (export-always 'publish)
 (defgeneric publish (publisher &key)
@@ -31,3 +31,14 @@ website."))
 (define-condition artifact-already-exists (error)
   ((path :initarg :path :reader artifact-path))
   (:documentation "Condition indicating that an artifact at the same location already exists."))
+
+(export-always 'publishable)
+(defclass publishable () ()
+  (:documentation "Anything that inherits from =publishable= class is meant to be published.
+Empty class representing a publishable object. A publishable object must implement PUBLISHED-URI
+method."))
+
+(export-always 'published-uri)
+(defgeneric published-uri (resource)
+  (:documentation "Return a universal RESOURCE identifier. A publisher consume PUBLISHABLE objects, which implement
+this method."))

@@ -131,40 +131,6 @@ use-case:
    to create instances of =blog-post=
 3. Use it to publish artifacts e.g convert =blog-post='s to HTML+CSS+JS+Image files
 
-Core concepts
-
-1. =Provider=
-
-   A provider provides content. It reaches the source, collect, sanitize and stores the content in a
-   way which loses as little information from the source as possible. =Provider=-s are specialized
-   for the source, not the destination. For example, A =DenoteNote= should represents a note, not a
-   blog post which can be created using it.
-
-2. =Publishable=
-
-   Anything that inherits from =Publishable= class is meant to be published. A =Publishable=
-   satisfies certain constraints:
-
-   1. =uri=
-
-      Every =Publishable= has a universal resource identifier, where universe is the current
-      publishing session. It is called a =URI= instead of ID or UUID because:
-      
-      1. It should human readable
-      2. It should be a UNIX path
-
-      =uri= deterministically decides where a =Publishable= shall be published to. 
-
-   A =Publishable= can be converted from data provided by a =Provider=, or a =Provider= might choose
-   to directly produce =Publishable=-s.
-
-3. =Publisher=
-
-   A publisher publishes the =Publishable=-s to produce final results. It might be a HTML page, a
-   ledger file, or a complete website.
-
-   Data provided by a single provider might produce multiple =Publishable=-s, which get published by
-   multiple =Publisher=-s.
 
    
    
