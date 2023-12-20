@@ -29,13 +29,7 @@ Give hackers the ability to publish their content while maintaining its ownershi
 
    Ability to hack isn't sufficient. Hacking experience should be pleasant. 
 
-3. Just-works user experience
-
-   Although cl-ownpress primarily targets software hackers, that does not mean it gets to ignore
-   user-experience. Only using the software (i.e without any desire to hack it further) should
-   achieve the "just works" standard.
-
-4. Content ownership
+3. Content ownership
 
    As users of the internet, we publish a lot of content on the web. It almost always end up in a
    walled platform, at the mercy of someone-not-you's whims. Cl-ownpress should bring ownership of
@@ -43,53 +37,56 @@ Give hackers the ability to publish their content while maintaining its ownershi
 
 ** Current state
 
-I am using cl-ownpress to create [[https://bitspook.in/][my personal website]].
-
-Right now cl-ownpress is moving forward to allow me achieve my desired publishing workflow.
+I am using cl-ownpress as a library to create [[https://bitspook.in/][my personal website]] ([[https://github.com/bitspook/bitspook.github.io][git repo]]). It allows me achieve
+my desired publishing workflow.
 
 - Publish with full power of Emacs
   
-  Most of my writing happens in org-mode. I often tinker it to a great extent,
-  to keep capturing my thoughts/experiments fluent in my computing workflow.
-  I want to turn this liability into an asset. 
+  Most of my writing happens in org-mode. I often tinker it to a great extent, to keep capturing my
+  thoughts/experiments fluent in my computing workflow. I want to turn this liability into an asset.
 
   #+begin_quote 
   *Status*: Done
-
-  *org-file-provider* allow publishing a directory full of org files to HTML,
-  delegating the responsibility of actual org->HTML conversion to Emacs itself.
   #+end_quote
+
+  *[[https://github.com/bitspook/cl-ownpress/blob/f33689dba0ac903fb8c9d64f9e8f5bc01b68429f/src/provider/emacs.lisp#L1][emacs-provider]]* allow interacting with my running Emacs instance, and run emacs-lisp. E.g I use
+  it to:
+  1. Publish a directory full of org files to HTML
+  2. Publish a subset of my notes as blog-posts
+     
+  while delegating the responsibility of actual org->HTML conversion to Emacs itself.
 
 - Publish a subset of my notes on my blog
 
-  I have a fluent [[https://en.wikipedia.org/wiki/Zettelkasten][zettlekasten]]-like note-taking system for capturing my
-  thoughts. Almost all my blog posts are edited versions of these. I want to
-  publish notes which mature enough.
+  I have a fluent [[https://en.wikipedia.org/wiki/Zettelkasten][zettlekasten]]-like note-taking system for capturing my thoughts. Almost all my blog
+  posts are edited versions of these. I want to publish notes which mature enough.
 
-  I also want to publish any linked notes, but in a "certain" way. e.g they
-  should be published, but not listed anywhere on the blog/rss-feeds etc.
+  I also want to publish any linked notes, but in a "certain" way. e.g they should be published, but
+  not listed anywhere on the blog/rss-feeds etc.
   
   #+begin_quote
-  *Status*: Done
-
-  *org-denote-provider* allow publishing notes with specific tags to be
-  published as blog posts. Any notes linked inside these notes are published,
-  but not listed (configurable) in any listings (tags, categories, home-page).
+  *Status*: In-Progress
   #+end_quote
+
+  *[[https://github.com/bitspook/bitspook.github.io/blob/3e49c3caf6c03e83f6a0cc7bd4ec054f8256d90e/src/provider/denote-provider.lisp#L1][denote-provider]]* allow publishing notes with specific tags as blog posts. Publishing notes linked
+  inside these notes however is pending.
 
 - Publish my personal projects
 
-  In addition to taking ownership of where my projects are presented (I might
-  switch away from Github), I want a place where I can express more about my
-  projects. A place to document inception of an idea, its evolution, fantasies
-  about a glorious future; things which aren't exactly documentation.
-
-  It is easily achievable with just a tag on a blog-post, but I think much can
-  be achieved with better presentation.
+  In addition to taking ownership of where my projects' source-code is hosted (I might switch away
+  from Github), I want a place where I can express more about my projects. A place to document
+  inception of an idea, its evolution, fantasies about a glorious future; things which aren't
+  exactly documentation.
 
   #+begin_quote
-  *Status*: TODO
+  *Status*: In-Progress
   #+end_quote
+
+  Right now I am publishing just one of my projects using cl-ownpress ([[https://bitspook.in/projects/spookfox][spookfox]]). cl-ownpress allow
+  me to turn live-code into documentation thanks to Emacs provider and the power of org-mode. It is
+  a starting point, I intend to make publishing projects more powerful. A lot of love and effort
+  goes into every project. I want the presentation of each project to be unique yet integral to my
+  personal website.
 
 - Publish my toots
 
