@@ -5,6 +5,8 @@
   (:import-from #:md5 :md5sum-string :md5sum-file))
 (in-package #:in.bitspook.cl-ownpress/publisher)
 
+(export-always 'publisher)
+(export-always 'publisher-dest)
 (defclass publisher ()
   ((dest :documentation "Directory in which publishable artifacts are created."
          :initform (error "dest is required")

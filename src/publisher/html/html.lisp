@@ -30,7 +30,7 @@ and not need a `page-builder'."
            (html (with-html-string (funcall page-builder :css-file css-file :html html)))
            (html-file-publisher (make 'asset-publisher :dest (publisher-dest pub))))
 
-      (publish html-file-publisher :path path :content html))))
+      (publish html-file-publisher :path (path-join (publisher-dest pub) path) :content html))))
 
 (export-always '*lass-tags*)
 (defparameter *lass-tags*
