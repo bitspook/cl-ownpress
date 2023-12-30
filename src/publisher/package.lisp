@@ -38,7 +38,7 @@ results. It might be a HTML page, a ledger file, or a complete website."))
 Empty class representing a publishable object. A publishable object must implement PUBLISHED-URI
 method."))
 
-(export-always 'published-uri)
-(defgeneric published-uri (resource)
-  (:documentation "Return a universal RESOURCE identifier. A publisher consume PUBLISHABLE objects, which implement
-this method."))
+(export-always 'published-path)
+(defgeneric published-path (publisher &key)
+  (:documentation "Every publisher should publish deterministically. PUBLISHED-PATH return a string that can be used to
+locate an artifact published by PUBLISHER."))
