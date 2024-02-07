@@ -69,7 +69,9 @@ It adds the instance to *RENDER-STACK*, which can then be used to determine what
 was rendered. This can be useful e.g to determine which widgets' css should be
 generated. Make sure to wrap calls to RENDER in a lexical scope which sets
 *RENDER-STACK*."
-  `(let ((instance (make-instance ,widget ,@args)))
+  `(let ((instance (if (eq 'symbol (class-name-of ,widget))
+                       (make-instance ,widget ,@args)
+                       ,widget)))
      (push instance *render-stack*)
      (dom-of instance)))
 
