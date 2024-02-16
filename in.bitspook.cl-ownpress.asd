@@ -2,21 +2,9 @@
   :version "0.1.0"
   :author "Charanjit Singh"
   :license "AGPL-3.0-only"
-  :depends-on ("serapeum"
-               "log4cl"
-               "jsonrpc"
-               "lass"
-               "cffi"
-               "spinneret"
-               "str"
-               "ppath"
-               "lparallel"
-               "usocket"
-               "yason"
-               "xml-emitter"
-               "plump"
-               "cl-slug"
-               "md5")
+  :depends-on ("serapeum" "str"
+               "lass" "spinneret" "cl-slug"
+               "jsonrpc" "md5")
   :components ((:module "src"
                 :serial nil
                 :components
