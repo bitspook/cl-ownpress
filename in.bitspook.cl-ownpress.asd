@@ -11,6 +11,8 @@
                 ((:file "package")
                  (:file "utils")
 
+                 (:file "artifact")
+
                  (:module "provider"
                   :serial t
                   :components ((:file "package")
@@ -22,7 +24,8 @@
                   :components ((:file "package")
                                (:file "asset")
                                (:file "html/widget")
-                               (:file "html/html"))))))
+                               (:file "html/html")
+                               (:file "html/artifacts"))))))
   :description "Personal publishing platform"
   :in-order-to ((test-op (test-op "in.bitspook.cl-ownpress/tests"))))
 
