@@ -1,22 +1,20 @@
 (in-package #:in.bitspook.cl-ownpress/publisher)
 
 (export-always 'widget)
-(export-always 'set-widget-children)
-(defclass widget ()
-  nil
+(defclass widget (artifact) nil
   (:documentation "A widget produces fragments of a web page. You can think of them as Web components.
 A widget is made up of spinneret Dom forms and lass Css forms. Use `defwidget' macro to create a new
 widget."))
 
 (export-always 'dom-of)
 (defgeneric dom-of (widget)
-  (:documentation "Provide spinneret DOM for the WIDGET."))
-(defmethod dom-of ((widget widget)) nil)
+  (:documentation "Provide spinneret DOM for the WIDGET.")
+  (:method ((widget widget)) nil))
 
 (export-always 'lass-of)
 (defgeneric lass-of (widget)
-  (:documentation "Provide a list of lass blocks for WIDGET"))
-(defmethod lass-of ((widget widget)) nil)
+  (:documentation "Provide a list of lass blocks for WIDGET")
+  (:method ((widget widget)) nil))
 
 (export-always 'css-of)
 (defgeneric css-of (widget)
@@ -26,25 +24,49 @@ widget."))
       (lass:write-sheet
        (apply #'lass:compile-sheet (lass-of widget))))))
 
+(export-always 'dep)
+(defmethod embed-as ((w widget) (as (eql 'dep)) &key of)
+  (add-dep of w)
+  (dom-of w))
+
+(export-always '*self*)
+(defvar *self* nil
+  "*self* is a hack. Its purpose is to identify the current widget being built in `defwidget'.
+You can use `emdep' in `defwidget' and never need *SELF*.")
+
 (export-always 'defwidget)
 (defmacro defwidget (name args lass  &body dom)
   "Create a widget (instance of `widget') named NAME.
-ARGS is the arguments received by `dom-of' and `lass-of' functions."
+ARGS is the arguments received by `dom-of' and `lass-of' functions.
+*self* is set to current widget in dom-of/lass-of methods."
   `(progn
      (defclass ,name (widget)
        ,(mapcar
          (lambda (arg) `(,arg :initarg ,(make-keyword arg)))
          args))
 
-     (defmethod dom-of ((widget ,name))
-       (with-slots ,args widget
-         (spinneret:with-html ,@dom)))
+     (defmethod dom-of ((self ,name))
+       (let ((*self* self))
+         (with-slots ,args self
+           (spinneret:with-html ,@dom))))
 
      (defmethod lass-of ((widget ,name))
-       (with-slots ,args widget
-         ,lass))
+       (let ((*self* widget))
+         (with-slots ,args widget
+           ,lass)))
 
      ',name))
+
+(export-always 'emdep)
+(defmacro emdep (widget &rest args)
+  "A convenient macro to add child-widgets. Features:
+1. Add WIDGET as dependency of *self*
+2. Instantiate WIDGET if it is a symbol"
+  (with-gensyms (instance)
+    `(let ((,instance (if (eq 'symbol (class-name-of ,widget))
+                          (make-instance ,widget ,@args)
+                          ,widget)))
+       (embed-as ,instance 'dep :of *self*))))
 
 (defvar *render-stack* nil
   "A list to keep track of widgets that are getting rendered. This is used/useful to determine which
@@ -59,7 +81,7 @@ widget's CSS should be included in the final artifact.")
 ;; widget, but also that of a particular instance can be manipulated by the end
 ;; user.
 (defmacro render (widget &rest args)
-  "Instantiate WIDGET with ARGS, add it to *RENDER-STACK* and return its dom.
+  "Instantiate WIDGET with ARGS (if it is a symbol), add it to *RENDER-STACK* and return its dom.
 
 This is recommended API for:
 1. Obtaining the dom of a widget for generating html

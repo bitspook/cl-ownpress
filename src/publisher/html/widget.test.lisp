@@ -186,3 +186,46 @@
            (css (rendered-css)))
       (true (string= "<nav><button>Click me</button><button>Click me again</button><button>Click me once more</button></nav><p>I am a blog post" html))
       (true (string= "p{background:parrot;}nav{background:cyan;}button{background:blue;}" css)))))
+
+(define-test "embed-as" :parent "widget"
+  (define-test "add widget as dependency when embedded in another widget"
+    (defwidget button (title) '((button :background "blue")) (:button title))
+
+    (defwidget navbar ()
+        '((nav :background "cyan"))
+      (let ((btn (make 'button :title "Click me")))
+        (:nav (:li (embed-as btn 'dep :of *self*))
+              (:li (embed-as btn 'dep :of *self*)))))
+
+    (defwidget post ()
+        '((p :background "parrot"))
+      (embed-as (make 'navbar) 'dep :of *self*)
+      (:p "I am a blog post"))
+
+    (let* ((*print-pretty* nil)
+           (post (make 'post))
+           (html (with-html-string (dom-of post))))
+      (true (eq 2 (length (all-deps post))))
+      (true (string= "<nav><li><button>Click me</button><li><button>Click me</button></nav><p>I am a blog post" html)))))
+
+(define-test "emdep" :parent "widget"
+  (define-test "add widget's DOM at call-site and add it as dependency of current widget"
+    (defwidget button (title) '((button :background "blue")) (:button title))
+
+    (defwidget navbar ()
+        '((nav :background "cyan"))
+      (let ((btn (make 'button :title "Click me")))
+        (:nav (:li (emdep btn))
+              (:li (emdep btn)))))
+
+    ;; Add navbar without instantiating it
+    (defwidget post ()
+        '((p :background "parrot"))
+      (emdep 'navbar)
+      (:p "I am a blog post"))
+
+    (let* ((*print-pretty* nil)
+           (post (make 'post))
+           (html (with-html-string (dom-of post))))
+      (true (eq 2 (length (all-deps post))))
+      (true (string= "<nav><li><button>Click me</button><li><button>Click me</button></nav><p>I am a blog post" html)))))

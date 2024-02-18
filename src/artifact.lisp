@@ -14,11 +14,19 @@ artifact, wherever it is published.'"))
 (export-always 'add-dep)
 (defgeneric add-dep (art dep)
   (:documentation "Add a new dependency if it isn't already added.")
-  (:method ((art artifact) dep)
-    (declare (artifact dep))
-    (adjoin dep (artifact-deps art))))
+  (:method ((art artifact) (dep artifact))
+    (setf (artifact-deps art)
+          (adjoin dep (artifact-deps art)))))
 
-(defgeneric embed-as (art as)
+(export-always 'all-deps)
+(defun all-deps (art)
+  (declare (artifact art))
+  (let ((deps (artifact-deps art)))
+    (nub (concatenate 'list deps (mapcar #'all-deps deps))
+         :test #'eql)))
+
+(export-always 'embed-as)
+(defgeneric embed-as (art as &key)
   (:documentation "Embed artifact ART in a given context as AS. For example: Embed a CSS artifact in an HTML artifact
 as a stylesheet or embedded code-snippet. Embedding an ARTIFACT should also add it as a dependency of embedd-er."))
 
