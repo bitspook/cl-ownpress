@@ -1,4 +1,4 @@
-(in-package #:in.bitspook.cl-ownpress/publisher)
+(in-package #:in.bitspook.cl-ownpress)
 
 (export-always 'html-page-artifact)
 (defclass html-page-artifact (artifact)
@@ -15,6 +15,7 @@
                                       :css css :body-html body-html))))
     page-html))
 
+;; CSS
 (defclass css-file-artifact (artifact)
   ((dest-dir :initarg :dest-dir
              :initform (error "css-file-artifact's :dest-dir is required"))))
@@ -30,3 +31,11 @@
     (base-path-join
      (slot-value art 'dest-dir)
      (str:concat "style" "-" hash ".css"))))
+
+;; Publishing
+(defmethod publish ((art html-page-artifact) &key dest-dir)
+  "Publish ART in DEST-DIR."
+  (let* ((html (with-html-string (render art)))
+         (css-art (rendered-css art)))
+
+    art))

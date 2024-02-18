@@ -47,16 +47,14 @@
     (defwidget button (title) nil
       (:button title))
 
-    (let ((btn (make-instance 'button :title "Lol")))
+    (defwidget form () nil
+      (:form (dom-of (make 'button :title "Lol"))))
 
-      (defwidget form () nil
-        (:form (dom-of btn)))
-
-      (let* ((*print-pretty* nil)
-             (frm (make-instance 'form)))
-        (true (string=
-               "<form><button>Lol</button></form>"
-               (spinneret:with-html-string (dom-of frm)))))))
+    (let* ((*print-pretty* nil)
+           (frm (make-instance 'form)))
+      (true (string=
+             "<form><button>Lol</button></form>"
+             (spinneret:with-html-string (dom-of frm))))))
 
   (define-test "allow extending the returned dom"
     (defwidget button (title) nil
@@ -112,42 +110,42 @@
       (true (string= "span{background:cyan;}button{background:blue;}span{background:red;}" extended-css)))))
 
 (define-test "render" :parent "widget"
-  (define-test "add WIDGET to *render-stack* before rendering it"
-    (defwidget button (title) nil (:button title))
+  (define-test "add widget's DOM at call-site and add it as dependency of current widget"
+    (defwidget button (title) '((button :background "blue")) (:button title))
 
-    (defwidget navbar () nil
-      (:nav (render 'button :title "Click me")))
+    (defwidget navbar ()
+        '((nav :background "cyan"))
+      (let ((btn (make 'button :title "Click me")))
+        (:nav (:li (render btn))
+              (:li (render btn)))))
 
-    (defwidget post () nil
+    ;; Add navbar without instantiating it
+    (defwidget post ()
+        '((p :background "parrot"))
       (render 'navbar)
       (:p "I am a blog post"))
 
-    (let* ((cpub:*render-stack* nil)
-           (*print-pretty* nil)
-           (html (with-html-string (render 'post))))
-      (true (string= "<nav><button>Click me</button></nav><p>I am a blog post" html))
-      (true (eq 3 (length cpub:*render-stack*)))
-      (true (eq 'button (class-name-of (car cpub:*render-stack*))))))
+    (let* ((*print-pretty* nil)
+           (post (make 'post))
+           (html (with-html-string (dom-of post))))
+      (true (eq 2 (length (all-deps post))))
+      (true (string= "<nav><li><button>Click me</button><li><button>Click me</button></nav><p>I am a blog post" html))))
 
-  (define-test "only add WIDGET to *render-stack* when final HTML is generated"
+  ;; Not exactly *desired* behavior here, but adding test to document significant behavior
+  (define-test "only add WIDGET's child-widgets to its deps when it is RENDERed"
     (defwidget button (title) nil (:button title))
-
-    (true (eq 0 (length cpub:*render-stack*)))
 
     (defwidget nav () nil
       (:nav (render 'button :title "Title")))
 
-    (true (eq 0 (length cpub:*render-stack*)))
+    (let* ((nav (make 'nav)))
+      (true (eq 0 (length (all-deps nav))))
+      (render nav)
 
-    (let* ((cpub:*render-stack* nil)
-           (*print-pretty* nil)
-           (html (with-html-string (render 'nav))))
-      (declare (ignore html))
-      (true (eq 2 (length cpub:*render-stack*)))
-      (setf cpub:*render-stack* nil))))
+      (true (eq 1 (length (all-deps nav)))))))
 
 (define-test "rendered-css" :parent "widget"
-  (define-test "return CSS for *all* rendered WIDGETs (parent and children)"
+  (define-test "return CSS for *all* deps of widget (including self)"
     (defwidget button (title) '((button :background "blue")) (:button title))
 
     (defwidget navbar ()
@@ -155,16 +153,15 @@
       (:nav (render 'button :title "Click me")))
 
     (defwidget post ()
-        '((p :background "parrot"))
+        '((.post :background "parrot"))
       (render 'navbar)
       (:p "I am a blog post"))
 
-    (let* ((cpub:*render-stack* nil)
-           (*print-pretty* nil)
-           (html (with-html-string (render 'post)))
-           (css (rendered-css)))
-      (true (string= "<nav><button>Click me</button></nav><p>I am a blog post" html))
-      (true (string= "p{background:parrot;}nav{background:cyan;}button{background:blue;}" css))))
+    (let* ((*print-pretty* nil)
+           (post (make 'post)))
+      (with-html-string (render post))
+      (true (string= ".post{background:parrot;}nav{background:cyan;}button{background:blue;}"
+                     (rendered-css post)))))
 
   (define-test "does not add duplicate CSS if a widget is rendered more than once"
     (defwidget button (title) '((button :background "blue")) (:button title))
@@ -180,12 +177,13 @@
       (render 'navbar)
       (:p "I am a blog post"))
 
-    (let* ((cpub:*render-stack* nil)
-           (*print-pretty* nil)
-           (html (with-html-string (render 'post)))
-           (css (rendered-css)))
-      (true (string= "<nav><button>Click me</button><button>Click me again</button><button>Click me once more</button></nav><p>I am a blog post" html))
-      (true (string= "p{background:parrot;}nav{background:cyan;}button{background:blue;}" css)))))
+    (let* ((*print-pretty* nil)
+           (post (make 'post)))
+      ;; resolve post's deps
+      ;; with-html-string so it won't write to stdout
+      (with-html-string (render post))
+
+      (true (string= "p{background:parrot;}nav{background:cyan;}button{background:blue;}" (rendered-css post))))))
 
 (define-test "embed-as" :parent "widget"
   (define-test "add widget as dependency when embedded in another widget"
@@ -208,24 +206,43 @@
       (true (eq 2 (length (all-deps post))))
       (true (string= "<nav><li><button>Click me</button><li><button>Click me</button></nav><p>I am a blog post" html)))))
 
-(define-test "emdep" :parent "widget"
-  (define-test "add widget's DOM at call-site and add it as dependency of current widget"
-    (defwidget button (title) '((button :background "blue")) (:button title))
+(define-test "tagged-lass" :parent "widget"
+  (define-test "returns top-level lass-forms as-is"
+    (let ((lass:*pretty* nil))
+      (true
+       (equal
+        (let ((lass:*pretty* nil))
+          (apply #'lass:compile-and-write
+                 (tagged-lass
+                  '((body :background blue)
+                    (p :margin 10px)))))
+        "body{background:blue;}p{margin:10px;}"))))
 
-    (defwidget navbar ()
-        '((nav :background "cyan"))
-      (let ((btn (make 'button :title "Click me")))
-        (:nav (:li (emdep btn))
-              (:li (emdep btn)))))
+  (define-test "returns lass-forms immediately following a tag with specifier applied"
+    (let ((lass:*pretty* nil))
+      (true
+       (equal
+        (let ((lass:*pretty* nil)
+              (*lass-tags* '((:md "(min-width: 0px)" :media-query))))
+          (apply #'lass:compile-and-write
+                 (tagged-lass
+                  '((body :background blue)
+                    (p :margin 10px))
+                  :md '((body :background red)
+                        (p :margin 0)))))
+        "body{background:blue;}p{margin:10px;}@media (min-width: 0px){body{background:red;}p{margin:0;}}"))))
 
-    ;; Add navbar without instantiating it
-    (defwidget post ()
-        '((p :background "parrot"))
-      (emdep 'navbar)
-      (:p "I am a blog post"))
+  (define-test "returns lass-forms immediately following a multiple-tags with specifier applied"
+    (true
+     (equal
+      (let ((lass:*pretty* nil)
+            (*lass-tags* '((:md "(min-width: 0px)" :media-query)
+                           (:sm "(min-width: 10px)" :media-query))))
+        (apply #'lass:compile-and-write
+               (tagged-lass
+                '((body :background blue)
+                  (p :margin 10px))
 
-    (let* ((*print-pretty* nil)
-           (post (make 'post))
-           (html (with-html-string (dom-of post))))
-      (true (eq 2 (length (all-deps post))))
-      (true (string= "<nav><li><button>Click me</button><li><button>Click me</button></nav><p>I am a blog post" html)))))
+                :md :sm '((body :background red)
+                          (p :margin 0)))))
+      "body{background:blue;}p{margin:10px;}@media (min-width: 10px) or (min-width: 0px){body{background:red;}p{margin:0;}}"))))
