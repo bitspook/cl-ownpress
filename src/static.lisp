@@ -37,7 +37,7 @@ of a conflict.
 
 Returns the path of created file/dir."
   (let ((dest-dir (namestring dest-dir))
-        (dest (path-join dest-dir path)))
+        (dest (base-path-join dest-dir (or path ""))))
     (when (or (uiop:file-exists-p dest)
               (uiop:directory-exists-p dest))
       (error 'file-already-exists :path dest))

@@ -7,35 +7,49 @@
    (root-widget :initarg :root-widget)))
 
 (defmethod artifact-content ((art html-page-artifact))
-  (let* ((*render-stack* nil)
-         (css (car (artifact-deps art)))
-         (body-html (with-html-string (dom-of (slot-value art 'root-widget))))
+  (let* ((root-w (slot-value art 'root-widget))
+         (body-html (with-html-string (render root-w)))
+         (css-art
+           (find-if
+            (op (eq (class-name-of _) 'css-file-artifact))
+            (artifact-deps art)))
          (page-html
-           (with-html-string (funcall (slot-value art 'builder)
-                                      :css css :body-html body-html))))
+           (with-html-string
+             (funcall
+              (slot-value art 'builder)
+              :css css-art :body-html body-html))))
     page-html))
 
 ;; CSS
 (defclass css-file-artifact (artifact)
-  ((dest-dir :initarg :dest-dir
-             :initform (error "css-file-artifact's :dest-dir is required"))))
+  ((location :initarg :location
+             :initform (error "css-file-artifact's :location is required"))
+   (root-widget :initarg :root-widget)))
 
 (defmethod artifact-content ((art css-file-artifact))
-  (rendered-css))
+  (with-slots (root-widget) art
+    (rendered-css root-widget)))
 
 (defmethod artifact-location ((art css-file-artifact))
-  (let* ((hash (str:downcase
-                (str:substring
-                 0 6
-                 (format nil "~{~X~}" (map 'list #'identity (md5:md5sum-string (artifact-content art))))))))
-    (base-path-join
-     (slot-value art 'dest-dir)
-     (str:concat "style" "-" hash ".css"))))
+  (let* ((hash (md5:md5sum-string (artifact-content art))))
+    (append-content-hash (namestring (slot-value art 'location)) hash)))
 
 ;; Publishing
+(export-always 'publish)
 (defmethod publish ((art html-page-artifact) &key dest-dir)
   "Publish ART in DEST-DIR."
-  (let* ((html (with-html-string (render art)))
-         (css-art (rendered-css art)))
+  (let* ((html (artifact-content art))
+         (css-art (find-if
+                   (op (eq (class-name-of _) 'css-file-artifact))
+                   (artifact-deps art))))
 
-    art))
+    (publish-static
+     :dest-dir dest-dir
+     :content html
+     :path (artifact-location art))
+
+    (when css-art
+      (publish-static
+       :dest-dir dest-dir
+       :content (artifact-content css-art)
+       :path (artifact-location css-art)))))
