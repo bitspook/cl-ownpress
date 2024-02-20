@@ -37,23 +37,3 @@
 (export-always 'sheet)
 (defmethod embed-as ((art css-file-artifact) (as (eql 'sheet)) &key)
   (with-html (:link :rel "stylesheet" :href (artifact-location art))))
-
-;; Publishing
-(export-always 'publish)
-(defmethod publish ((art html-page-artifact) &key dest-dir)
-  "Publish ART in DEST-DIR."
-  (let* ((html (artifact-content art))
-         (css-art (find-if
-                   (op (eq (class-name-of _) 'css-file-artifact))
-                   (artifact-deps art))))
-
-    (publish-static
-     :dest-dir dest-dir
-     :content html
-     :path (artifact-location art))
-
-    (when css-art
-      (publish-static
-       :dest-dir dest-dir
-       :content (artifact-content css-art)
-       :path (artifact-location css-art)))))

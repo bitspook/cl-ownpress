@@ -37,3 +37,13 @@ obtaining the location. e.g when materializing the artifact as HTML file."))
 (export-always 'artifact-content)
 (defgeneric artifact-content (art)
   (:documentation "Artifact-content is what is actually published at end of publishing lifecycle."))
+
+;; Publishing
+(export-always 'publish-artifact)
+(defun publish-artifact (artifact &key dest-dir)
+  "Publish ART and all its dependencies to DEST-DIR."
+  (dolist (art (append1 (all-deps artifact) artifact))
+    (publish-static
+     :dest-dir dest-dir
+     :content (artifact-content art)
+     :path (artifact-location art))))
