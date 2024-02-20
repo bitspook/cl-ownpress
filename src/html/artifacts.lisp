@@ -33,7 +33,3 @@
 (defmethod artifact-location ((art css-file-artifact))
   (let* ((hash (md5:md5sum-string (artifact-content art))))
     (append-content-hash (namestring (slot-value art 'location)) hash)))
-
-(export-always 'sheet)
-(defmethod embed-as ((art css-file-artifact) (as (eql 'sheet)) &key)
-  (with-html (:link :rel "stylesheet" :href (artifact-location art))))

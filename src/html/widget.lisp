@@ -24,11 +24,6 @@ widget."))
       (lass:write-sheet
        (apply #'lass:compile-sheet (lass-of widget))))))
 
-(export-always 'dep)
-(defmethod embed-as ((w widget) (as (eql 'dep)) &key of)
-  (add-dep of w)
-  (dom-of w))
-
 (export-always '*self*)
 (defvar *self* nil
   "*self* is a hack. Its purpose is to identify the current widget being built in `defwidget'.
@@ -70,7 +65,7 @@ Enable consuming WIDGET in following ways:
                           (make-instance ,widget ,@args)
                           ,widget)))
        (if *self*
-           (embed-as ,instance 'dep :of *self*)
+           (add-dep *self* ,instance)
            (dom-of ,instance)))))
 
 (export-always 'rendered-css)

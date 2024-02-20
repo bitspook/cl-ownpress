@@ -24,11 +24,6 @@ artifact, wherever it is published.'"))
   (let ((deps (artifact-deps art)))
     (nub (flatten (concatenate 'list deps (mapcar #'all-deps deps))))))
 
-(export-always 'embed-as)
-(defgeneric embed-as (art as &key)
-  (:documentation "Embed artifact ART in a given context as AS. For example: Embed a CSS artifact in an HTML artifact
-as a stylesheet or embedded code-snippet. Embedding an ARTIFACT should also add it as a dependency of embedd-er."))
-
 (export-always 'artifact-location)
 (defgeneric artifact-location (art)
   (:documentation "Uniquely locate ART within given context. Context here is a vague notion determined by intention of
