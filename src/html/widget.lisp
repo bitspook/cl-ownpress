@@ -64,9 +64,8 @@ Enable consuming WIDGET in following ways:
     `(let ((,instance (if (eq 'symbol (class-name-of ,widget))
                           (make-instance ,widget ,@args)
                           ,widget)))
-       (if *self*
-           (add-dep *self* ,instance)
-           (dom-of ,instance)))))
+       (when *self* (add-dep *self* ,instance))
+       (dom-of ,instance))))
 
 (export-always 'rendered-css)
 (defun rendered-css (widget)
