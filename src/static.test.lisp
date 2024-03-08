@@ -31,87 +31,89 @@
   (define-test "copy file at CONTENT to PATH"
     (setup)
     (uiop:with-temporary-file (:pathname src-file) :directory *test-src-dir*
-      (let ((dest-file (path-join *test-dir* "images/lol.png")))
+      (let* ((path "images/lol.png")
+             (dest-file (path-join *test-dir* path)))
         (str:to-file src-file "TEST")
-        (publish-static :dest-dir (namestring *test-dir*) :path dest-file :content src-file)
+        (publish-static :dest-dir (namestring *test-dir*) :path path :content src-file)
         (true (string= (str:from-file dest-file) "TEST")))))
 
   (define-test "when PATH already exists"
       (define-test "signal file-already-exists error"
         (setup)
         (uiop:with-temporary-file (:pathname src-file) :directory *test-src-dir*
-          (let ((dest-file (path-join *test-dir* "images/lol.png")))
+          (let* ((path "images/lol.png")
+                 (dest-file (path-join *test-dir* path)))
             (str:to-file src-file "TEST")
             (publish-static :dest-dir *test-dir*
                             :path dest-file
                             :content src-file)
             (fail (publish-static :dest-dir *test-dir* :path dest-file :content src-file)
-                  'file-already-exists))))))
+                'file-already-exists))))))
 
 (define-test "when CONTENT is path to a directory" :parent "publish-static"
-    (define-test "recursively copy dir at CONTENT to PATH"
-        (setup)
-      ;; Setup recursive src dirs
-      (let* ((src-level1 (path-join *test-src-dir* "level1/"))
-             (src-level2 (path-join src-level1 "level2/")))
-        (uiop:ensure-all-directories-exist (list src-level1 src-level2))
-        (str:to-file (path-join src-level1 "l1.css") "LEVEL1 CSS")
-        (str:to-file (path-join src-level2 "l2.css") "LEVEL2 CSS")
+  (define-test "recursively copy dir at CONTENT to PATH"
+    (setup)
+    ;; Setup recursive src dirs
+    (let* ((src-level1 (path-join *test-src-dir* "level1/"))
+           (src-level2 (path-join src-level1 "level2/")))
+      (uiop:ensure-all-directories-exist (list src-level1 src-level2))
+      (str:to-file (path-join src-level1 "l1.css") "LEVEL1 CSS")
+      (str:to-file (path-join src-level2 "l2.css") "LEVEL2 CSS")
 
-        (let* ((dest-dir (path-join *test-dir* "css/"))
-               (dest-level1 (path-join dest-dir "level1/"))
-               (dest-level2 (path-join dest-level1 "level2/")))
-          (publish-static :dest-dir *test-dir*
-                          :path dest-dir
-                          :content *test-src-dir*)
+      (let* ((dest-dir (base-path-join *test-dir* "css/"))
+             (dest-level1 (base-path-join dest-dir "level1/"))
+             (dest-level2 (base-path-join dest-level1 "level2/")))
+        (publish-static :dest-dir *test-dir*
+                        :path "css/"
+                        :content *test-src-dir*)
 
-          (is string= (str:from-file (path-join dest-level1 "l1.css"))
-              "LEVEL1 CSS")
-          (is string= (str:from-file (path-join dest-level2 "l2.css"))
-              "LEVEL2 CSS"))))
+        (is string= (str:from-file (path-join dest-level1 "l1.css"))
+            "LEVEL1 CSS")
+        (is string= (str:from-file (path-join dest-level2 "l2.css"))
+            "LEVEL2 CSS"))))
 
   (define-test "when PATH already exists"
-      (define-test "signal file-already-exists error"
-          (setup)
-        (let ((existing-dir (path-join *test-dir* "l1/")))
-          (ensure-directories-exist existing-dir)
-          (uiop:with-temporary-file (:pathname temp-file :directory existing-dir)
-            (declare (ignore temp-file))
-            (fail (publish-static :dest-dir *test-dir*
-                                  :path "l1/"
-                                  :content existing-dir)
-                  'file-already-exists)))))
+    (define-test "signal file-already-exists error"
+      (setup)
+      (let ((existing-dir (path-join *test-dir* "l1/")))
+        (ensure-directories-exist existing-dir)
+        (uiop:with-temporary-file (:pathname temp-file :directory existing-dir)
+          (declare (ignore temp-file))
+          (fail (publish-static :dest-dir *test-dir*
+                                :path "l1/"
+                                :content existing-dir)
+              'file-already-exists)))))
 
   (define-test "when HASH-FILE-NAME-P is non-nil"
-      (define-test "throw error if  CONTENT is a path to a directory"
-          (setup)
-        (let ((content-dir (path-join *test-dir* "some-dir/")))
-          (ensure-directories-exist content-dir)
-          (handler-case (publish-static :dest-dir *test-dir*
-                                        :path "l1"
-                                        :content content-dir
-                                        :hash-file-name-p t)
-            (error (e)
-              (true (string=
-                     (format nil "~a" e)
-                     "HASH-FILE-NAME-P can not be used to publish a directory"))))))
+    (define-test "throw error if  CONTENT is a path to a directory"
+      (setup)
+      (let ((content-dir (path-join *test-dir* "some-dir/")))
+        (ensure-directories-exist content-dir)
+        (handler-case (publish-static :dest-dir *test-dir*
+                                      :path "l1"
+                                      :content content-dir
+                                      :hash-file-name-p t)
+          (error (e)
+            (true (string=
+                   (format nil "~a" e)
+                   "HASH-FILE-NAME-P can not be used to publish a directory"))))))
 
     (define-test "include content hash of artifact in published artifact's name"
-        (define-test "when CONTENT is a string"
-            (setup)
-          (let* ((src-filename "css/lol.css")
-                 (content "body{background:red}")
-                 (expected-filename (append-content-hash
-                                     src-filename
-                                     (md5:md5sum-string content))))
-            (publish-static :dest-dir *test-dir*
-                            :path src-filename
-                            :content content
-                            :hash-file-name-p t)
-            (true (uiop:file-exists-p (path-join *test-dir* expected-filename)))))
+      (define-test "when CONTENT is a string"
+        (setup)
+        (let* ((src-filename "css/lol.css")
+               (content "body{background:red}")
+               (expected-filename (append-content-hash
+                                   src-filename
+                                   (md5:md5sum-string content))))
+          (publish-static :dest-dir *test-dir*
+                          :path src-filename
+                          :content content
+                          :hash-file-name-p t)
+          (true (uiop:file-exists-p (path-join *test-dir* expected-filename)))))
 
       (define-test "when CONTENT is pathname to a file"
-          (setup)
+        (setup)
         (let* ((src-filename #p"lol.css")
                (content "body{background:red}")
                (expected-filename (append-content-hash
@@ -121,7 +123,7 @@
           (str:to-file (path-join *test-src-dir* src-filename) content)
 
           (publish-static :dest-dir *test-dir*
-                          :path (path-join *test-dir* src-filename)
+                          :path src-filename
                           :content (path-join *test-src-dir* src-filename)
                           :hash-file-name-p t)
 
