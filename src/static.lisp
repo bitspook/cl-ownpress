@@ -25,6 +25,10 @@ on Windows maybe."
   ((path :initarg :path :reader file-path))
   (:documentation "Condition indicating that an file at the same location already exists."))
 
+(export-always 'skip-existing)
+(defun skip-existing (c)
+  (invoke-restart 'skip-existing))
+
 (export-always 'publish-static)
 (defmethod publish-static (&key dest-dir path content hash-file-name-p)
   "Publish CONTENT as a file or at PATH. PATH is a suggestion for where the new file should be created,
@@ -36,33 +40,37 @@ of a conflict.
   is appended with hash of the content of the artifact
 
 Returns the path of created file/dir."
-  (let ((dest-dir (namestring dest-dir))
-        (dest (base-path-join dest-dir (or path ""))))
-    (when (or (uiop:file-exists-p dest)
-              (uiop:directory-exists-p dest))
-      (error 'file-already-exists :path dest))
+  (labels ((publish ()
+             (let ((dest-dir (namestring dest-dir))
+                   (dest (base-path-join dest-dir (or path ""))))
+               (when (or (uiop:file-exists-p dest)
+                         (uiop:directory-exists-p dest))
+                 (error 'file-already-exists :path dest))
 
-    (ensure-directories-exist (directory-namestring dest))
+               (ensure-directories-exist (directory-namestring dest))
 
-    (when (pathnamep content)
-      (when (uiop:directory-exists-p content)
-        (when hash-file-name-p
-          (error "HASH-FILE-NAME-P can not be used to publish a directory"))
+               (when (pathnamep content)
+                 (when (uiop:directory-exists-p content)
+                   (when hash-file-name-p
+                     (error "HASH-FILE-NAME-P can not be used to publish a directory"))
 
-        (return-from publish-static
-          (progn
-            (copy-dirs content dest)
-            (str:replace-first dest-dir "" (namestring dest)))))
+                   (return-from publish-static
+                     (progn
+                       (copy-dirs content dest)
+                       (str:replace-first dest-dir "" (namestring dest)))))
 
-      (return-from publish-static
-        (let ((dest (if hash-file-name-p
-                        (append-content-hash (namestring dest) (md5sum-file content))
-                        dest)))
-          (uiop:copy-file content dest)
-          (str:replace-first dest-dir "" (namestring dest)))))
+                 (return-from publish-static
+                   (let ((dest (if hash-file-name-p
+                                   (append-content-hash (namestring dest) (md5sum-file content))
+                                   dest)))
+                     (uiop:copy-file content dest)
+                     (str:replace-first dest-dir "" (namestring dest)))))
 
-    (let ((dest (if hash-file-name-p
-                    (append-content-hash (namestring dest) (md5sum-string content))
-                    dest)))
-      (str:to-file dest content)
-      (str:replace-first dest-dir "" (namestring dest)))))
+               (let ((dest (if hash-file-name-p
+                               (append-content-hash (namestring dest) (md5sum-string content))
+                               dest)))
+                 (str:to-file dest content)
+                 (str:replace-first dest-dir "" (namestring dest))))))
+    ;; TODO Write tests for restarts
+    (restart-case (publish)
+      (skip-existing () nil))))
