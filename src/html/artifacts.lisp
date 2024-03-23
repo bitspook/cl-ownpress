@@ -74,6 +74,7 @@
 
 (export-always 'link)
 (defmethod embed-artifact-as ((art artifact) (as (eql 'link)) &key)
+  (when *self* (add-dep *self* art))
   (base-path-join *base-url* (artifact-location art)))
 
 ;; Fonts
@@ -110,6 +111,7 @@
 
 (export-always 'font-face)
 (defmethod embed-artifact-as ((art font-artifact) (as (eql 'font-face)) &key family)
+  (when *self* (add-dep *self* art))
   (with-slots (weight style) art
     `(@font-face :font-family ,family
                  :src ,(str:join
