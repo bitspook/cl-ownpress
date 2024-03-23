@@ -31,25 +31,14 @@ obtaining the location. e.g when materializing the artifact as HTML file."))
 
 (export-always 'artifact-content)
 (defgeneric artifact-content (art)
-  (:documentation "Artifact-content is what is actually published at end of publishing lifecycle."))
+  (:documentation "Artifact-content is what is actually published at end of publishing lifecycle.")
+  (:method ((art artifact)) nil))
 
 (export-always 'embed-artifact-as)
 (defgeneric embed-artifact-as (art as &key)
   (:documentation "Embed an ART artifact in some context as AS e.g embed css-file-artifact in an html file as
 'stylesheet by prepending *base-url* to css location."))
 
-;; Publishing
 (export-always 'publish-artifact)
-(defun publish-artifact (artifact &key dest-dir)
-  "Publish ART and all its dependencies to DEST-DIR."
-  (dolist (art (append (list artifact) (all-deps artifact)))
-    (handler-bind
-        ((file-already-exists
-           (lambda (c)
-             ;; We know CSS files are content hashed. So we can skip when they collide
-             (when (eq (class-name-of art) 'css-file-artifact)
-               (skip-existing c)))))
-      (publish-static
-       :dest-dir dest-dir
-       :content (artifact-content art)
-       :path (artifact-location art)))))
+(defgeneric publish-artifact (art dest-dir)
+  (:documentation "Publish ART artifact to DEST-DIR. It must also publish its dependencies."))
