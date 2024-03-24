@@ -38,7 +38,7 @@
 
     (let* ((root-w-deps (all-deps (slot-value art 'root-widget)))
            ;; There is no publishing widgets; they get published as html content
-           (non-widget-deps (remove-if (op (subtypep (type-of _) 'widget)) root-w-deps)))
+           (non-widget-deps (remove-if #'widgetp root-w-deps)))
       (mapcar (op (publish-artifact _ dest-dir)) non-widget-deps))
 
     (publish-static

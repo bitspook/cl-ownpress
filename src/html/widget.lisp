@@ -6,6 +6,9 @@
 A widget is made up of spinneret Dom forms and lass Css forms. Use `defwidget' macro to create a new
 widget."))
 
+(defun widgetp (w)
+  (subtypep (type-of w) 'widget))
+
 (export-always 'dom-of)
 (defgeneric dom-of (widget)
   (:documentation "Provide spinneret DOM for the WIDGET.")
@@ -73,9 +76,7 @@ Enable consuming WIDGET in following ways:
 Make sure widget has been `render'ed. A WIDGET's dependencies are resolved when it is `render'ed."
   (let* ((lass:*pretty* *print-pretty*)
          (all-deps (append (list widget) (all-deps widget)))
-         (css-deps (remove-if-not
-                    (op (equal (class-name-of _) "css-file-artifact"))
-                    all-deps))
+         (css-deps (remove-if-not #'widgetp all-deps))
          (css-fragments (mapcar #'css-of (append1 (nreverse css-deps) widget)))
          (unique-css-fragments (nreverse (remove-duplicates css-fragments :test #'equal))))
     (str:join (if *print-pretty* #\NewLine "") unique-css-fragments)))
