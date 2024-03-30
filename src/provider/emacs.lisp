@@ -1,4 +1,4 @@
-(in-package #:in.bitspook.cl-ownpress/provider)
+(in-package #:in.bitspook.cl-ownpress)
 
 (export-always 'emacs-provider)
 (export-always 'script)

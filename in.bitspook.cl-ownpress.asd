@@ -18,11 +18,9 @@
 
                  (:file "html/artifacts")
 
-                 (:module "provider"
-                  :serial t
-                  :components ((:file "package")
-                               (:file "rpc-server")
-                               (:file "emacs"))))))
+                 (:file "provider")
+                 (:file "provider/rpc-server")
+                 (:file "provider/emacs"))))
   :description "Personal publishing platform"
   :in-order-to ((test-op (test-op "in.bitspook.cl-ownpress/tests"))))
 

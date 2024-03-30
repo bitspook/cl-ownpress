@@ -1,4 +1,4 @@
-(in-package #:in.bitspook.cl-ownpress/provider)
+(in-package #:in.bitspook.cl-ownpress)
 
 (defvar _rpc-server_ nil)
 (defparameter *rpc-port* 1337
