@@ -14,13 +14,12 @@ effective)."))
 (defmethod provide-all ((provider emacs-provider) &rest script-args)
   "Starts a jsonrpc server, runs PROVIDER's :script, collects and returns all messages of type :event
 emitted from Emacs script, until message of type :done is emitted."
-  (let ((events nil)
-        (server (rpc-server)))
+  (let ((events nil))
 
-    (with-slots (script) provider
-      (with-rpc-server (server msg)
+    (with-slots (script (server rpc-server)) provider
+      (with-rpc-server (msg)
         (:case event (push msg events))
-        (:finally done (declare (ignore msg)) t)
+        (:finally done)
         (uiop:run-program (format nil "emacsclient -e '(load \"~a\")' ~
                                        '(main ~{\"~a\" ~})'"
                                   script script-args)

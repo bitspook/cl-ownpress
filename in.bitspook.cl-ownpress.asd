@@ -4,7 +4,7 @@
   :license "AGPL-3.0-only"
   :depends-on ("serapeum" "str"
                "lass" "spinneret" "cl-slug"
-               "jsonrpc" "md5")
+               "clack" "yason" "md5")
   :components ((:module "src"
                 :serial nil
                 :components

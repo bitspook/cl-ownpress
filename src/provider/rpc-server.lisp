@@ -1,17 +1,45 @@
 (in-package #:in.bitspook.cl-ownpress)
 
-(defvar _rpc-server_ nil)
-(defparameter *rpc-port* 1337
-  "Port on which rpc-server will be started")
+(defparameter *rpc-request-handlers* (dict))
 
-(defun rpc-server ()
-  (when (not _rpc-server_)
-    (setf _rpc-server_ (jsonrpc:make-server))
-    (jsonrpc:server-listen _rpc-server_ :port *rpc-port* :mode :tcp))
+(defun clack-handler (env)
+  (let* ((content-length (or (getf env :content-length) 0))
+         (raw-body (getf env :raw-body))
+         (str-body (with-output-to-string (out)
+                     (let* ((buffer (make-array content-length :element-type 'character))
+                            (position (read-sequence buffer raw-body)))
+                       (write-sequence buffer out :end position))))
+         (parsed-body nil))
+    (handler-case (setf parsed-body (yason:parse str-body))
+      (error ()
+        (return-from clack-handler
+          (list 400 nil
+                `("Expected a json of shape: [{ \"type\": string, \"payload\": any }]\n"
+                  ,(format nil "Got: ~a" str-body)) ))))
+    ;; A big fat RCE right here. Not a problem since rpc-server and rpc-client are
+    ;; supposed to be on same machine
+    (let* ((request-name (@ parsed-body "type"))
+           (request-body (@ parsed-body "payload"))
+           (request-handler (@ *rpc-request-handlers* request-name)))
+      (handler-case (list 200 nil (if request-handler (funcall request-handler request-body)
+                                      (error (format nil "No handler for: ~a" request-name))))
+        (error (c) (list 500 nil (list (format nil "~a" c))))))))
 
-  _rpc-server_)
+(export-always 'start-rpc-server)
+(defun start-rpc-server (port)
+  (clack:clackup (lambda (env) (funcall #'clack-handler env)) :port port))
 
-(defmacro with-rpc-server ((server msg-var) &body body)
+(export-always 'stop-rpc-server)
+(defun stop-rpc-server (server)
+  (clack:stop server))
+
+(defun add-rpc-request-handler (name handler)
+  (setf (gethash name *rpc-request-handlers*) handler))
+
+(defun remove-rpc-request-handler (name)
+  (remhash name *rpc-request-handlers*))
+
+(defmacro with-rpc-server ((msg-var) &body body)
   "Macro to work with json-rpc server. RPC server is started on *RPC-PORT*.
 SERVER is an instance of jsonrpc:server. MSG-VAR is variable which holds value of received message.
 BODY contains 3 kind of forms:
@@ -22,7 +50,7 @@ BODY contains 3 kind of forms:
 
 Example:
 ```
-(with-rpc-server ((rpc-server) msg)
+(with-rpc-server (msg)
   (:case :my-request-1 (format t \"I got 1 ~a\" msg))
   (:case :my-request-2 (format t \"I got 2 ~a\" msg))
   (:finally :my-done-request (format t \"I got finally ~a\" msg))
@@ -33,28 +61,27 @@ Example:
            (final-actionp (_1) (eq (car _1) :finally))
            (action-name (action) (let ((name (second action)))
                                    (if (symbolp name) (string-downcase (symbol-name name)) name)))
-           (action-cb (action) `(lambda (,msg-var) ,@(cddr action))))
-    (let ((server server)
-          (rpc-actions (remove-if-not #'actionp body))
+           (action-cb (action) `(lambda (,msg-var)
+                                  (declare (ignorable ,msg-var))
+                                  ,@(cddr action))))
+    (let ((rpc-actions (remove-if-not #'actionp body))
           (rpc-final-action (first (remove-if-not #'final-actionp body)))
           (body (remove-if (op (or (actionp _1) (final-actionp _1))) body)))
 
-      (when (not rpc-final-action) (error "It is mandatory to provide a final json rpc action with :finally"))
+      (when (not rpc-final-action) (error ":finally clause for with-rpc-server must be provided. It is used to determine when to tear-down rpc event handlers."))
 
-      ;; TODO Ensure that duplicates listeners aren't added
       `(progn
          ,@(loop :for action :in rpc-actions
-                 :collect `(jsonrpc:expose ,server ,(action-name action) ,(action-cb action)))
+                 :collect `(add-rpc-request-handler ,(action-name action) ,(action-cb action)))
 
          ;; When client wants to end it, handle the final request and clear all
          ;; the request-handlers
-         (jsonrpc:expose
-          ,server ,(action-name rpc-final-action)
-          (compose (lambda (_)
-                     (declare (ignore _))
-                     ;; FIXME instead of clearing all callbacks, only remove the
-                     ;; ones added by this macro
-                     (jsonrpc:clear-methods ,server))
-                   ,(action-cb rpc-final-action)))
+         (add-rpc-request-handler
+          ,(action-name rpc-final-action)
+          (lambda (msg)
+            (funcall ,(action-cb rpc-final-action) msg)
+            ,@(loop :for action :in rpc-actions
+                    :collect `(remove-rpc-request-handler ,(action-name action)))
+            (remove-rpc-request-handler ,(action-name rpc-final-action))))
 
          ,@body))))
