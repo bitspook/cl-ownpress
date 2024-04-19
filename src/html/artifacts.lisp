@@ -7,7 +7,8 @@
    (root-widget :initarg :root-widget)))
 
 (export-always 'make-html-page-artifact)
-(defun make-html-page-artifact (location builder root-widget &key (css-location "/css/styles.css"))
+(defun make-html-page-artifact (&key location builder root-widget
+                                  (css-location "/css/styles.css"))
   (let ((css-art (make 'css-file-artifact
                        :location css-location
                        :root-widget root-widget)))
@@ -75,7 +76,14 @@
 (export-always 'link)
 (defmethod embed-artifact-as ((art artifact) (as (eql 'link)) &key)
   (when *self* (add-dep *self* art))
-  (base-path-join *base-url* (artifact-location art)))
+  (let* ((loc (artifact-location art))
+         (path-frags (str:split "/" (namestring loc)))
+         (clean-loc (when (equal (car (last path-frags)) "index.html")
+                      (str:join "/"
+                                (firstn
+                                 (- (length path-frags) 1)
+                                 path-frags)))))
+    (base-path-join *base-url* (or clean-loc loc))))
 
 ;; Fonts
 (export-always 'font-artifact)

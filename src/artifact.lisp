@@ -11,6 +11,10 @@ to. This prevents the problem of 'make sure X thing is published at this exact a
 linking to in this file'; but passing the artifact to link to and just saying 'link to this
 artifact, wherever it is published.'"))
 
+(defmethod print-object ((art artifact) out)
+  (print-unreadable-object (art out :type t)
+    (format out "~a" (artifact-location art))))
+
 (export-always 'add-dep)
 (defgeneric add-dep (art dep)
   (:documentation "Add a new dependency if it isn't already added.")
