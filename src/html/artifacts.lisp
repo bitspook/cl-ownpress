@@ -32,15 +32,23 @@
               :css css-art :body-html body-html))))
     page-html))
 
+(export-always '*already-published-artifacts*)
+;; Ugly way of handing circular dependencies
+(defparameter *already-published-artifacts* nil
+  "List of artifacts which have already been published, and should not be published again. This is used
+to resolve circular dependencies when two artifacts depend on each other.")
+
 (defmethod publish-artifact ((art html-page-artifact) dest-dir)
+  (setf *already-published-artifacts* (concatenate 'list *already-published-artifacts* (list art)))
   (let ((content (artifact-content art)))
     (dolist (dep (artifact-deps art))
       (publish-artifact dep dest-dir))
 
     (let* ((root-w-deps (all-deps (slot-value art 'root-widget)))
            ;; There is no publishing widgets; they get published as html content
-           (non-widget-deps (remove-if #'widgetp root-w-deps)))
-      (mapcar (op (publish-artifact _ dest-dir)) non-widget-deps))
+           (non-widget-deps (remove-if #'widgetp root-w-deps))
+           (non-published-deps (remove-if (op (find _ *already-published-artifacts*)) non-widget-deps)))
+      (mapcar (op (publish-artifact _ dest-dir)) non-published-deps))
 
     (publish-static
      :dest-dir dest-dir
