@@ -46,3 +46,9 @@ obtaining the location. e.g when materializing the artifact as HTML file."))
 (export-always 'publish-artifact)
 (defgeneric publish-artifact (art dest-dir)
   (:documentation "Publish ART artifact to DEST-DIR. It must also publish its dependencies."))
+
+(export-always '*already-published-artifacts*)
+;; Ugly way of handing circular dependencies
+(defparameter *already-published-artifacts* nil
+  "List of artifacts which have already been published, and should not be published again. This is used
+to resolve circular dependencies when two artifacts depend on each other.")

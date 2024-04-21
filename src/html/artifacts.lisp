@@ -3,40 +3,22 @@
 (export-always 'html-page-artifact)
 (defclass html-page-artifact (artifact)
   ((location :initarg :location :accessor artifact-location)
-   (builder :initarg :builder)
    (root-widget :initarg :root-widget)))
 
 (export-always 'make-html-page-artifact)
-(defun make-html-page-artifact (&key location builder root-widget
-                                  (css-location "/css/styles.css"))
-  (let ((css-art (make 'css-file-artifact
-                       :location css-location
-                       :root-widget root-widget)))
-    (make 'html-page-artifact
-          :location location
-          :root-widget root-widget
-          :builder builder
-          :deps (list css-art))))
+(defun make-html-page-artifact (&key location root css-location)
+  (multiple-value-bind (root-widget root-mod) (funcall root :css nil)
+    (let ((css-art (make 'css-file-artifact
+                         :location css-location
+                         :root-widget root-widget)))
+      (funcall root-mod :css css-art)
+      (make 'html-page-artifact
+            :location location
+            :root-widget root-widget
+            :deps (list css-art)))))
 
 (defmethod artifact-content ((art html-page-artifact))
-  (let* ((root-w (slot-value art 'root-widget))
-         (body-html (with-html-string (render root-w)))
-         (css-art
-           (find-if
-            (op (eq (class-name-of _) 'css-file-artifact))
-            (artifact-deps art)))
-         (page-html
-           (with-html-string
-             (funcall
-              (slot-value art 'builder)
-              :css css-art :body-html body-html))))
-    page-html))
-
-(export-always '*already-published-artifacts*)
-;; Ugly way of handing circular dependencies
-(defparameter *already-published-artifacts* nil
-  "List of artifacts which have already been published, and should not be published again. This is used
-to resolve circular dependencies when two artifacts depend on each other.")
+  (with-html-string (render (slot-value art 'root-widget))))
 
 (defmethod publish-artifact ((art html-page-artifact) dest-dir)
   (setf *already-published-artifacts* (concatenate 'list *already-published-artifacts* (list art)))
@@ -58,16 +40,14 @@ to resolve circular dependencies when two artifacts depend on each other.")
 ;; CSS
 (defclass css-file-artifact (artifact)
   ((location :initarg :location
-             :initform (error "css-file-artifact's :location is required"))
+             :initform (error "css-file-artifact's :location is required")
+             :accessor artifact-location)
    (root-widget :initarg :root-widget)))
 
 (defmethod artifact-content ((art css-file-artifact))
   (with-slots (root-widget) art
+    (with-html-string (render root-widget))
     (rendered-css root-widget)))
-
-(defmethod artifact-location ((art css-file-artifact))
-  (let ((hash (md5:md5sum-string (artifact-content art))))
-    (append-content-hash (namestring (slot-value art 'location)) hash)))
 
 (defmethod publish-artifact ((art css-file-artifact) dest-dir)
   (let ((content (artifact-content art)))
