@@ -6,16 +6,16 @@
    (root-widget :initarg :root-widget)))
 
 (export-always 'make-html-page-artifact)
-(defun make-html-page-artifact (&key location root css-location)
-  (multiple-value-bind (root-widget root-mod) (funcall root :css nil)
-    (let ((css-art (make 'css-file-artifact
-                         :location css-location
-                         :root-widget root-widget)))
-      (funcall root-mod :css css-art)
-      (make 'html-page-artifact
-            :location location
-            :root-widget root-widget
-            :deps (list css-art)))))
+(defun make-html-page-artifact (&key location root-widget css-location)
+  (let ((css-art (make 'css-file-artifact
+                       :location css-location
+                       :root-widget root-widget)))
+    (when (slot-exists-p root-widget 'css-file-artifact)
+      (setf (slot-value root-widget 'css-file-artifact) css-art))
+    (make 'html-page-artifact
+          :location location
+          :root-widget root-widget
+          :deps (list css-art))))
 
 (defmethod artifact-content ((art html-page-artifact))
   (with-html-string (render (slot-value art 'root-widget))))
