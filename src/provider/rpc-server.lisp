@@ -2,10 +2,11 @@
 
 (defparameter *rpc-request-handlers* (dict))
 
-(defun clack-handler (env)
-  (let* ((content-length (or (getf env :content-length) 0))
-         (raw-body (getf env :raw-body))
+(defun clack-handler (req)
+  (let* ((content-length (or (getf req :content-length) 0))
+         (raw-body (getf req :raw-body))
          (str-body (with-output-to-string (out)
+                     (setf (flexi-streams:flexi-stream-external-format raw-body) '(:utf-8 :EOL-STYLE :LF))
                      (let* ((buffer (make-array content-length :element-type 'character))
                             (position (read-sequence buffer raw-body)))
                        (write-sequence buffer out :end position))))
@@ -16,8 +17,6 @@
           (list 400 nil
                 `("Expected a json of shape: [{ \"type\": string, \"payload\": any }]\n"
                   ,(format nil "Got: ~a" str-body)) ))))
-    ;; A big fat RCE right here. Not a problem since rpc-server and rpc-client are
-    ;; supposed to be on same machine
     (let* ((request-name (@ parsed-body "type"))
            (request-body (@ parsed-body "payload"))
            (request-handler (@ *rpc-request-handlers* request-name)))
@@ -27,7 +26,7 @@
 
 (export-always 'start-rpc-server)
 (defun start-rpc-server (port)
-  (clack:clackup (lambda (env) (funcall #'clack-handler env)) :port port))
+  (clack:clackup (lambda (req) (funcall #'clack-handler req)) :port port))
 
 (export-always 'stop-rpc-server)
 (defun stop-rpc-server (server)
