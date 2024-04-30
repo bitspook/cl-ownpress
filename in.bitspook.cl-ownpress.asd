@@ -4,7 +4,7 @@
   :license "AGPL-3.0-only"
   :depends-on ("serapeum" "str"
                "lass" "spinneret" "cl-slug"
-               "clack" "yason" "md5")
+               "flexi-streams" "clack" "yason" "md5")
   :components ((:module "src"
                 :serial nil
                 :components
