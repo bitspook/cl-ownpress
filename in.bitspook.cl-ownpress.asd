@@ -1,3 +1,5 @@
+(push :HUNCHENTOOT-NO-SSL *features*)
+
 (defsystem "in.bitspook.cl-ownpress"
   :version "0.1.0"
   :author "Charanjit Singh"
