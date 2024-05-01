@@ -1,5 +1,20 @@
 (in-package #:in.bitspook.cl-ownpress)
 
+(export-always '*base-url*)
+(defparameter *base-url* "/")
+
+(export-always 'link)
+(defmethod embed-artifact-as ((art artifact) (as (eql 'link)) &key)
+  (when *self* (add-dep *self* art))
+  (let* ((loc (namestring (artifact-location art)))
+         (clean-loc (if (equal (path-basename loc) "index.html")
+                        (str:replace-all "/index.html" "" loc)
+                        loc)))
+    (str:concat
+     *base-url*
+     (unless (str:ends-with-p "/" *base-url*) "/")
+     (if (str:starts-with-p "/" clean-loc) (str:substring 1 nil clean-loc) clean-loc))))
+
 (export-always 'html-page-artifact)
 (defclass html-page-artifact (artifact)
   ((location :initarg :location :accessor artifact-location)
@@ -57,21 +72,6 @@
        :dest-dir dest-dir
        :content content
        :path (artifact-location art)))))
-
-(export-always '*base-url*)
-(defparameter *base-url* "/")
-
-(export-always 'link)
-(defmethod embed-artifact-as ((art artifact) (as (eql 'link)) &key)
-  (when *self* (add-dep *self* art))
-  (let* ((loc (artifact-location art))
-         (path-frags (str:split "/" (namestring loc)))
-         (clean-loc (when (equal (car (last path-frags)) "index.html")
-                      (str:join "/"
-                                (firstn
-                                 (- (length path-frags) 1)
-                                 path-frags)))))
-    (base-path-join *base-url* (or clean-loc loc))))
 
 ;; Fonts
 (export-always 'font-artifact)
