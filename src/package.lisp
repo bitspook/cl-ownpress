@@ -5,5 +5,8 @@
   (:export
    *conf* conf conf-merge
    make-connection run-pending-migrations create-new-migration
-   join-paths system-local recursive-directory-files))
+   join-paths system-local recursive-directory-files
+   #:artifact-registry #:registry-store #:registry-indices
+   #:registry-query #:registry-add-index #:registry-add-artifact #:registry-on-index-artifact))
+
 (in-package #:in.bitspook.cl-ownpress)

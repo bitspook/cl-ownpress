@@ -2,8 +2,10 @@
 
 (export-always 'artifact)
 (export-always 'artifact-deps)
+(export-always 'artifact-id)
 (defclass artifact ()
-  ((deps :initarg :deps :initform nil :accessor artifact-deps
+  ((id :initarg :id :accessor artifact-id)
+   (deps :initarg :deps :initform nil :accessor artifact-deps
          :documentation "List of ARTIFACTs current ARTIFACT depends on."))
   (:documentation "An artifact is something that will eventually be published and can depend on other artifacts.
 They provide a convenient way to represent entire 'is also published' objects, which can be linked
@@ -51,4 +53,33 @@ obtaining the location. e.g when materializing the artifact as HTML file."))
 ;; Ugly way of handing circular dependencies
 (defparameter *already-published-artifacts* nil
   "List of artifacts which have already been published, and should not be published again. This is used
-to resolve circular dependencies when two artifacts depend on each other.")
+to resolve circular dependencies when two artifacts depend on each other. It is publisher's
+responsibility to set it to NIL when publishing a new artifact.")
+
+(defclass artifact-registry ()
+  ((store :initform (dict)
+          :accessor registry-store)
+   (indices :initform (make-hash-table)
+            :accessor registry-indices
+            :documentation "INDICES are lists of ARTIFACT-IDs")))
+
+(defmethod registry-add-index ((registry artifact-registry) (name symbol) &optional (default (dict)))
+  (setf (@ (registry-indices registry) name) default))
+
+(defgeneric registry-query (registry key &key)
+  (:method ((registry artifact-registry) (key string) &key)
+    (@ (registry-store registry) key)))
+
+(defmethod registry-add-artifact ((registry artifact-registry) (artifact artifact))
+  (setf (@ (registry-store registry) (artifact-id artifact)) artifact)
+
+  (loop :for key :in (hash-table-keys (registry-indices registry))
+        :do (on-index-artifact registry artifact key)))
+
+(defgeneric registry-on-index-artifact (registry artifact index-name &key)
+  (:documentation "Add ARTIFACT in to INDEX-NAMEd index of REGISTRY.")
+  (:method ((registry artifact-registry) (artifact artifact) (index-name symbol) &key keys)
+    (loop :for key :in keys
+          :for ids := (@ (registry-indices registry) index-name key)
+          :do (setf (@ (registry-indices registry) index-name key)
+                    (adjoin (artifact-id artifact) ids :test #'equal)))))
