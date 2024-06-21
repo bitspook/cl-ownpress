@@ -74,7 +74,7 @@ responsibility to set it to NIL when publishing a new artifact.")
   (setf (@ (registry-store registry) (artifact-id artifact)) artifact)
 
   (loop :for key :in (hash-table-keys (registry-indices registry))
-        :do (on-index-artifact registry artifact key)))
+        :do (registry-on-index-artifact registry artifact key)))
 
 (defgeneric registry-on-index-artifact (registry artifact index-name &key)
   (:documentation "Add ARTIFACT in to INDEX-NAMEd index of REGISTRY.")
