@@ -49,6 +49,15 @@ obtaining the location. e.g when materializing the artifact as HTML file."))
 (defgeneric publish-artifact (art dest-dir)
   (:documentation "Publish ART artifact to DEST-DIR. It must also publish its dependencies."))
 
+;; TODO Figure out how to implement this so that this gets called for methods of any child class as
+;; well. This code need to be repeated for every instance of this method. This don't work because
+;; child class's functions get called before this.
+;; (defmethod publish-artifact :around ((art artifact) dest)
+;;   (let* ((loc (namestring (artifact-location art)))
+;;          (publish-p (not (find loc *already-published-artifacts* :test #'equal))))
+;;     (push *already-published-artifacts* loc)
+;;     (when publish-p (call-next-method art dest))))
+
 (export-always '*already-published-artifacts*)
 ;; Ugly way of handing circular dependencies
 (defparameter *already-published-artifacts* nil

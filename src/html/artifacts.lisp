@@ -36,16 +36,19 @@
   (with-html-string (render (slot-value art 'root-widget))))
 
 (defmethod publish-artifact ((art html-page-artifact) dest-dir)
-  (setf *already-published-artifacts* (concatenate 'list *already-published-artifacts* (list art)))
+  (when (find (artifact-location art) *already-published-artifacts*)
+    (return-from publish-artifact))
+
+  (appendf *already-published-artifacts* (list (artifact-location art)))
+
   (let ((content (artifact-content art)))
     (dolist (dep (artifact-deps art))
       (publish-artifact dep dest-dir))
 
     (let* ((root-w-deps (all-deps (slot-value art 'root-widget)))
            ;; There is no publishing widgets; they get published as html content
-           (non-widget-deps (remove-if #'widgetp root-w-deps))
-           (non-published-deps (remove-if (op (find _ *already-published-artifacts*)) non-widget-deps)))
-      (mapcar (op (publish-artifact _ dest-dir)) non-published-deps))
+           (non-widget-deps (remove-if #'widgetp root-w-deps)))
+      (mapcar (op (publish-artifact _ dest-dir)) non-widget-deps))
 
     (publish-static
      :dest-dir dest-dir
@@ -65,6 +68,10 @@
     (rendered-css root-widget)))
 
 (defmethod publish-artifact ((art css-file-artifact) dest-dir)
+  (when (find (artifact-location art) *already-published-artifacts*)
+    (return-from publish-artifact))
+  (appendf *already-published-artifacts* (list (artifact-location art)))
+
   (let ((content (artifact-content art)))
     ;; since css files are content-hashed, we can simply ignore conflicts
     (handler-bind ((file-already-exists #'skip-existing))
@@ -121,6 +128,10 @@
                  :font-stype ,style)))
 
 (defmethod publish-artifact ((art font-artifact) dest-dir)
+  (when (find (artifact-location art) *already-published-artifacts*)
+    (return-from publish-artifact))
+  (appendf *already-published-artifacts* (list (artifact-location art)))
+
   (with-slots (files) art
     (loop :for file :in files
           :for i :from 0 :to (1- (length files))
