@@ -21,13 +21,14 @@
    (root-widget :initarg :root-widget)))
 
 (export-always 'make-html-page-artifact)
-(defun make-html-page-artifact (&key location root-widget css-location)
+(defun make-html-page-artifact (&key location root-widget css-location (id nil))
   (let ((css-art (make 'css-file-artifact
                        :location css-location
                        :root-widget root-widget)))
     (when (slot-exists-p root-widget 'css-file-artifact)
       (setf (slot-value root-widget 'css-file-artifact) css-art))
     (make 'html-page-artifact
+          :id id
           :location location
           :root-widget root-widget
           :deps (list css-art))))
