@@ -88,6 +88,7 @@ responsibility to set it to NIL when publishing a new artifact.")
 (defgeneric registry-on-index-artifact (registry artifact index-name &key)
   (:documentation "Add ARTIFACT in to INDEX-NAMEd index of REGISTRY.")
   (:method ((registry artifact-registry) (artifact artifact) (index-name symbol) &key keys)
+    "Default implementation for adding ARTIFACT-id to a list which can be REGISTRY-QUERY-ed with KEY."
     (loop :for key :in keys
           :for ids := (@ (registry-indices registry) index-name key)
           :do (setf (@ (registry-indices registry) index-name key)

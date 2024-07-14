@@ -20,7 +20,10 @@
     (let* ((request-name (@ parsed-body "type"))
            (request-body (@ parsed-body "payload"))
            (request-handler (@ *rpc-request-handlers* request-name)))
-      (handler-case (list 200 nil (if request-handler (funcall request-handler request-body)
+      (handler-case (list 200 nil (if request-handler
+                                      (progn
+                                        (funcall request-handler request-body)
+                                        nil)
                                       (error (format nil "No handler for: ~a" request-name))))
         (error (c) (list 500 nil (list (format nil "~a" c))))))))
 
