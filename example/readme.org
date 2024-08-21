@@ -1,0 +1,243 @@
+#+PROPERTY: header-args :tangle ./app.lisp
+
+* cl-ownpress Example
+
+** Publishing a single-page website
+
+Here's a small example of how to build a publish-able website using cl-ownpress. A bigger example
+can be found at [[https://github.com/bitspook/bitspook.github.io/blob/491e8777835aa1f122a8562ac907d2e89044e2f7/scratch.lisp#L1][github.com/bitspook/bitspook.github.io]], which is the source of my personal website
+hosted at https://bitspook.in.
+
+This example is built by [[https://orgmode.org/manual/Extracting-Source-Code.html][tangling]] code snippets from a single readme.org file (*this* file).
+
+Let's start by creating a lisp system, and adding some dependencies.
+
+#+begin_src lisp
+  (defpackage com.example.website
+    (:use #:cl #:serapeum/bundle)
+    (:import-from #:spinneret :with-html)
+    (:import-from #:in.bitspook.cl-ownpress :css-file-artifact)
+    (:local-nicknames (:clown #:in.bitspook.cl-ownpress)))
+
+  (in-package #:com.example.website)
+#+end_src
+
+Note that we are directly importing =css-file-artifact= symbol here, although we are importing
+cl-ownpress itself under =clown= alias.
+
+cl-ownpress is a library which provides few abstractions and utilities which you can glue together
+as you want. One of the primary abstractions is an [[https://github.com/bitspook/cl-ownpress/blob/04612381d1f0489cb472e8471619dc3435809c89/src/artifact.lisp#L6][artifact]]. An artifact represents a graph (of
+other artifacts) that get published as files. In case of a website we primarily want to publish html
+files, so we'll have to create an [[https://github.com/bitspook/cl-ownpress/blob/04612381d1f0489cb472e8471619dc3435809c89/src/html/artifacts.lisp#L19][html-page-artifact]].
+
+But an =html-page-artifact= has a =:root-widget= slot. Which means we need to deal with another
+abstraction provided by cl-ownpress: a [[https://github.com/bitspook/cl-ownpress/blob/04612381d1f0489cb472e8471619dc3435809c89/src/html/widget.lisp#L4][widget]]. We can think of widget as a react/web component (if
+you're familiar with the concept), or simply as a fragment of an HTML page. An HTML page itself is
+also a widget.
+
+/Note/: There is a more powerful abstraction with similar name and purpose in [[https://40ants.com/reblocks/widgets/#x-28REBLOCKS-2FDOC-2FWIDGETS-3A-3A-40WIDGETS-2040ANTS-DOC-2FLOCATIVES-3ASECTION-29][reblocks.]] Sadly it is
+not compatible with cl-ownpress out of the box.
+
+A single =widget= represents both CSS and HTML required to display a HTML page fragment. Let's
+create a few widgets.
+
+#+begin_src lisp
+  (clown:defwidget navbar-w (links)
+    (clown:tagged-lass
+     `((.top-nav
+        :min-height (var --size-16)
+        :max-width (var --width-lg)
+        :margin 0 auto
+        :display flex
+        :padding (var --size-2)
+        :flex-direction column
+        :position relative
+        :justify-content space-between
+
+        (.brand
+         :width (var --size-16)
+         :height (var --size-16)
+         :align-self center
+         :flex-grow 1
+
+         (img :width (var --size-16)))
+
+        (ul.nav
+         :list-style-type none
+         :padding 0
+         :display flex
+         :flex-wrap wrap
+         :justify-content center
+         :align-items center
+
+         (li :padding 0 (var --size-4) (var --size-4)))))
+
+     :sm  `((.top-nav
+             :padding-right 1em
+             :flex-direction row
+
+             (a :font-size 1em)
+
+             (ul.nav (li :padding 0 (var --size-4))))))
+
+    (let ((links (or links '(("Home" "/")
+                             ("Blog" "/blog")
+                             ("Projects" "/projects")
+                             ("About me" "/about")))))
+      (:nav :class "top-nav"
+            (:div :class "brand" (:a :href "/" "Home"))
+            (:ul :class "nav"
+                 (loop :for link :in links
+                       :do (:li (:a :href (second link) (first link))))))))
+#+end_src
+
+This snippet uses a few utilities provided by cl-ownpress:
+1. [[https://github.com/bitspook/cl-ownpress/blob/04612381d1f0489cb472e8471619dc3435809c89/src/html/widget.lisp#L36][defwidget]]: a convenience macro to create a new widget.
+   - =navbar-w= is the name of our new widget.
+   - =linkes= is slots of =navbar-w= (since a =widget= is a class)
+   - Next argument is a list of [[https://shinmera.github.io/LASS/][lass]] blocks which make up CSS of this widget
+   - Finally there is [[https://github.com/ruricolist/spinneret][spinneret]] form representing HTML of the widget
+2. [[https://github.com/bitspook/cl-ownpress/blob/04612381d1f0489cb472e8471619dc3435809c89/src/html/widget.lisp#L113][tagged-lass]]: a convenience function which make creating different variants of a widget's CSS a
+   little easy. For example, in above snippet there is normal list of lass blocks, and then there is
+   a similar list but after =:sm= keyword. Defined in [[https://github.com/bitspook/cl-ownpress/blob/04612381d1f0489cb472e8471619dc3435809c89/src/html/widget.lisp#L86][*lass-tags*]], =:sm= tells cl-ownpress to add
+   following styles in a media-query for small screens.
+
+We can use this widget directly to create an =html-page-artifact=, or we can use it in another
+widget. Since above is just a navigation bar, let's create another widget which uses it and renders
+our page.
+
+#+begin_src lisp
+  (clown:defwidget home-page-w (title css-file-artifact)
+    (clown:tagged-lass
+     `((.home
+        :display flex
+        :flex-direction column
+
+        (.main
+         :width 100%
+         :position relative
+         :padding 20rem)
+
+        (.header
+         :padding 1rem
+         :margin 1rem 0)
+
+        (.title :font-family "monospace"
+                :font-size 4rem
+                :padding-bottom 2rem
+                :border-bottom 1px solid "#222"))))
+    (:doctype)
+    (:html
+     (:head (:title title)
+            (:meta :name "viewport" :content "width=device-width, initial-scale=1")
+            (:link :rel "stylesheet" :href (clown:embed-artifact-as css-file-artifact 'clown:link)))
+     (:body
+      (clown:render 'navbar-w :links nil)
+      (:article.home
+       (:div
+        :class "main" (:h1 title))))))
+#+end_src
+
+Few things to note in this snippet.
+1. We added =css-file-artifact= as a slot of the widget. This symbol will receive the
+   [[https://github.com/bitspook/cl-ownpress/blob/04612381d1f0489cb472e8471619dc3435809c89/src/html/artifacts.lisp#L60][css-file-artifact]] needed to render this widget (injected by [[https://github.com/bitspook/cl-ownpress/blob/04612381d1f0489cb472e8471619dc3435809c89/src/html/artifacts.lisp#L24][make-html-page-artifact]] function
+   we'll use later). This artifact will contain *all* the css needed to render this widget and any
+   widgets rendered inside it.
+2. [[https://github.com/bitspook/cl-ownpress/blob/04612381d1f0489cb472e8471619dc3435809c89/src/artifact.lisp#L44][embed-artifact-as]]: method takes an =artifact=, and embed it in another artifact. In this case,
+   =css-file-artifact= will be embedded as a web-accessible =link= (result will be something like
+   =/css/home.css=).
+3. [[https://github.com/bitspook/cl-ownpress/blob/04612381d1f0489cb472e8471619dc3435809c89/src/html/widget.lisp#L59][render]]: is another convenience macro which renders a widget inside another widget. In this case,
+   it is rendering =navbar-w= widget in =home-page-w=.
+
+We can new use [[https://github.com/bitspook/cl-ownpress/blob/04612381d1f0489cb472e8471619dc3435809c89/src/html/artifacts.lisp#L24][make-html-page-artifact]] function to make an =html-page-artifact= we can publish.
+
+#+begin_src lisp
+  (defparameter *page* (clown:make-html-page-artifact
+                        :location "/index.html"
+                        :css-location "/css/home.css"
+                        :root-widget (make 'home-page-w
+                                           :title "Hello world!")))
+#+end_src
+
+=make-html-page-artifact= accept following keyword arguments:
+1. =location=: Is location relative to a hypothetical directory where we'll publish the artifact.
+   We'll provide it later.
+2. =css-location=: Similar to =location=, but determines where the css file corresponding to
+   published HTML file will be generated.
+3. =root-widget=: is the widget which will make the content of this page. CSS and HTML will be
+   provided by this widget.
+
+We are now ready to publish our html-page.
+
+#+begin_src lisp
+  (let ((clown:*already-published-artifacts* nil)
+        (www "/tmp/build"))
+    (clown:publish-artifact *page* www))
+#+end_src
+
+In above snippet:
+1. [[https://github.com/bitspook/cl-ownpress/blob/790c7d94829fce236a1ac3391a23045b2a9b6fd2/src/artifact.lisp#L63][*already-published-artifacts*]]: Since cl-ownpress builds and publishes a graph of =artifact=-s, it
+   uses this variable to resolve circular dependencies. As a user of the library, it is our
+   responsibility to set to this to =nil= when we are starting a new publish task.
+2. [[https://github.com/bitspook/cl-ownpress/blob/790c7d94829fce236a1ac3391a23045b2a9b6fd2/src/artifact.lisp#L49][publish-artifact]]: method decides how an artifact is actually published. e.g in case of
+   =html-page-artifact=, it is rendering =root-widget= to HTML and writing it as a file.
+
+We can now find the files published in =/tmp/build=. cl-ownpress don't yet have a dev-server, so
+we'll have to rely on external tools to browse the website we just published. e.g if you have
+=python3= present in your =$PATH=, you can execute following command:
+
+#+begin_src sh :tangle no
+  python3 -m http.server -d /tmp/build
+#+end_src
+
+cl-ownpress provide some more abstractions/utilities to make it easier to publish websites. For
+example there is [[https://github.com/bitspook/cl-ownpress/blob/790c7d94829fce236a1ac3391a23045b2a9b6fd2/src/artifact.lisp#L68][artifact-registry]] to make it easier to store (collected data which is already
+transformed into) publishable artifacts in a way which makes it easier to publish them in different
+ways. =artifact-registry= is a still in-progress abstraction which is being polished [[https://github.com/bitspook/bitspook.github.io/blob/491e8777835aa1f122a8562ac907d2e89044e2f7/src/registry.lisp#L4][as it is used
+to build bitspook.in]].
+
+** Collecting data
+
+In =Publishing a single-page website= section above we saw how cl-ownpress help creating publishable
+=artifact=-s. To publish data from source of our choice e.g from an org-mode file, we need to
+somehow obtain (extract) it and transform it to an =artifact=.
+
+We can obtain data however we want. cl-ownpress provide following abstractions to extract data:
+
+1. [[https://github.com/bitspook/cl-ownpress/blob/790c7d94829fce236a1ac3391a23045b2a9b6fd2/src/provider/emacs.lisp#L5][emacs-provider]]: allows extracting data from a running Emacs instance. It starts an HTTP server
+   and run an Elisp script in a running Emacs instance. This Elisp code then provide data to
+   cl-ownpress by posting to the HTTP endpoint.
+
+   It is quite low-level provider and you'll need to create your own Elisp code to generate data,
+   and data-structures to store that data. As an example, you can see how [[https://github.com/bitspook/bitspook.github.io/blob/491e8777835aa1f122a8562ac907d2e89044e2f7/in.bitspook.website.asd#L3][in.bitspook.website]] uses
+   =emacs-provider=:
+   1. [[https://github.com/bitspook/bitspook.github.io/blob/491e8777835aa1f122a8562ac907d2e89044e2f7/src/provider/org-file-provider.lisp#L3][org-file-provider]] extends =emacs-provider= to run [[https://github.com/bitspook/bitspook.github.io/blob/491e8777835aa1f122a8562ac907d2e89044e2f7/src/elisp/org-file.el#L1][an Elisp script]] to convert all org files
+      present in a given directory to [[https://github.com/bitspook/bitspook.github.io/blob/491e8777835aa1f122a8562ac907d2e89044e2f7/src/provider/org-file-provider.lisp#L20][org-file]] objects.
+   2. [[https://github.com/bitspook/bitspook.github.io/blob/491e8777835aa1f122a8562ac907d2e89044e2f7/src/provider/denote-provider.lisp#L3][denote-provider]] extends =org-file-provider= to run a slightly [[https://github.com/bitspook/bitspook.github.io/blob/491e8777835aa1f122a8562ac907d2e89044e2f7/src/elisp/denote.el#L1][different elisp script]]. It is
+      capable of providing [[https://github.com/protesilaos/denote][denotes]] with given tags and all its linked notes (since Denote builds a
+      knowledge graph). bitspook.in uses this to publish a subset of denotes (e.g all denotes with
+      tagged 'blog-post') as blog posts while not breaking any linked notes.
+   3. [[https://github.com/bitspook/bitspook.github.io/blob/491e8777835aa1f122a8562ac907d2e89044e2f7/src/provider/org-project-provider.lisp#L3][org-project-provider]] also extends =org-file-provider= to provide documentation for projects.
+      This [[https://github.com/bitspook/bitspook.github.io/blob/491e8777835aa1f122a8562ac907d2e89044e2f7/projects/spookfox.org?plain=1#L1][documentation is stored in an org-file]] and executes code using org-babel to generate code
+      docs for running elisp code.
+   4. [[https://github.com/bitspook/bitspook.github.io/blob/491e8777835aa1f122a8562ac907d2e89044e2f7/src/provider/journey.lisp#L3][journey-provider]] creates a new entity/section for bitspook.in representing a 'Journey'. A
+      Journey is a long term commitment with or without a clear end. It is in-progress, and aims to
+      show:
+      1. A journey author takes to go in a certain direction
+      2. Activity that contributes to this journey (think of Github activity graph)
+      3. A collection of notes taken during this journey (a journey notebook) which documents the
+         small steps.
+
+   All (or some of) these can and will be moved back to cl-ownpress, but for now this is all
+   cl-ownpress provides.
+
+** Future
+
+cl-ownpress evolves as I build more apps using it. Right now I am primarily buidling:
+
+1. [[https://github.com/bitspook/bitspook.github.io/blob/491e8777835aa1f122a8562ac907d2e89044e2f7/in.bitspook.website.asd#L3][in.bitspook.website]] (personal website)
+2. [[https://github.com/bitspook/vidhi/blob/3ec52b92600bf6a73e747d6e2ed02217dc54a67d/in.bitspook.vidhi.asd#L1][in.bitspook.vidhi]] (German learning app)
+
+Progress is slow because I work fulltime elsewhere, and get easily distracted. Due to this
+cl-ownpress moves in the direction of my whims. You are welcome to join me and help guide
+cl-ownpress in a direction we can choose together.
