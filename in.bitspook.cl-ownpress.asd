@@ -5,8 +5,8 @@
   :author "Charanjit Singh"
   :license "AGPL-3.0-only"
   :depends-on ("serapeum" "str"
-               "lass" "spinneret" "cl-slug"
-               "flexi-streams" "clack" "yason" "md5")
+                          "lass" "spinneret" "cl-slug"
+                          "flexi-streams" "clack" "yason" "md5")
   :components ((:module "src"
                 :serial nil
                 :components
@@ -16,8 +16,6 @@
                  (:file "static")
 
                  (:file "artifact")
-                 (:file "html/widget")
-
                  (:file "html/artifacts")
 
                  (:file "provider")
@@ -36,7 +34,6 @@
                (:module "src"
                 :components
                 ((:file "artifact.test")
-                 (:file "static.test")
-                 (:file "html/widget.test"))))
+                 (:file "static.test"))))
   :description "Test system for cl-ownpress"
   :perform (test-op (op c) (symbol-call :parachute :test :in.bitspook.cl-ownpress/tests)))
