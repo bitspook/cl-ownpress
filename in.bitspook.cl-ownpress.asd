@@ -4,9 +4,10 @@
   :version "0.1.0"
   :author "Charanjit Singh"
   :license "AGPL-3.0-only"
-  :depends-on ("serapeum" "str"
-                          "lass" "spinneret" "cl-slug"
-                          "flexi-streams" "clack" "yason" "md5")
+  :depends-on ("serapeum"
+               "str" "in.bitspook.web-components"
+               "lass" "spinneret" "cl-slug"
+               "flexi-streams" "clack" "yason" "md5")
   :components ((:module "src"
                 :serial nil
                 :components

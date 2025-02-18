@@ -30,19 +30,19 @@ as you want. One of the primary abstractions is an [[https://github.com/bitspook
 other artifacts) that get published as files. In case of a website we primarily want to publish html
 files, so we'll have to create an [[https://github.com/bitspook/cl-ownpress/blob/04612381d1f0489cb472e8471619dc3435809c89/src/html/artifacts.lisp#L19][html-page-artifact]].
 
-But an =html-page-artifact= has a =:root-widget= slot. Which means we need to deal with another
-abstraction provided by cl-ownpress: a [[https://github.com/bitspook/cl-ownpress/blob/04612381d1f0489cb472e8471619dc3435809c89/src/html/widget.lisp#L4][widget]]. We can think of widget as a react/web component (if
+But an =html-page-artifact= has a =:root-component= slot. Which means we need to deal with another
+abstraction provided by cl-ownpress: a [[https://github.com/bitspook/cl-ownpress/blob/04612381d1f0489cb472e8471619dc3435809c89/src/html/component.lisp#L4][component]]. We can think of component as a react/web component (if
 you're familiar with the concept), or simply as a fragment of an HTML page. An HTML page itself is
-also a widget.
+also a component.
 
 /Note/: There is a more powerful abstraction with similar name and purpose in [[https://40ants.com/reblocks/widgets/#x-28REBLOCKS-2FDOC-2FWIDGETS-3A-3A-40WIDGETS-2040ANTS-DOC-2FLOCATIVES-3ASECTION-29][reblocks.]] Sadly it is
 not compatible with cl-ownpress out of the box.
 
-A single =widget= represents both CSS and HTML required to display a HTML page fragment. Let's
-create a few widgets.
+A single =component= represents both CSS and HTML required to display a HTML page fragment. Let's
+create a few components.
 
 #+begin_src lisp
-  (clown:defwidget navbar-w (links)
+  (clown:defcomponent navbar-w (links)
     (clown:tagged-lass
      `((.top-nav
         :min-height (var --size-16)
@@ -92,22 +92,22 @@ create a few widgets.
 #+end_src
 
 This snippet uses a few utilities provided by cl-ownpress:
-1. [[https://github.com/bitspook/cl-ownpress/blob/04612381d1f0489cb472e8471619dc3435809c89/src/html/widget.lisp#L36][defwidget]]: a convenience macro to create a new widget.
-   - =navbar-w= is the name of our new widget.
-   - =linkes= is slots of =navbar-w= (since a =widget= is a class)
-   - Next argument is a list of [[https://shinmera.github.io/LASS/][lass]] blocks which make up CSS of this widget
-   - Finally there is [[https://github.com/ruricolist/spinneret][spinneret]] form representing HTML of the widget
-2. [[https://github.com/bitspook/cl-ownpress/blob/04612381d1f0489cb472e8471619dc3435809c89/src/html/widget.lisp#L113][tagged-lass]]: a convenience function which make creating different variants of a widget's CSS a
+1. [[https://github.com/bitspook/cl-ownpress/blob/04612381d1f0489cb472e8471619dc3435809c89/src/html/widget.lisp#L36][defcomponent]]: a convenience macro to create a new component.
+   - =navbar-w= is the name of our new component.
+   - =linkes= is slots of =navbar-w= (since a =component= is a class)
+   - Next argument is a list of [[https://shinmera.github.io/LASS/][lass]] blocks which make up CSS of this component
+   - Finally there is [[https://github.com/ruricolist/spinneret][spinneret]] form representing HTML of the component
+2. [[https://github.com/bitspook/cl-ownpress/blob/04612381d1f0489cb472e8471619dc3435809c89/src/html/widget.lisp#L113][tagged-lass]]: a convenience function which make creating different variants of a component's CSS a
    little easy. For example, in above snippet there is normal list of lass blocks, and then there is
    a similar list but after =:sm= keyword. Defined in [[https://github.com/bitspook/cl-ownpress/blob/04612381d1f0489cb472e8471619dc3435809c89/src/html/widget.lisp#L86][*lass-tags*]], =:sm= tells cl-ownpress to add
    following styles in a media-query for small screens.
 
-We can use this widget directly to create an =html-page-artifact=, or we can use it in another
-widget. Since above is just a navigation bar, let's create another widget which uses it and renders
+We can use this component directly to create an =html-page-artifact=, or we can use it in another
+component. Since above is just a navigation bar, let's create another component which uses it and renders
 our page.
 
 #+begin_src lisp
-  (clown:defwidget home-page-w (title css-file-artifact)
+  (clown:defcomponent home-page-w (title css-file-artifact)
     (clown:tagged-lass
      `((.home
         :display flex
@@ -139,15 +139,15 @@ our page.
 #+end_src
 
 Few things to note in this snippet.
-1. We added =css-file-artifact= as a slot of the widget. This symbol will receive the
-   [[https://github.com/bitspook/cl-ownpress/blob/04612381d1f0489cb472e8471619dc3435809c89/src/html/artifacts.lisp#L60][css-file-artifact]] needed to render this widget (injected by [[https://github.com/bitspook/cl-ownpress/blob/04612381d1f0489cb472e8471619dc3435809c89/src/html/artifacts.lisp#L24][make-html-page-artifact]] function
-   we'll use later). This artifact will contain *all* the css needed to render this widget and any
-   widgets rendered inside it.
+1. We added =css-file-artifact= as a slot of the component. This symbol will receive the
+   [[https://github.com/bitspook/cl-ownpress/blob/04612381d1f0489cb472e8471619dc3435809c89/src/html/artifacts.lisp#L60][css-file-artifact]] needed to render this component (injected by [[https://github.com/bitspook/cl-ownpress/blob/04612381d1f0489cb472e8471619dc3435809c89/src/html/artifacts.lisp#L24][make-html-page-artifact]] function
+   we'll use later). This artifact will contain *all* the css needed to render this component and any
+   components rendered inside it.
 2. [[https://github.com/bitspook/cl-ownpress/blob/04612381d1f0489cb472e8471619dc3435809c89/src/artifact.lisp#L44][embed-artifact-as]]: method takes an =artifact=, and embed it in another artifact. In this case,
    =css-file-artifact= will be embedded as a web-accessible =link= (result will be something like
    =/css/home.css=).
-3. [[https://github.com/bitspook/cl-ownpress/blob/04612381d1f0489cb472e8471619dc3435809c89/src/html/widget.lisp#L59][render]]: is another convenience macro which renders a widget inside another widget. In this case,
-   it is rendering =navbar-w= widget in =home-page-w=.
+3. [[https://github.com/bitspook/cl-ownpress/blob/04612381d1f0489cb472e8471619dc3435809c89/src/html/widget.lisp#L59][render]]: is another convenience macro which renders a component inside another component. In this case,
+   it is rendering =navbar-w= component in =home-page-w=.
 
 We can new use [[https://github.com/bitspook/cl-ownpress/blob/04612381d1f0489cb472e8471619dc3435809c89/src/html/artifacts.lisp#L24][make-html-page-artifact]] function to make an =html-page-artifact= we can publish.
 
@@ -155,7 +155,7 @@ We can new use [[https://github.com/bitspook/cl-ownpress/blob/04612381d1f0489cb4
   (defparameter *page* (clown:make-html-page-artifact
                         :location "/index.html"
                         :css-location "/css/home.css"
-                        :root-widget (make 'home-page-w
+                        :root-component (make 'home-page-w
                                            :title "Hello world!")))
 #+end_src
 
@@ -164,8 +164,8 @@ We can new use [[https://github.com/bitspook/cl-ownpress/blob/04612381d1f0489cb4
    We'll provide it later.
 2. =css-location=: Similar to =location=, but determines where the css file corresponding to
    published HTML file will be generated.
-3. =root-widget=: is the widget which will make the content of this page. CSS and HTML will be
-   provided by this widget.
+3. =root-component=: is the component which will make the content of this page. CSS and HTML will be
+   provided by this component.
 
 We are now ready to publish our html-page.
 
@@ -180,7 +180,7 @@ In above snippet:
    uses this variable to resolve circular dependencies. As a user of the library, it is our
    responsibility to set to this to =nil= when we are starting a new publish task.
 2. [[https://github.com/bitspook/cl-ownpress/blob/790c7d94829fce236a1ac3391a23045b2a9b6fd2/src/artifact.lisp#L49][publish-artifact]]: method decides how an artifact is actually published. e.g in case of
-   =html-page-artifact=, it is rendering =root-widget= to HTML and writing it as a file.
+   =html-page-artifact=, it is rendering =root-component= to HTML and writing it as a file.
 
 We can now find the files published in =/tmp/build=. cl-ownpress don't yet have a dev-server, so
 we'll have to rely on external tools to browse the website we just published. e.g if you have

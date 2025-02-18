@@ -1,5 +1,5 @@
 (defpackage in.bitspook.cl-ownpress
-  (:use :cl :serapeum/bundle)
+  (:use :cl :serapeum/bundle :in.bitspook.web-components)
   (:import-from :md5 :md5sum-string :md5sum-file)
   (:import-from :spinneret :with-html-string :with-html)
   (:export

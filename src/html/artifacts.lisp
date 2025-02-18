@@ -18,23 +18,23 @@
 (export-always 'html-page-artifact)
 (defclass html-page-artifact (artifact)
   ((location :initarg :location :accessor artifact-location)
-   (root-widget :initarg :root-widget)))
+   (root-component :initarg :root-component)))
 
 (export-always 'make-html-page-artifact)
-(defun make-html-page-artifact (&key location root-widget css-location (id nil))
+(defun make-html-page-artifact (&key location root-component css-location (id nil))
   (let ((css-art (make 'css-file-artifact
                        :location css-location
-                       :root-widget root-widget)))
-    (when (slot-exists-p root-widget 'css-file-artifact)
-      (setf (slot-value root-widget 'css-file-artifact) css-art))
+                       :root-component root-component)))
+    (when (slot-exists-p root-component 'css-file-artifact)
+      (setf (slot-value root-component 'css-file-artifact) css-art))
     (make 'html-page-artifact
           :id id
           :location location
-          :root-widget root-widget
+          :root-component root-component
           :deps (list css-art))))
 
 (defmethod artifact-content ((art html-page-artifact))
-  (with-html-string (render (slot-value art 'root-widget))))
+  (with-html-string (render (slot-value art 'root-component))))
 
 (defmethod publish-artifact ((art html-page-artifact) dest-dir)
   (when (find (artifact-location art) *already-published-artifacts*)
@@ -46,10 +46,10 @@
     (dolist (dep (artifact-deps art))
       (publish-artifact dep dest-dir))
 
-    (let* ((root-w-deps (all-deps (slot-value art 'root-widget)))
-           ;; There is no publishing widgets; they get published as html content
-           (non-widget-deps (remove-if #'widgetp root-w-deps)))
-      (mapcar (op (publish-artifact _ dest-dir)) non-widget-deps))
+    (let* ((root-w-deps (all-deps (slot-value art 'root-component)))
+           ;; There is no publishing components; they get published as html content
+           (non-component-deps (remove-if #'componentp root-w-deps)))
+      (mapcar (op (publish-artifact _ dest-dir)) non-component-deps))
 
     (publish-static
      :dest-dir dest-dir
@@ -61,12 +61,12 @@
   ((location :initarg :location
              :initform (error "css-file-artifact's :location is required")
              :accessor artifact-location)
-   (root-widget :initarg :root-widget)))
+   (root-component :initarg :root-component)))
 
 (defmethod artifact-content ((art css-file-artifact))
-  (with-slots (root-widget) art
-    (with-html-string (render root-widget))
-    (rendered-css root-widget)))
+  (with-slots (root-component) art
+    (with-html-string (render root-component))
+    (rendered-css root-component)))
 
 (defmethod publish-artifact ((art css-file-artifact) dest-dir)
   (when (find (artifact-location art) *already-published-artifacts*)
@@ -124,7 +124,7 @@
                               :for format := (pathname-type file)
                               :collect (format
                                         nil "url('~a') format('~a')"
-                                        (base-path-join *base-url* (artifact-location art)) format)))
+                                        (str:concat *base-url* (namestring (artifact-location art))) format)))
                  :font-weight ,weight
                  :font-stype ,style)))
 
