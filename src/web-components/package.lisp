@@ -1,11 +1,24 @@
 (defpackage in.bitspook.web-components
   (:use :cl :serapeum/bundle)
   (:import-from :spinneret :with-html-string :with-html)
-  (:import-from :lass :compile-sheet :write-sheet))
+  (:import-from :lass :compile-sheet :write-sheet)
+  (:export
+   ;; component
+   #:component
+   #:dom-of
+   #:lass-of
+   #:css-of
+   #:defcomponent
+   ;; rendering
+   #:*self*
+   #:render
+   #:rendered-css
+   ;; lass conveniences
+   #:*lass-tags*
+   #:tagged-lass))
 
 (in-package #:in.bitspook.web-components)
 
-(export-always 'component)
 (defclass component ()
   ((dependencies :initform nil
                  :documentation "List of dependency components. Used to decide final CSS."))
@@ -26,17 +39,14 @@ macro to create a new component."))
 (defun componentp (w)
   (subtypep (type-of w) 'component))
 
-(export-always 'dom-of)
 (defgeneric dom-of (component)
   (:documentation "Provide spinneret DOM for the COMPONENT.")
   (:method ((component component)) nil))
 
-(export-always 'lass-of)
 (defgeneric lass-of (component)
   (:documentation "Provide a list of lass blocks for COMPONENT")
   (:method ((component component)) nil))
 
-(export-always 'css-of)
 (defgeneric css-of (component)
   (:documentation "Return css string for COMPONENT. Uses LASS-OF internally.")
   (:method ((component component))
@@ -44,12 +54,10 @@ macro to create a new component."))
       (write-sheet
        (apply #'compile-sheet (lass-of component))))))
 
-(export-always '*self*)
 (defvar *self* nil
-  "*self* is a hack. Its purpose is to identify the current component being built in `defcomponent'.
+  "*self* is a hack. Its purpose is to identify the current component being rendered in `defcomponent'.
 You can use `render' in `defcomponent' and never need *SELF*.")
 
-(export-always 'defcomponent)
 (defmacro defcomponent (name args lass &body dom)
   "Create a component (instance of `component') named NAME.
 ARGS is the arguments received by `dom-of' and `lass-of' functions.
@@ -72,7 +80,6 @@ ARGS is the arguments received by `dom-of' and `lass-of' functions.
 
      ',name))
 
-(export-always 'render)
 (defmacro render (component &rest args)
   "A convenient macro to provide single API to consume a COMPONENT.
 Enable consuming COMPONENT in following ways:
@@ -87,7 +94,6 @@ Enable consuming COMPONENT in following ways:
        (when *self* (add-dependency *self* ,instance))
        (dom-of ,instance))))
 
-(export-always 'rendered-css)
 (defun rendered-css (component)
   "Return CSS rendered for COMPONENT.
 Make sure component has been `render'ed. A COMPONENT's dependencies are resolved when it is `render'ed."
@@ -99,7 +105,6 @@ Make sure component has been `render'ed. A COMPONENT's dependencies are resolved
     (str:join (if *print-pretty* #\NewLine "") unique-css-fragments)))
 
 
-(export-always '*lass-tags*)
 (defparameter *lass-tags*
   '((:sm "(min-width: 640px)" :media-query)
     (:md "(min-width: 768px)" :media-query)
@@ -126,7 +131,6 @@ specialized lass using MOBILE-FIRST-LASS.")
                       `((:media ,m-queries ,@l2-lass)))))
     (car l1-lass)))
 
-(export-always 'tagged-lass)
 (defun tagged-lass (&rest styles)
   "Ergonomically add Lass for different cases based on *LASS-TAGS*."
   (let ((lass nil)
